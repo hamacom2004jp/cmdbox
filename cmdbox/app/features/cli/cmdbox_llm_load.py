@@ -55,6 +55,9 @@ class LLMLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                             + "}",
                     description_ja="読み込むLLM設定の名前を指定します。",
                     description_en="Specify the name of the LLM configuration to load."),
+                dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="mask",
+                    description_ja="このユーザーグループでLLM設定を利用するように指定します。",
+                    description_en="Specify user groups used to authorize access to the LLM configuration."),
             ]
         )
 
@@ -62,7 +65,7 @@ class LLMLoad(feature.OneshotResultEdgeFeature, validator.Validator):
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
-        payload = dict(llmname=args.llmname)
+        payload = dict(llmname=args.llmname, groups=args.groups if hasattr(args, 'groups') else None)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -90,6 +93,9 @@ class LLMLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             llmtemperature: Union[float, None] = pydantic.Field(default=None, description="LLM温度パラメータ")
             llmsvaccountfile_data: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="LLMサービスアカウントファイルデータ")
             llmpriority: Union[int, None] = pydantic.Field(default=None, description="LLM優先度")
+            groups: Union[List[str], None] = pydantic.Field(default=None, description="LLMに関連付けられたグループ")
+            owner_groups: Union[List[str], None] = pydantic.Field(default=None, description="保存(edit/del)を許可するグループ")
+            user_groups: Union[List[str], None] = pydantic.Field(default=None, description="使用(list/load)を許可するグループ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -114,6 +120,12 @@ class LLMLoad(feature.OneshotResultEdgeFeature, validator.Validator):
 
             llmname = payload.get('llmname')
             configure = self.load(data_dir, llmname)
+            groups = payload.get('groups')
+            # リクエスト元のグループが許可されていない場合は警告を返す
+            if groups and not self.is_allowed_by_groups(groups, configure.get('user_groups'), redis_cli):
+                msg = dict(warn=f"You do not have permission to use LLM configuration '{llmname}'.")
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
 
             msg = dict(success=configure)
             redis_cli.rpush(reskey, msg)

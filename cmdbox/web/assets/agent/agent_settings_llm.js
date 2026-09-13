@@ -1,7 +1,8 @@
 agentView.get_llm_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('llm', 'save');
     const vform_names = ['llmname', 'llmprov', 'llmtype', 'llmapikey', 'llmendpoint', 'llmmodel', 'llmapiversion',
-                        'llmprojectid', 'llmsvaccountfile', 'llmlocation', 'llmtemperature', 'llmseed', 'llmpriority'];
+                        'llmprojectid', 'llmsvaccountfile', 'llmlocation', 'llmtemperature', 'llmseed', 'llmpriority',
+                        'owner_groups', 'user_groups'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -29,6 +30,20 @@ agentView.list_llm = async () => {
             $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#llm_edit_modal'));
             $('#llm_edit_modal').modal('show');
+            // owner_groupsリストをロード
+            await cmdbox.callcmd('web','group_list',{},(res)=>{
+                const val = $("[name='owner_groups']").val();
+                $("[name='owner_groups']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="owner_groups"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                $("[name='owner_groups']").val(val);
+            },$('[name="title"]').val(),'owner_groups');
+            // user_groupsリストをロード
+            await cmdbox.callcmd('web','group_list',{},(res)=>{
+                const val = $("[name='user_groups']").val();
+                $("[name='user_groups']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="user_groups"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                $("[name='user_groups']").val(val);
+            },$('[name="title"]').val(),'user_groups');
         } finally {
             cmdbox.hide_loading();
         }
@@ -115,6 +130,18 @@ agentView.list_llm = async () => {
                     $('[name="save_mode"]').val('update');
                     cmdbox.process_i18n($('#llm_edit_modal'));
                     $('#llm_edit_modal').modal('show');
+                    // owner_groupsリストをロード
+                    await cmdbox.callcmd('web','group_list',{},(res)=>{
+                        $("[name='owner_groups']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="owner_groups"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        $("[name='owner_groups']").val(config.owner_groups);
+                    },$('[name="title"]').val(),'owner_groups');
+                    // user_groupsリストをロード
+                    await cmdbox.callcmd('web','group_list',{},(res)=>{
+                        $("[name='user_groups']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="user_groups"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        $("[name='user_groups']").val(config.user_groups);
+                    },$('[name="title"]').val(),'user_groups');
                 } finally {
                     cmdbox.hide_loading();
                 }
@@ -141,9 +168,24 @@ agentView.list_llm = async () => {
 agentView.save_llm = async () => {
     const form = $('#form_llm_edit');
     const data = {save_mode: $('[name="save_mode"]').val()};
+    const multiMap = {};
     form.serializeArray().forEach(item => {
-        if (item.value) data[item.name] = item.value;
+        if (multiMap[item.name]) {
+            if (!Array.isArray(multiMap[item.name])) {
+                multiMap[item.name] = [multiMap[item.name]];
+            }
+            multiMap[item.name].push(item.value);
+        } else {
+            multiMap[item.name] = item.value;
+        }
     });
+    if (multiMap['owner_groups'] && !Array.isArray(multiMap['owner_groups'])) {
+        multiMap['owner_groups'] = [multiMap['owner_groups']];
+    }
+    if (multiMap['user_groups'] && !Array.isArray(multiMap['user_groups'])) {
+        multiMap['user_groups'] = [multiMap['user_groups']];
+    }
+    Object.assign(data, multiMap);
 
     try {
         const res = await agentView.exec_cmd('llm', 'save', data);

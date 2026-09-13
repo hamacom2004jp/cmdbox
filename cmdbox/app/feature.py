@@ -9,6 +9,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import os
+import json
 import queue
 
 
@@ -190,6 +191,52 @@ class Feature(object):
         if 'save_mode' in configure:
             del configure['save_mode']
         return ret, msg
+
+    def is_allowed_by_groups(self, request_groups:List[str], allowed_groups:Any, redis_cli:redis_client.RedisClient) -> bool:
+        """
+        リクエストユーザーが許可グループに含まれるか判定します。
+
+        Args:
+            request_groups (List[str]): リクエストユーザーの所属グループ
+            allowed_groups (Any): 許可グループ（None/str/list[str] を許容）
+            redis_cli (redis_client.RedisClient): Redisクライアント
+
+        Returns:
+            bool: 許可される場合はTrue
+        """
+        if allowed_groups is None:
+            return True
+        if isinstance(allowed_groups, str):
+            allowed_groups = [allowed_groups]
+        if not isinstance(allowed_groups, list):
+            return True
+        normalized_allowed = [g for g in allowed_groups if isinstance(g, str) and g]
+        if len(normalized_allowed) == 0:
+            return True # 許可グループが空の場合は全てのリクエストを許可
+        if request_groups is None:
+            request_groups = []
+        if isinstance(request_groups, str):
+            request_groups = [request_groups]
+        if not isinstance(request_groups, list):
+            request_groups = []
+
+        def _parent_group(signin_file_data, request_groups, master_groups):
+            gns = []
+            for gn in request_groups.copy():
+                new_request_groups = [gr['parent'] for gr in master_groups if 'parent' in gr and gr['name']==gn]
+                gns += _parent_group(signin_file_data, new_request_groups, master_groups)
+            return request_groups + gns
+        try:
+            json_str = redis_cli.hget(redis_cli.memname, "signin_file_data")
+            signin_file_data = json.loads(json_str)
+            request_groups = _parent_group(signin_file_data, request_groups, signin_file_data['groups'])
+        except Exception as e:
+            self.logger.error(f"Failed to load signin_file_data from redis. data={json_str}, error={e}")
+            raise ValueError(f"Failed to load signin_file_data from redis. data={json_str}, error={e}")
+        normalized_request = [g for g in request_groups if isinstance(g, str) and g]
+        if len(normalized_request) == 0:
+            return False
+        return len(set(normalized_request).intersection(set(normalized_allowed))) > 0
 
 class OneshotEdgeFeature(Feature):
     """

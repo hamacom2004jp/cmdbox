@@ -1,5 +1,6 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
+from cmdbox.app.features.cli import cmdbox_llm_list
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -10,6 +11,10 @@ import pydantic
 
 
 class LLMEmbed(feature.OneshotResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
+    def __init__(self, appcls, ver, language = None):
+        super().__init__(appcls, ver, language)
+        self.llm_list = cmdbox_llm_list.LLMList(appcls, ver, language)
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'llm'
 
@@ -43,7 +48,7 @@ class LLMEmbed(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Li
                 dict(opt="timeout", type=Options.T_INT, default="600", required=False, multi=False, hide=True, choice=None,
                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                     description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="llmname", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                dict(opt="llmname", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
                     callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
                             + "const val = $(\"[name='llmname']\").val();"
                             + "$(\"[name='llmname']\").empty().append('<option></option>');"
@@ -51,11 +56,14 @@ class LLMEmbed(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Li
                             + "$(\"[name='llmname']\").val(val);"
                             + "},$(\"[name='title']\").val(),'llmname');"
                             + "}",
-                    description_ja="読み込むLLM設定の名前を指定します。",
-                    description_en="Specify the name of the LLM configuration to load."),
+                    description_ja="使用するLLM設定の名前を指定します。省略した場合はLLM設定の優先度が一番高いものが自動的に選択されます。",
+                    description_en="Specify the name of the LLM configuration to use. If omitted, the LLM configuration with the highest priority is automatically selected."),
                 dict(opt="input_text", type=Options.T_TEXT, default=None, required=True, multi=True, hide=False, choice=None,
                     description_ja="エンベディングするテキストを指定します。複数指定可能です。",
                     description_en="Specify the text to embed. Multiple values can be specified."),
+                dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="mask",
+                     description_ja="このユーザーグループでチャットを行うように指定します。",
+                     description_en="Specify user groups used to authorize chat operations."),
             ]
         )
 
@@ -63,7 +71,7 @@ class LLMEmbed(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Li
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
-        payload = dict(llmname=args.llmname, input_text=args.input_text,)
+        payload = dict(llmname=args.llmname, input_text=args.input_text, groups=args.groups)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -100,10 +108,30 @@ class LLMEmbed(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Li
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
             llmname = payload.get('llmname')
+            groups = payload.get('groups')
+            if llmname:
+                data = [dict(name=llmname, priority=0, type='embedding')]
+            else:
+                data = self.llm_list.get_llmlist("", data_dir, redis_cli, groups=groups)
+            if not data:
+                redis_cli.rpush(reskey, dict(warn=f"No LLM configurations were available."))
+                return self.RESP_WARN
+            # 優先度の高いものから順に試す
+            for llm in data:
+                if llm.get('type', None) != 'embedding': continue
+                name = llm.get('name')
+                try:
+                    st, msg = self.embed(data_dir, logger, name, input_text=payload.get('input_text', []),)
+                    if st == self.RESP_SUCCESS:
+                        redis_cli.rpush(reskey, msg)
+                        return st
+                except Exception as e:
+                    logger.warning(f"Failed to embed using LLM '{name}': {e}. Trying next LLM if available.")
+                    continue
 
-            st, msg = self.embed(data_dir, logger, llmname, input_text=payload.get('input_text', []),)
+            msg = dict(warn=f"Either no LLMs are available, or processing failed for all LLMs.")
             redis_cli.rpush(reskey, msg)
-            return st
+            return self.RESP_WARN
 
         except Exception as e:
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
@@ -203,6 +231,20 @@ class LLMEmbed(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Li
                 model=llmmodel,
                 input=input_text,
                 api_base=llmendpoint,
+            )
+            res = [dict(index=item.get("index"), embedding=item.get("embedding")) for item in response.get("data", [])]
+        elif llmprov == 'proxy':
+            llmmodel = configure.get('llmmodel', None)
+            llmapikey = configure.get('llmapikey', None)
+            llmendpoint = configure.get('llmendpoint', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            response = litellm.embedding(
+                model=f"litellm_proxy/{llmmodel}",
+                input=input_text,
+                api_base=llmendpoint,
+                api_key=llmapikey,
             )
             res = [dict(index=item.get("index"), embedding=item.get("embedding")) for item in response.get("data", [])]
         else:

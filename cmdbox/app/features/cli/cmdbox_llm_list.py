@@ -46,13 +46,16 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja=f"検索したい名前を指定します。中間マッチで検索します。",
                     description_en=f"Specify the name you want to search for. Searches for partial matches."),
+                dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="mask",
+                    description_ja="このユーザーグループで利用可能なLLM設定のみ返すように指定します。",
+                    description_en="Specify to return only LLM configurations available to this user group."),
             ]
         )
 
-    @cache.apprun_cache(exclude_fn=lambda args: hasattr(args,'kwd') and args.kwd)
+    @cache.apprun_cache(exclude_fn=lambda args: hasattr(args,'kwd') and args.kwd and hasattr(args,'groups') and args.groups)
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        payload = dict(kwd=args.kwd)
+        payload = dict(kwd=args.kwd, groups=args.groups if hasattr(args, 'groups') else None)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -93,7 +96,8 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
             kwd = payload.get('kwd')
-            data = self.get_llmlist(kwd, data_dir)
+            groups = payload.get('groups')
+            data = self.get_llmlist(kwd, data_dir, redis_cli, groups)
             msg = dict(success=dict(data=data))
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
@@ -104,19 +108,23 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
 
-    def get_llmlist(self, kwd:str, data_dir:Path) -> List[Dict[str, Any]]:
+    def get_llmlist(self, kwd:str, data_dir:Path, redis_cli:redis_client.RedisClient, groups:List[str]=None) -> List[Dict[str, Any]]:
         """
         保存されているLLM設定のリストを取得します。
 
         Args:
             kwd (str): 検索キーワード
             data_dir (Path): データディレクトリのパス
+            redis_cli (redis_client.RedisClient): Redisクライアントのインスタンス
+            groups (List[str], optional): リクエスト元のユーザーグループのリスト。指定された場合、許可されているグループに含まれる設定のみを返します。
 
         Returns:
             List[Dict[str, Any]]: LLM設定のリスト
         """
         if kwd is None or kwd == '':
             kwd = '*'
+        if groups is None:
+            groups = []
         agent_dir = data_dir / '.agent'
         results: List[Dict[str, Any]] = []
         if agent_dir.exists() and agent_dir.is_dir():
@@ -126,6 +134,9 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
                 if not name.startswith('llm-') or not name.endswith('.json'):
                     continue
                 configure = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=False)
+                # グループが指定されている場合、許可されていない設定はスキップ
+                if groups and not self.is_allowed_by_groups(groups, configure.get('user_groups'), redis_cli):
+                    continue
                 priority = configure.get('llmpriority', 9999)
                 llmtype = configure.get('llmtype', 'chat')
                 results.append(dict(name=name[4:-5], path=str(p),

@@ -71,6 +71,9 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
                 dict(opt="nosave", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                     description_ja="翻訳結果を保存しない場合は指定します。",
                     description_en="Specify if the translation result should not be saved."),
+                dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="mask",
+                     description_ja="このユーザーグループで翻訳を行うように指定します。",
+                     description_en="Specify user groups used to authorize translation operations."),
             ]
         )
 
@@ -95,6 +98,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             words=words,
             target_lang=args.target_lang,
             nosave=args.nosave,
+            groups=args.groups if hasattr(args, 'groups') else None,
         )
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -132,12 +136,17 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             words = payload.get('words', [])
             target_lang = payload.get('target_lang', 'en_US')
             nosave = payload.get('nosave', False)
-
-            data = [] if not llmname else [dict(llmname=llmname, priority=0, type='chat')]
-            data = data + self.llm_list.get_llmlist("", data_dir)
+            groups = payload.get('groups', None)
+            if llmname:
+                data = [dict(name=llmname, priority=0, type='chat')]
+            else:
+                data = self.llm_list.get_llmlist("", data_dir, redis_cli, groups=groups)
+            if not data:
+                redis_cli.rpush(reskey, dict(warn=f"No LLM configurations were available."))
+                return self.RESP_WARN
             # 優先度の高いものから順に試す
             for llm in data:
-                if llm.get('type', 'chat') != 'chat': continue
+                if llm.get('type', None) != 'chat': continue
                 name = llm.get('name')
                 try:
                     st, result = self.translate(data_dir, logger, name, words, target_lang, nosave=nosave)
@@ -150,9 +159,6 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             # すべてのLLMで翻訳できなかった場合は、元の単語を返す
             redis_cli.rpush(reskey, dict(success=dict(data={w: w for w in words})))
             return self.RESP_SUCCESS
-
-            redis_cli.rpush(reskey, dict(warn=f"{self.get_mode()}_{self.get_cmd()}: No available LLM could translate the words."))
-            return st
 
         except Exception as e:
             result = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")

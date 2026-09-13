@@ -25,7 +25,8 @@
                 "Python: cmdbox server2",
                 "Python: cmdbox web",
                 "Python: cmdbox mcpsv",
-                "Python: cmdbox a2asv"
+                "Python: cmdbox a2asv",
+                "Python: cmdbox chat_proxy"
             ]
         }
     ],
@@ -121,6 +122,29 @@
             "consoleTitle": "cmdbox setup",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
-        }
+        },
+        {
+            "name": "Python: cmdbox llm_proxy_start",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","llm","-c","proxy_start", "--debug", "--data", "./.client_data", "--proxy_apikey", "sk-ABCD1234",
+                     "--llm", "azure_openai", "--llm", "gpt-5-mini"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "consoleTitle": "cmdbox llm_proxy_start",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: cmdbox llm_proxy_stop",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","llm","-c","proxy_stop", "--debug", "--data", "./.client_data"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "consoleTitle": "cmdbox llm_proxy_stop",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
     ]
 }

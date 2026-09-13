@@ -217,6 +217,8 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
             msg = dict(warn="Please specify --a2asv_apikey or enable --a2asv_delegated_auth")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+        if hasattr(args, 'llm') and isinstance(args.llm, list) and len(args.llm) > 0:
+            args.llm = args.llm[0]
 
         configure = dict(
             agent_name=args.agent_name,

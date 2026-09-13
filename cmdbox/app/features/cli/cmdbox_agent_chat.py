@@ -561,6 +561,30 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 output_schema=self.create_agent_output_schema(),
                 before_model_callback=self.create_agent_before_model_callback(llm_conf),
             )
+        elif llmprov == 'proxy':
+            llmmodel = llm_conf.get('llmmodel', None)
+            llmapikey = llm_conf.get('llmapikey', None)
+            llmendpoint = llm_conf.get('llmendpoint', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            tools = self.create_agent_tools(logger, data_dir, agent_conf, mcpsv_confs, payload)
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=f"litellm_proxy/{llmmodel}",
+                    api_base=llmendpoint,
+                    api_key=llmapikey,
+                    stream=True,
+                ),
+                description=description,
+                instruction=instruction,
+                planner=planner,
+                tools=tools,
+                sub_agents=subagents,
+                output_schema=self.create_agent_output_schema(),
+                before_model_callback=self.create_agent_before_model_callback(llm_conf),
+            )
         elif disable_remote_agent:
             return None
         else:
@@ -615,6 +639,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             ))
         elif llmprov == 'ollama':
             return PlanReActPlanner()
+        elif llmprov == 'proxy':
+            return None
         elif llmprov == 'custom':
             return None
         else:

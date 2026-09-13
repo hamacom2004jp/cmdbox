@@ -47,13 +47,16 @@ class LLMDel(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="llmname", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="削除するLLM設定の名前を指定します。",
                      description_en="Specify the name of the LLM configuration to delete."),
+                dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="mask",
+                     description_ja="このユーザーグループでLLM設定の削除を行うように指定します。",
+                     description_en="Specify user groups used to authorize LLM configuration deletion."),
             ]
         )
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
-        payload = dict(llmname=args.llmname)
+        payload = dict(llmname=args.llmname, groups=args.groups if hasattr(args, 'groups') else None)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -84,6 +87,13 @@ class LLMDel(feature.OneshotResultEdgeFeature, validator.Validator):
             configure_path = data_dir / ".agent" / f"llm-{llmname}.json"
             if not configure_path.exists():
                 msg = dict(warn=f"Specified LLM configuration '{llmname}' not found on server at '{str(configure_path)}'.")
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+
+            configure = common.load_file(configure_path, lambda f: json.load(f), encoding='utf-8', nolock=False)
+            request_groups = payload.get('groups')
+            if not self.is_allowed_by_groups(request_groups, configure.get('owner_groups'), redis_cli):
+                msg = dict(warn=f"You do not have permission to delete LLM configuration '{llmname}'.")
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 

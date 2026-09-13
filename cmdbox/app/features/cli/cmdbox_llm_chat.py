@@ -1,7 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
-from cmdbox.app.features.cli import cmdbox_client_file_download
+from cmdbox.app.features.cli import cmdbox_client_file_download, cmdbox_llm_list
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -14,6 +14,7 @@ import re
 class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def __init__(self, appcls, ver, language = None):
         super().__init__(appcls, ver, language)
+        self.llm_list = cmdbox_llm_list.LLMList(appcls, ver, language)
         self.file_download = cmdbox_client_file_download.ClientFileDownload(appcls, ver, language)
 
     def get_mode(self) -> Union[str, List[str]]:
@@ -49,7 +50,7 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 dict(opt="timeout", type=Options.T_INT, default="600", required=False, multi=False, hide=True, choice=None,
                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                     description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="llmname", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                dict(opt="llmname", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
                     callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
                             + "const val = $(\"[name='llmname']\").val();"
                             + "$(\"[name='llmname']\").empty().append('<option></option>');"
@@ -57,8 +58,8 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                             + "$(\"[name='llmname']\").val(val);"
                             + "},$(\"[name='title']\").val(),'llmname');"
                             + "}",
-                    description_ja="読み込むLLM設定の名前を指定します。",
-                    description_en="Specify the name of the LLM configuration to load."),
+                    description_ja="使用するLLM設定の名前を指定します。省略した場合はLLM設定の優先度が一番高いものが自動的に選択されます。",
+                    description_en="Specify the name of the LLM configuration to use. If omitted, the LLM configuration with the highest priority is automatically selected."),
                 dict(opt="msg_role", type=Options.T_STR, default="user", required=True, multi=False, hide=False, choice=["user", "assistant", "system", "function", "tool"],
                     description_ja="メッセージ送信者の役割を指定します。",
                     description_en="Specify the role of the message sender."),
@@ -101,6 +102,9 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 dict(opt="msg_file_mime", type=Options.T_STR, default="application/pdf", required=False, multi=False, hide=False, choice=None,
                     description_ja="送信するファイルのMIMEタイプを指定します。",
                     description_en="Specify the MIME type of the file to be sent."),
+                dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="mask",
+                     description_ja="このユーザーグループでチャットを行うように指定します。",
+                     description_en="Specify user groups used to authorize chat operations."),
             ]
         )
 
@@ -150,6 +154,7 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                        msg_file=args.msg_file,
                        msg_file_mime=args.msg_file_mime,
                        msg_file_name=args.msg_file_name if hasattr(args, 'msg_file_name') else None,
+                       groups=args.groups if hasattr(args, 'groups') else None,
                        )
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -187,24 +192,44 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
             llmname = payload.get('llmname')
+            groups = payload.get('groups', None)
+            if llmname:
+                data = [dict(name=llmname, priority=0, type='chat')]
+            else:
+                data = self.llm_list.get_llmlist("", data_dir, redis_cli, groups=groups)
+            if not data:
+                redis_cli.rpush(reskey, dict(warn=f"No LLM configurations were available."))
+                return self.RESP_WARN
+            # 優先度の高いものから順に試す
+            for llm in data:
+                if llm.get('type', None) != 'chat': continue
+                name = llm.get('name')
+                try:
+                    st, msg = self.chat(data_dir, logger, name,
+                                    msg_role=payload.get('msg_role', 'user'),
+                                    msg_name=payload.get('msg_name', None),
+                                    msg_text=payload.get('msg_text', None),
+                                    msg_text_system=payload.get('msg_text_system', None),
+                                    msg_text_param=payload.get('msg_text_param', None),
+                                    msg_image_url=payload.get('msg_image_url', None),
+                                    msg_audio=payload.get('msg_audio', None),
+                                    msg_audio_format=payload.get('msg_audio_format', None),
+                                    msg_video_url=payload.get('msg_video_url', None),
+                                    msg_file_url=payload.get('msg_file_url', None),
+                                    msg_file=payload.get('msg_file', None),
+                                    msg_file_mime=payload.get('msg_file_mime', None),
+                                    msg_file_name=payload.get('msg_file_name', None),
+                                    )
+                    if st == self.RESP_SUCCESS:
+                        redis_cli.rpush(reskey, msg)
+                        return st
+                except Exception as e:
+                    logger.warning(f"Failed to chat using LLM '{name}': {e}. Trying next LLM if available.")
+                    continue
 
-            st, msg = self.chat(data_dir, logger, llmname,
-                            msg_role=payload.get('msg_role', 'user'),
-                            msg_name=payload.get('msg_name', None),
-                            msg_text=payload.get('msg_text', None),
-                            msg_text_system=payload.get('msg_text_system', None),
-                            msg_text_param=payload.get('msg_text_param', None),
-                            msg_image_url=payload.get('msg_image_url', None),
-                            msg_audio=payload.get('msg_audio', None),
-                            msg_audio_format=payload.get('msg_audio_format', None),
-                            msg_video_url=payload.get('msg_video_url', None),
-                            msg_file_url=payload.get('msg_file_url', None),
-                            msg_file=payload.get('msg_file', None),
-                            msg_file_mime=payload.get('msg_file_mime', None),
-                            msg_file_name=payload.get('msg_file_name', None),
-                            )
+            msg = dict(warn=f"Either no LLMs are available, or processing failed for all LLMs.")
             redis_cli.rpush(reskey, msg)
-            return st
+            return self.RESP_WARN
 
         except Exception as e:
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
@@ -236,10 +261,10 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             msg_file (str, optional): 送信するファイルの内容。Base64エンコードされた文字列で指定します。
             msg_file_mime (str, optional): 送信するファイルのMIMEタイプ。
             msg_file_name (str, optional): 送信するファイルの名前。
+            groups (List[str], optional): リクエスト元のユーザーグループのリスト。指定された場合、許可されているグループに含まれる設定のみを返します。
         Returns:
             Tuple[int, List[Dict[str, Any]]]: (ステータスコード, LLMからの応答メッセージのリスト)
         """
-
         configure_path = data_dir / ".agent" / f"llm-{llmname}.json"
         if not configure_path.exists():
             msg = dict(warn=f"Specified LLM configuration '{llmname}' not found on server at '{str(configure_path)}'.")
@@ -338,6 +363,22 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 vertex_location=llmlocation,
                 seed=llmseed,
                 temperature=llmtemperature,
+                messages=[message],)
+            res = []
+            for choice in response.get("choices", []):
+                message = choice.get("message", {})
+                res.append(dict(role=message.get("role"), content=message.get("content")))
+        elif llmprov == 'proxy':
+            llmmodel = configure.get('llmmodel', None)
+            llmapikey = configure.get('llmapikey', None)
+            llmendpoint = configure.get('llmendpoint', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            response = litellm.completion(
+                model=f"litellm_proxy/{llmmodel}",
+                api_base=llmendpoint,
+                api_key=llmapikey,
                 messages=[message],)
             res = []
             for choice in response.get("choices", []):

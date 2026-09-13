@@ -48,13 +48,14 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                      description_ja="保存するLLM設定の名前を指定します。",
                      description_en="Specify the name of the LLM configuration to save."),
                 dict(opt="llmprov", type=Options.T_STR, default=None, required=True, multi=False, hide=False,
-                     choice=["", "azureopenai", "openai", "vertexai", "ollama", "custom"],
+                     choice=["", "azureopenai", "openai", "vertexai", "ollama", "proxy", "custom"],
                      description_ja="llmのプロバイダを指定します。",
                      description_en="Specify llm provider.",
                      choice_show=dict(azureopenai=["llmapikey", "llmendpoint", "llmmodel", "llmapiversion"],
                                       openai=["llmapikey", "llmendpoint", "llmmodel"],
                                       vertexai=["llmprojectid", "llmsvaccountfile", "llmlocation", "llmmodel", "llmseed", "llmtemperature"],
                                       ollama=["llmendpoint", "llmmodel", "llmtemperature"],
+                                      proxy=["llmendpoint", "llmmodel", "llmapikey"],
                                       custom=["llmprojectid", "llmsvaccountfile", "llmlocation",
                                               "llmapikey", "llmapiversion", "llmendpoint", "llmmodel", "llmseed", "llmtemperature"]),
                      ),
@@ -91,12 +92,50 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 dict(opt="llmpriority", type=Options.T_INT, default=1, required=True, multi=False, hide=False, choice=None,
                      description_ja="llmモデルを使用するときの優先度を指定します。小さい値ほど優先されます。",
                      description_en="Specifies the priority when using llm model. Lower values indicate higher priority."),
+                dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="mask",
+                     description_ja="このユーザーグループでLLM設定の編集・保存を行うように指定します。",
+                     description_en="Specify user groups used to authorize LLM configuration edit/save operations."),
+                dict(opt="owner_groups", type=Options.T_MLIST, default=None, required=False, multi=False, hide=False, choice=[],
+                     callcmd="async () => {await cmdbox.callcmd('web','group_list',{},(res)=>{"
+                              + "const val = $(\"[name='owner_groups']\").val();"
+                              + "$(\"[name='owner_groups']\").empty().append('<option></option>');"
+                              + "res['data'].map(elm=>{$(\"[name='owner_groups']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                              + "$(\"[name='owner_groups']\").val(val);"
+                              + "},$(\"[name='title']\").val(),'owner_groups');"
+                              + "}",
+                     description_ja="このLLM設定の保存(save/del)を許可するグループを指定します。省略時はすべてのグループを許可します。",
+                     description_en="Specify the groups that are allowed to save (save/del) this LLM configuration. If omitted, all groups are allowed."),
+                dict(opt="user_groups", type=Options.T_MLIST, default=None, required=False, multi=False, hide=False, choice=[],
+                     callcmd="async () => {await cmdbox.callcmd('web','group_list',{},(res)=>{"
+                              + "const val = $(\"[name='user_groups']\").val();"
+                              + "$(\"[name='user_groups']\").empty().append('<option></option>');"
+                              + "res['data'].map(elm=>{$(\"[name='user_groups']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                              + "$(\"[name='user_groups']\").val(val);"
+                              + "},$(\"[name='title']\").val(),'user_groups');"
+                              + "}",
+                     description_ja="このLLM設定の使用(list/load)を許可するグループを指定します。省略時はすべてのグループを許可します。",
+                     description_en="Specify the groups that are allowed to use this LLM configuration (list/load). If omitted, all groups are allowed."),
             ]
         )
 
     @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+        owner_groups = [g for g in args.owner_groups if g] if hasattr(args, 'owner_groups') and isinstance(args.owner_groups, list) else args.owner_groups if hasattr(args, 'owner_groups') else None
+        user_groups = [g for g in args.user_groups if g] if hasattr(args, 'user_groups') and isinstance(args.user_groups, list) else args.user_groups if hasattr(args, 'user_groups') else None
+        groups = [g for g in args.groups if g] if hasattr(args, 'groups') and isinstance(args.groups, list) else args.groups if hasattr(args, 'groups') else None
+        if owner_groups and len([g for g in owner_groups if g in groups]) <= 0:
+            msg = dict(warn=f"Owner groups must be in the allowed groups. groups:{groups} , owner_groups:{owner_groups}")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+        if user_groups and len([g for g in user_groups if g in groups]) <= 0:
+            msg = dict(warn=f"User groups must be in the allowed groups. groups:{groups} , user_groups:{user_groups}")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+        if owner_groups and user_groups and len([g for g in user_groups if g in owner_groups]) <= 0:
+            msg = dict(warn=f"User groups must be in the owner groups. owner_groups:{owner_groups} , user_groups:{user_groups}")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
 
         configure = dict(
             llmname=args.llmname,
@@ -112,6 +151,9 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             llmseed=args.llmseed if hasattr(args, 'llmseed') else None,
             llmtemperature=args.llmtemperature if hasattr(args, 'llmtemperature') else None,
             llmpriority=args.llmpriority if hasattr(args, 'llmpriority') else None,
+            owner_groups=owner_groups,
+            user_groups=user_groups,
+            groups=args.groups if hasattr(args, 'groups') else None,
             save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
@@ -174,6 +216,7 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
         reskey = msg[1]
         try:
             configure = json.loads(convert.b64str2str(msg[2]))
+            groups = configure.pop('groups', None)
             name = configure.get('llmname')
             configure_path = data_dir / ".agent" / f"llm-{name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
@@ -181,6 +224,12 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             if not chk:
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
+            if configure_path.exists():
+                before = common.load_file(configure_path, lambda f: json.load(f), encoding='utf-8', nolock=False)
+                if not self.is_allowed_by_groups(groups, before.get('owner_groups'), redis_cli):
+                    msg = dict(warn=f"You do not have permission to edit LLM configuration '{name}'.")
+                    redis_cli.rpush(reskey, msg)
+                    return self.RESP_WARN
             common.save_file(configure_path, lambda f: json.dump(configure, f, indent=4),
                              encoding='utf-8', nolock=False)
             msg = dict(success=f"LLM configuration saved to '{str(configure_path)}'.")
