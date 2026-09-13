@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/09/06 documentation</title>
+  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/09/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cfafd609"></script>
+      <script src="../_static/documentation_options.js?v=f36998f3"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -66,6 +66,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#llm-embed-cmdbox-m-llm-c-embed-option">llm ( embed ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">embed</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-list-cmdbox-m-llm-c-list-option">llm ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-load-cmdbox-m-llm-c-load-option">llm ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llm-proxy-start-cmdbox-m-llm-c-proxy-start-option">llm ( proxy_start ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">proxy_start</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llm-proxy-stop-cmdbox-m-llm-c-proxy-stop-option">llm ( proxy_stop ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">proxy_stop</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-save-cmdbox-m-llm-c-save-option">llm ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-translation-cmdbox-m-llm-c-translation-option">llm ( translation ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">translation</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
@@ -203,10 +205,10 @@
 <tr class="row-odd"><td><p>--llmname &lt;llmname&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
-<td><p>required</p></td>
 <td></td>
 <td></td>
-<td><p>Specify the name of the LLM configuration to load.</p></td>
+<td></td>
+<td><p>Specify the name of the LLM configuration to use. If omitted, the LLM configuration with the highest priority is automatically selected.</p></td>
 </tr>
 <tr class="row-even"><td><p>--msg_role &lt;msg_role&gt;</p></td>
 <td><p>str</p></td>
@@ -319,6 +321,14 @@
 <td><p>application/pdf</p></td>
 <td></td>
 <td><p>Specify the MIME type of the file to be sent.</p></td>
+</tr>
+<tr class="row-even"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify user groups used to authorize chat operations.</p></td>
 </tr>
 </tbody>
 </table>
@@ -524,6 +534,14 @@
 <td></td>
 <td><p>Specify the name of the LLM configuration to delete.</p></td>
 </tr>
+<tr class="row-even"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify user groups used to authorize LLM configuration deletion.</p></td>
+</tr>
 </tbody>
 </table>
 <p><strong>Output Schema</strong></p>
@@ -723,10 +741,10 @@
 <tr class="row-odd"><td><p>--llmname &lt;llmname&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
-<td><p>required</p></td>
 <td></td>
 <td></td>
-<td><p>Specify the name of the LLM configuration to load.</p></td>
+<td></td>
+<td><p>Specify the name of the LLM configuration to use. If omitted, the LLM configuration with the highest priority is automatically selected.</p></td>
 </tr>
 <tr class="row-even"><td><p>--input_text &lt;input_text&gt;</p></td>
 <td><p>text</p></td>
@@ -735,6 +753,14 @@
 <td></td>
 <td></td>
 <td><p>Specify the text to embed. Multiple values can be specified.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify user groups used to authorize chat operations.</p></td>
 </tr>
 </tbody>
 </table>
@@ -939,6 +965,14 @@
 <td></td>
 <td></td>
 <td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+<tr class="row-even"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify to return only LLM configurations available to this user group.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1175,6 +1209,14 @@
 <td></td>
 <td><p>Specify the name of the LLM configuration to load.</p></td>
 </tr>
+<tr class="row-even"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify user groups used to authorize access to the LLM configuration.</p></td>
+</tr>
 </tbody>
 </table>
 <p><strong>Output Schema</strong></p>
@@ -1201,7 +1243,16 @@
 <span class="w">    </span><span class="nt">"llmseed"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">"llmtemperature"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">"llmsvaccountfile_data"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">    </span><span class="nt">"llmpriority"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">    </span><span class="nt">"llmpriority"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"groups"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">"string"</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"owner_groups"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">"string"</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"user_groups"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">"string"</span>
+<span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -1328,6 +1379,521 @@
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLM優先度</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.groups</p></td>
+<td><p>list[str] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>LLMに関連付けられたグループ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.owner_groups</p></td>
+<td><p>list[str] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存(edit/del)を許可するグループ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.user_groups</p></td>
+<td><p>list[str] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>使用(list/load)を許可するグループ</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="llm-proxy-start-cmdbox-m-llm-c-proxy-start-option">
+<h2>llm ( proxy_start ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">proxy_start</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-proxy-start-cmdbox-m-llm-c-proxy-start-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Start LiteLLM Proxy service.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--data &lt;data&gt;</p></td>
+<td><p>dir</p></td>
+<td></td>
+<td></td>
+<td><p>C:Usershama.cmdbox</p></td>
+<td></td>
+<td><p>When omitted, <cite>$HOME/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--proxy_allow_host &lt;proxy_allow_host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>0.0.0.0</p></td>
+<td></td>
+<td><p>Specify the bind host name. Default is <cite>0.0.0.0</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--proxy_listen_port &lt;proxy_listen_port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>4000</p></td>
+<td></td>
+<td><p>Specify the listening port of LiteLLM Proxy. Default is <cite>4000</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p>--proxy_workers &lt;proxy_workers&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specify the number of workers for LiteLLM Proxy. Default is <cite>3</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--proxy_apikey &lt;proxy_apikey&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the API key for LiteLLM Proxy. It must start with 'sk-'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--llm &lt;llm&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify multiple LLM configuration names to register to the proxy. The specified order is used as failover priority.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--num_retries &lt;num_retries&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>2</p></td>
+<td></td>
+<td><p>Specify retry count for LiteLLM Router.</p></td>
+</tr>
+<tr class="row-even"><td><p>--request_timeout &lt;request_timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify request timeout seconds for LiteLLM Proxy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--allowed_fails &lt;allowed_fails&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specify failure threshold for cooldown.</p></td>
+</tr>
+<tr class="row-even"><td><p>--cooldown_time &lt;cooldown_time&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>30</p></td>
+<td></td>
+<td><p>Specify cooldown duration in seconds.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"pid"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"config_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"proxy_allow_host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"proxy_listen_port"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"proxy_workers"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"llm"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">"string"</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.pid</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>起動したプロセスID</p></td>
+</tr>
+<tr class="row-even"><td><p>success.config_path</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>生成したLiteLLM設定ファイルパス</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.proxy_allow_host</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>待ち受けホスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.proxy_listen_port</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>待ち受けポート</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.proxy_workers</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>LiteLLM Proxy ワーカー数</p></td>
+</tr>
+<tr class="row-even"><td><p>success.llm</p></td>
+<td><p>list[str]</p></td>
+<td><p>no</p></td>
+<td><p>(必須)</p></td>
+<td><p>登録したLLM設定名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.message</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行結果メッセージ</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="llm-proxy-stop-cmdbox-m-llm-c-proxy-stop-option">
+<h2>llm ( proxy_stop ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">proxy_stop</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-proxy-stop-cmdbox-m-llm-c-proxy-stop-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Stop LiteLLM Proxy service.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td><p>dir</p></td>
+<td></td>
+<td></td>
+<td><p>C:Usershama.cmdbox</p></td>
+<td></td>
+<td><p>When omitted, <cite>$HOME/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--proxy_listen_port &lt;proxy_listen_port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>4000</p></td>
+<td></td>
+<td><p>Specify the listening port of LiteLLM Proxy to stop. Default is <cite>4000</cite>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"pid"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"proxy_listen_port"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"pid_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.pid</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>停止したプロセスID</p></td>
+</tr>
+<tr class="row-even"><td><p>success.proxy_listen_port</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>停止対象ポート</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.pid_path</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>PIDファイルパス</p></td>
+</tr>
+<tr class="row-even"><td><p>success.message</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行結果メッセージ</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
@@ -1477,7 +2043,7 @@
 <td></td>
 <td><blockquote>
 <div><div class="line-block">
-<div class="line">azureopenai | openai | vertexai | ollama | custom</div>
+<div class="line">azureopenai | openai | vertexai | ollama | proxy | custom</div>
 </div>
 </div></blockquote>
 </td>
@@ -1570,6 +2136,30 @@
 <td><p>1</p></td>
 <td></td>
 <td><p>Specifies the priority when using llm model. Lower values indicate higher priority.</p></td>
+</tr>
+<tr class="row-even"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify user groups used to authorize LLM configuration edit/save operations.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--owner_groups &lt;owner_groups&gt;</p></td>
+<td><p>mlist</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the groups that are allowed to save (save/del) this LLM configuration. If omitted, all groups are allowed.</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_groups &lt;user_groups&gt;</p></td>
+<td><p>mlist</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the groups that are allowed to use this LLM configuration (list/load). If omitted, all groups are allowed.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1799,6 +2389,14 @@
 <td><p>False</p></td>
 <td><p>True | False</p></td>
 <td><p>Specify if the translation result should not be saved.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify user groups used to authorize translation operations.</p></td>
 </tr>
 </tbody>
 </table>

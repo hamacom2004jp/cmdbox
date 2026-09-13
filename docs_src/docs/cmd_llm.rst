@@ -23,7 +23,7 @@ llm ( chat ) : ``cmdbox -m llm -c chat <Option>``
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","600","","Specify the maximum waiting time until the server responds."
-    "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to load."
+    "--llmname <llmname>","str","","","","","Specify the name of the LLM configuration to use. If omitted, the LLM configuration with the highest priority is automatically selected."
     "--msg_role <msg_role>","str","","required","user","user | assistant | system | function | tool","Specify the role of the message sender."
     "--msg_name <msg_name>","str","","","","","Specify the name of the message sender. Required if msg_role is `function` or `tool`."
     "--msg_text <msg_text>","text","","","","","Specify the content of the text to be sent."
@@ -38,6 +38,7 @@ llm ( chat ) : ``cmdbox -m llm -c chat <Option>``
     "--msg_file_url <msg_file_url>","str","","","","","Specify the URL of the file to be sent."
     "--msg_file <msg_file>","file","","","","","Specify the content of the file to be sent."
     "--msg_file_mime <msg_file_mime>","str","","","application/pdf","","Specify the MIME type of the file to be sent."
+    "--groups <groups>","str","multi","","","","Specify user groups used to authorize chat operations."
 
 **Output Schema**
 
@@ -99,6 +100,7 @@ llm ( del ) : ``cmdbox -m llm -c del <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to delete."
+    "--groups <groups>","str","multi","","","","Specify user groups used to authorize LLM configuration deletion."
 
 **Output Schema**
 
@@ -159,8 +161,9 @@ llm ( embed ) : ``cmdbox -m llm -c embed <Option>``
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","600","","Specify the maximum waiting time until the server responds."
-    "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to load."
+    "--llmname <llmname>","str","","","","","Specify the name of the LLM configuration to use. If omitted, the LLM configuration with the highest priority is automatically selected."
     "--input_text <input_text>","text","multi","required","","","Specify the text to embed. Multiple values can be specified."
+    "--groups <groups>","str","multi","","","","Specify user groups used to authorize chat operations."
 
 **Output Schema**
 
@@ -222,6 +225,7 @@ llm ( list ) : ``cmdbox -m llm -c list <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--kwd <kwd>","str","","","","","Specify the name you want to search for. Searches for partial matches."
+    "--groups <groups>","str","multi","","","","Specify to return only LLM configurations available to this user group."
 
 **Output Schema**
 
@@ -294,6 +298,7 @@ llm ( load ) : ``cmdbox -m llm -c load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to load."
+    "--groups <groups>","str","multi","","","","Specify user groups used to authorize access to the LLM configuration."
 
 **Output Schema**
 
@@ -323,7 +328,16 @@ This command implements ``output_schema()`` returning ``Result`` model.
         "llmseed": 0,
         "llmtemperature": 0.0,
         "llmsvaccountfile_data": {},
-        "llmpriority": 0
+        "llmpriority": 0,
+        "groups": [
+          "string"
+        ],
+        "owner_groups": [
+          "string"
+        ],
+        "user_groups": [
+          "string"
+        ]
       },
       "warn": {},
       "error": {},
@@ -353,6 +367,154 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.llmtemperature","float | null","no","null","LLM温度パラメータ"
     "success.llmsvaccountfile_data","dict[str, any] | null","no","null","LLMサービスアカウントファイルデータ"
     "success.llmpriority","int | null","no","null","LLM優先度"
+    "success.groups","list[str] | null","no","null","LLMに関連付けられたグループ"
+    "success.owner_groups","list[str] | null","no","null","保存(edit/del)を許可するグループ"
+    "success.user_groups","list[str] | null","no","null","使用(list/load)を許可するグループ"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
+llm ( proxy_start ) : ``cmdbox -m llm -c proxy_start <Option>``
+===============================================================
+
+- Start LiteLLM Proxy service.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
+    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
+    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
+    "--proxy_allow_host <proxy_allow_host>","str","","","0.0.0.0","","Specify the bind host name. Default is `0.0.0.0`."
+    "--proxy_listen_port <proxy_listen_port>","int","","","4000","","Specify the listening port of LiteLLM Proxy. Default is `4000`."
+    "--proxy_workers <proxy_workers>","int","","","3","","Specify the number of workers for LiteLLM Proxy. Default is `3`."
+    "--proxy_apikey <proxy_apikey>","str","","required","","","Specify the API key for LiteLLM Proxy. It must start with 'sk-'."
+    "--llm <llm>","str","multi","required","","","Specify multiple LLM configuration names to register to the proxy. The specified order is used as failover priority."
+    "--num_retries <num_retries>","int","","","2","","Specify retry count for LiteLLM Router."
+    "--request_timeout <request_timeout>","int","","","60","","Specify request timeout seconds for LiteLLM Proxy."
+    "--allowed_fails <allowed_fails>","int","","","3","","Specify failure threshold for cooldown."
+    "--cooldown_time <cooldown_time>","int","","","30","","Specify cooldown duration in seconds."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "save_mode": "string",
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "pid": 0,
+        "config_path": "string",
+        "proxy_allow_host": "string",
+        "proxy_listen_port": 0,
+        "proxy_workers": 0,
+        "llm": [
+          "string"
+        ],
+        "message": "string"
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.pid","int | null","no","null","起動したプロセスID"
+    "success.config_path","str | null","no","null","生成したLiteLLM設定ファイルパス"
+    "success.proxy_allow_host","str | null","no","null","待ち受けホスト"
+    "success.proxy_listen_port","int | null","no","null","待ち受けポート"
+    "success.proxy_workers","int | null","no","null","LiteLLM Proxy ワーカー数"
+    "success.llm","list[str]","no","(必須)","登録したLLM設定名"
+    "success.message","str | null","no","null","実行結果メッセージ"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
+llm ( proxy_stop ) : ``cmdbox -m llm -c proxy_stop <Option>``
+=============================================================
+
+- Stop LiteLLM Proxy service.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
+    "--proxy_listen_port <proxy_listen_port>","int","","","4000","","Specify the listening port of LiteLLM Proxy to stop. Default is `4000`."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "save_mode": "string",
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "pid": 0,
+        "proxy_listen_port": 0,
+        "pid_path": "string",
+        "message": "string"
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.pid","int | null","no","null","停止したプロセスID"
+    "success.proxy_listen_port","int | null","no","null","停止対象ポート"
+    "success.pid_path","str | null","no","null","PIDファイルパス"
+    "success.message","str | null","no","null","実行結果メッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -381,7 +543,7 @@ llm ( save ) : ``cmdbox -m llm -c save <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to save."
-    "--llmprov <llmprov>","str","","required",""," | azureopenai | openai | vertexai | ollama | custom","Specify llm provider."
+    "--llmprov <llmprov>","str","","required",""," | azureopenai | openai | vertexai | ollama | proxy | custom","Specify llm provider."
     "--llmtype <llmtype>","str","","","chat","chat | embedding","Specify the type of the LLM configuration to save."
     "--llmprojectid <llmprojectid>","str","","","","","Specify the project ID for llm's provider connection."
     "--llmsvaccountfile <llmsvaccountfile>","file","","","","","Specifies the service account file for llm's provider connection."
@@ -393,6 +555,9 @@ llm ( save ) : ``cmdbox -m llm -c save <Option>``
     "--llmseed <llmseed>","int","","","13","","Specifies the seed value when using llm model."
     "--llmtemperature <llmtemperature>","float","","","0.1","","Specifies the temperature when using llm model."
     "--llmpriority <llmpriority>","int","","required","1","","Specifies the priority when using llm model. Lower values indicate higher priority."
+    "--groups <groups>","str","multi","","","","Specify user groups used to authorize LLM configuration edit/save operations."
+    "--owner_groups <owner_groups>","mlist","","","","","Specify the groups that are allowed to save (save/del) this LLM configuration. If omitted, all groups are allowed."
+    "--user_groups <user_groups>","mlist","","","","","Specify the groups that are allowed to use this LLM configuration (list/load). If omitted, all groups are allowed."
 
 **Output Schema**
 
@@ -458,6 +623,7 @@ llm ( translation ) : ``cmdbox -m llm -c translation <Option>``
     "--words <words>","str","multi","required","","","Specify the list of words to translate. Multiple values can be specified."
     "--target_lang <target_lang>","str","","required","en_US","","Specify the target language."
     "--nosave <nosave>","bool","","","False","True | False","Specify if the translation result should not be saved."
+    "--groups <groups>","str","multi","","","","Specify user groups used to authorize translation operations."
 
 **Output Schema**
 
