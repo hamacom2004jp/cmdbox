@@ -82,7 +82,11 @@ class AuditBase(feature.ResultEdgeFeature):
             #if logger.level == logging.DEBUG:
             #    logger.debug(f"Initializing database with db_path={db_path}")
             db_path.parent.mkdir(parents=True, exist_ok=True)
-            conn = sqlite3.connect(db_path)
+            conn = sqlite3.connect(db_path, timeout=30.0)
+            # SQLiteの書き込み競合を緩和するため、WALと待機時間を設定する
+            conn.execute('PRAGMA journal_mode=WAL')
+            conn.execute('PRAGMA synchronous=NORMAL')
+            conn.execute('PRAGMA busy_timeout=30000')
             return conn
 
     def initdb(self, data_dir:Path, logger:logging.Logger, pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str) -> None:

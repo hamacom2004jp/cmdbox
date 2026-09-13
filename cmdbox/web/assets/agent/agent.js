@@ -32,7 +32,7 @@ agentView.initView = () => {
         $('#appid_version').html(version_html);
     });
     // 現在時刻の取得と表示
-    cmdbox.current_time().then((time_info) => {
+    /*cmdbox.current_time().then((time_info) => {
         if (time_info) {
             const update_time = () => {
                 const dt = new Date((time_info['timestamp'] * 1000 + (new Date().getTime() - time_info['timestamp'] * 1000)));
@@ -41,7 +41,7 @@ agentView.initView = () => {
             update_time();
             setInterval(update_time, 1000);
         }
-    });
+    });*/
     // copyright表示
     cmdbox.copyright();
     // 設定モーダルの初期化

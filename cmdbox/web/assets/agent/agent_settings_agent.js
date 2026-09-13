@@ -200,7 +200,7 @@ agentView.save_agent = async () => {
     const form = $('#form_agent_edit');
     const data = {save_mode: $('[name="save_mode"]').val()};
     const array = form.serializeArray();
-    
+
     // Helper to handle multiple values for same name (for mcpservers)
     const multiMap = {};
     array.forEach(item => {
@@ -223,7 +223,6 @@ agentView.save_agent = async () => {
     if (multiMap['skill_names'] && !Array.isArray(multiMap['skill_names'])) {
         multiMap['skill_names'] = [multiMap['skill_names']];
     }
-    
     Object.assign(data, multiMap);
 
     try {
