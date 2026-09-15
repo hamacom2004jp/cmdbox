@@ -56,22 +56,23 @@ class Filer(object):
         current_path = current_path.replace("\\","/").replace("//","/")
         cp = current_path[1:] if current_path.startswith('/') else current_path
         abspath:Path = (self.data_dir / cp).resolve()
+        apath:str = self._abspath_to_apath(abspath, current_path)
         data_dir = self.data_dir.resolve()
         if not self._normalize_path(abspath).is_relative_to(self._normalize_path(data_dir)):
-            self.logger.warning(f"Path {abspath} is out of data directory. current_path={current_path}")
-            return False, abspath, dict(warn=f"Path {abspath} is out of data directory. current_path={current_path}")
+            self.logger.warning(f"Path {apath} is out of data directory.")
+            return False, abspath, dict(warn=f"Path {apath} is out of data directory.")
         # パス存在チェックを行わない場合は、パスが存在するかどうかに関わらず成功とする
         if not exists_chk:
-            return True, abspath, dict(success=f"Path {abspath} not exists.")
+            return True, abspath, dict(success=f"Path {apath} not exists.")
         # not_existsがTrueの場合は、パスが存在しないことを確認する
         if not not_exists and not abspath.exists():
-            self.logger.warning(f"Path {abspath} does not exist. param={current_path}")
-            return False, abspath, dict(warn=f"Path {abspath} does not exist. param={current_path}")
+            self.logger.warning(f"Path {apath} does not exist.")
+            return False, abspath, dict(warn=f"Path {apath} does not exist.")
         # not_existsがFalseの場合は、パスが存在することを確認する
         if not_exists and abspath.exists():
-            self.logger.warning(f"Path {abspath} exist. param={current_path}")
-            return False, abspath, dict(warn=f"Path {abspath} exist. param={current_path}")
-        return True, abspath, dict(success=f"Path {abspath} exists.")
+            self.logger.warning(f"Path {apath} exist.")
+            return False, abspath, dict(warn=f"Path {apath} exist.")
+        return True, abspath, dict(success=f"Path {apath} exists.")
 
     def check_fwpath(self, path:str, fwpaths:List[str], rjpaths:List[str]=None, exists_chk:bool=True) -> Tuple[int, Dict[str, Any]]:
         """
@@ -152,6 +153,14 @@ class Filer(object):
             dirs_last = common.format_dtvalue(max_mtime.isoformat())
         return dict(path=current_path, files_cnt=files_cnt,
                     dirs_cnt=dirs_cnt, dirs_size=dirs_size, dirs_last=dirs_last)
+
+    def _abspath_to_apath(self, abspath:Path, current_path:str) -> str:
+        try:
+            relpath = abspath.relative_to(self.data_dir)
+            apath = '/' if str(relpath) == '.' else f"/{relpath.as_posix()}"
+        except ValueError:
+            apath = '/' if current_path == '' else f"/{current_path}"
+        return apath
 
     def file_list(self, current_path:str, recursive:bool=False,
                   fwpaths:List[str]=None, rjpaths:List[str]=None, listregs:str=".*", summary:bool=False) -> Tuple[int, Dict[str, Any]]:
@@ -291,20 +300,20 @@ class Filer(object):
             int: レスポンスコード
             dict: メッセージ
         """
-        chk, abspath, msg = self._file_exists(current_path, not_exists=True, exists_chk=not exist_ok)
-        if not chk:
-            return self.RESP_WARN, msg
         chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=not exist_ok)
         if not chk:
             return self.RESP_WARN, msg
-
+        chk, abspath, msg = self._file_exists(current_path, not_exists=True, exists_chk=not exist_ok)
+        if not chk:
+            return self.RESP_WARN, msg
+        apath:str = self._abspath_to_apath(abspath, current_path)
         try:
             abspath.mkdir(parents=True, exist_ok=exist_ok)
             ret_path = str(Path(current_path).parent).replace("\\","/")
-            return self.RESP_SUCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Created {abspath}"))
+            return self.RESP_SUCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Created {apath}"))
         except Exception as e:
-            self.logger.warning(f"Failed to create {abspath}. {e}")
-            return self.RESP_WARN, dict(warn=f"Failed to create {abspath}. {e}")
+            self.logger.warning(f"Failed to create {apath}. {e}")
+            return self.RESP_WARN, dict(warn=f"Failed to create {apath}. {e}")
     
     def file_rmdir(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None, notexist_ok:bool=False) -> Tuple[int, Dict[str, Any]]:
         """
@@ -320,23 +329,24 @@ class Filer(object):
             int: レスポンスコード
             dict: メッセージ
         """
-        chk, abspath, msg = self._file_exists(current_path, exists_chk=not notexist_ok)
-        if not chk:
-            return self.RESP_WARN, msg
         chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=not notexist_ok)
         if not chk:
             return self.RESP_WARN, msg
+        chk, abspath, msg = self._file_exists(current_path, exists_chk=not notexist_ok)
+        if not chk:
+            return self.RESP_WARN, msg
+        apath:str = self._abspath_to_apath(abspath, current_path)
         if abspath == self.data_dir:
-            self.logger.warning(f"Path {abspath} is root directory.")
-            return self.RESP_WARN, dict(warn=f"Path {abspath} is root directory.")
+            self.logger.warning(f"Path {apath} is root directory.")
+            return self.RESP_WARN, dict(warn=f"Path {apath} is root directory.")
 
         try:
             common.rmdirs(abspath, ignore_errors=notexist_ok)
             ret_path = str(Path(current_path).parent).replace("\\","/")
-            return self.RESP_SUCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Removed {abspath}"))
+            return self.RESP_SUCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Removed {apath}"))
         except Exception as e:
-            self.logger.warning(f"Failed to remove {abspath}. {e}")
-            return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
+            self.logger.warning(f"Failed to remove {apath}. {e}")
+            return self.RESP_WARN, dict(warn=f"Failed to remove {apath}. {e}")
 
     def file_download(self, current_path:str, img_thumbnail:float=0.0,
                       fwpaths:List[str]=None, rjpaths:List[str]=None, meta:Dict[str, Any]=None, etag:str=None) -> Tuple[int, Dict[str, Any]]:
@@ -356,15 +366,16 @@ class Filer(object):
             dict: メッセージ
         """
         img_thumbnail = 0.0 if img_thumbnail is None else img_thumbnail
-        chk, abspath, msg = self._file_exists(current_path)
-        if not chk:
-            return self.RESP_WARN, msg
         chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
         if not chk:
             return self.RESP_WARN, msg
+        chk, abspath, msg = self._file_exists(current_path)
+        if not chk:
+            return self.RESP_WARN, msg
+        apath:str = self._abspath_to_apath(abspath, current_path)
         if abspath.is_dir():
-            self.logger.warning(f"Path {abspath} is directory.")
-            return self.RESP_WARN, dict(warn=f"Path {abspath} is directory.")
+            self.logger.warning(f"Path {apath} is directory.")
+            return self.RESP_WARN, dict(warn=f"Path {apath} is directory.")
 
         try:
             mime_type, encoding = mimetypes.guess_type(str(abspath))
@@ -385,8 +396,8 @@ class Filer(object):
                 meta = common.save_meta(abspath, meta)
             return self.RESP_SUCCESS, dict(success=dict(name=fname, data=data, mime_type=mime_type, etag=file_etag, not_modified=False, meta=meta))
         except Exception as e:
-            self.logger.warning(f"Failed to download {abspath}. {e}")
-            return self.RESP_WARN, dict(warn=f"Failed to download {abspath}. {e}")
+            self.logger.warning(f"Failed to download {apath}. {e}")
+            return self.RESP_WARN, dict(warn=f"Failed to download {apath}. {e}")
 
     def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool,
                     overwrite:bool, fwpaths:List[str]=None, rjpaths:List[str]=None,
@@ -409,19 +420,20 @@ class Filer(object):
             dict: メッセージ
             meta (Dict[str, Any], optional): メタデータ. Defaults to None.
         """
-        chk, abspath, msg = self._file_exists(current_path, exists_chk=False)
-        if not chk:
-            return self.RESP_WARN, msg
         chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=False)
         if not chk:
             return self.RESP_WARN, msg
+        chk, abspath, msg = self._file_exists(current_path, exists_chk=False)
+        if not chk:
+            return self.RESP_WARN, msg
+        apath:str = self._abspath_to_apath(abspath, current_path)
 
         if abspath.exists():
             if abspath.is_dir():
                 abspath = abspath / file_name
             if abspath.is_file() and not overwrite:
-                self.logger.warning(f"Path {abspath} already exist. param={current_path}")
-                return self.RESP_WARN, dict(warn=f"Path {abspath} already exist. param={current_path}")
+                self.logger.warning(f"Path {apath} already exist. param={current_path}")
+                return self.RESP_WARN, dict(warn=f"Path {apath} already exist. param={current_path}")
             save_path = abspath
         elif abspath.suffix == '':
             abspath.mkdir(parents=True, exist_ok=True)
@@ -438,10 +450,10 @@ class Filer(object):
             if meta and 'last_access_date' in meta and 'last_update_date' not in meta:
                 meta['last_update_date'] = meta['last_access_date']
             common.save_file(Path(save_path), _w, mode='wb', nolock=False, meta=meta)
-            return self.RESP_SUCCESS, dict(success=f"Uploaded {save_path}")
+            return self.RESP_SUCCESS, dict(success=f"Uploaded {apath}")
         except Exception as e:
-            self.logger.warning(f"Failed to upload {save_path}. {e}")
-            return self.RESP_WARN, dict(warn=f"Failed to upload {save_path}. {e}")
+            self.logger.warning(f"Failed to upload {apath}. {e}")
+            return self.RESP_WARN, dict(warn=f"Failed to upload {apath}. {e}")
 
     def file_remove(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None, notexist_ok:bool=False) -> Tuple[int, Dict[str, Any]]:
         """
@@ -457,24 +469,25 @@ class Filer(object):
             int: レスポンスコード
             dict: メッセージ
         """
-        chk, abspath, msg = self._file_exists(current_path, exists_chk=not notexist_ok)
-        if not chk:
-            return self.RESP_WARN, msg
         chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=not notexist_ok)
         if not chk:
             return self.RESP_WARN, msg
+        chk, abspath, msg = self._file_exists(current_path, exists_chk=not notexist_ok)
+        if not chk:
+            return self.RESP_WARN, msg
+        apath:str = self._abspath_to_apath(abspath, current_path)
         if abspath.is_dir():
-            self.logger.warning(f"Path {abspath} is directory.")
-            return self.RESP_WARN, dict(warn=f"Path {abspath} is directory.")
+            self.logger.warning(f"Path {apath} is directory.")
+            return self.RESP_WARN, dict(warn=f"Path {apath} is directory.")
 
         try:
             abspath.unlink(missing_ok=notexist_ok)
             common.remove_meta(abspath)
             ret_path = str(Path(current_path).parent).replace("\\","/")
-            return self.RESP_SUCCESS, dict(success=dict(path=ret_path, msg=f"Removed {abspath}"))
+            return self.RESP_SUCCESS, dict(success=dict(path=ret_path, msg=f"Removed {apath}"))
         except Exception as e:
-            self.logger.warning(f"Failed to remove {abspath}. {e}")
-            return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
+            self.logger.warning(f"Failed to remove {apath}. {e}")
+            return self.RESP_WARN, dict(warn=f"Failed to remove {apath}. {e}")
 
     def file_copy(self, from_path:str, to_path:str, overwrite:bool, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
                   from_rjpaths:List[str]=None, to_rjpaths:List[str]=None, meta:Dict[str, Any]=None) -> Tuple[int, Dict[str, Any]]:
@@ -495,18 +508,19 @@ class Filer(object):
             int: レスポンスコード
             dict: メッセージ
         """
-        chk, from_abspath, msg = self._file_exists(from_path)
-        if not chk:
-            return self.RESP_WARN, msg
         chk, msg = self.check_fwpath(from_path, from_fwpaths, from_rjpaths)
         if not chk:
             return self.RESP_WARN, msg
-
-        chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
-        if not chk and not overwrite:
+        chk, from_abspath, msg = self._file_exists(from_path)
+        if not chk:
             return self.RESP_WARN, msg
+        from_apath:str = self._abspath_to_apath(from_abspath, from_path)
+
         chk, msg = self.check_fwpath(to_path, to_fwpaths, to_rjpaths)
         if not chk:
+            return self.RESP_WARN, msg
+        chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
+        if not chk and not overwrite:
             return self.RESP_WARN, msg
         if overwrite and not to_abspath.parent.exists():
             to_abspath.parent.mkdir(parents=True, exist_ok=True)
@@ -521,8 +535,8 @@ class Filer(object):
                 meta['last_update_date'] = meta['last_access_date']
             common.save_meta(to_abspath, meta)
         else:
-            self.logger.warning(f"Path {from_abspath} is not file or directory.")
-            return self.RESP_WARN, dict(warn=f"Path {from_abspath} is not file or directory.")
+            self.logger.warning(f"Path {from_apath} is not file or directory.")
+            return self.RESP_WARN, dict(warn=f"Path {from_apath} is not file or directory.")
 
         return self.RESP_SUCCESS, dict(success=dict(path=Path(to_path).parent,
                                                     to_path=to_path,
@@ -548,17 +562,18 @@ class Filer(object):
             int: レスポンスコード
             dict: メッセージ
         """
-        chk, from_abspath, msg = self._file_exists(from_path)
-        if not chk:
-            return self.RESP_WARN, msg
         chk, msg = self.check_fwpath(from_path, from_fwpaths, from_rjpaths)
         if not chk:
             return self.RESP_WARN, msg
-
-        chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
+        chk, from_abspath, msg = self._file_exists(from_path)
         if not chk:
             return self.RESP_WARN, msg
+        from_apath:str = self._abspath_to_apath(from_abspath, from_path)
+
         chk, msg = self.check_fwpath(to_path, to_fwpaths, to_rjpaths)
+        if not chk:
+            return self.RESP_WARN, msg
+        chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
         if not chk:
             return self.RESP_WARN, msg
 
