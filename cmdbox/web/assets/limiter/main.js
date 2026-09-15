@@ -3,7 +3,12 @@ $(() => {
     cmdbox.copyright();
     // バージョン情報
     cmdbox.init_version_modal();
-    
+    // バージョン情報の取得と表示
+    cmdbox.versions().then((versions) => {
+        const version_html = `${versions['appid']}-${versions['version']}`;
+        $('#appid_version').html(version_html);
+    });
+
     // ===== Limiter (limiters) タブのイベント =====
     // フィルタ条件の変更
     $('#filter_target_mode').on('change', async () => {

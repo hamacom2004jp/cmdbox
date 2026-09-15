@@ -944,4 +944,9 @@ fsapi.onload = (svpath="/") => {
                 el.innerHTML = result.value.replace(/^/gm,'<span class="row-number"></span>');
         }
     });
+    // バージョン情報の取得と表示
+    cmdbox.versions().then((versions) => {
+        const version_html = `${versions['appid']}-${versions['version']}`;
+        $('#appid_version').html(version_html);
+    });
 }

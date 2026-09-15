@@ -10,21 +10,12 @@
     <nav class="navbar navbar-expand-sm console-header fixed-top p-2">
         <div class="container-fluid">
             <a class="navbar-brand" href="./">cmdbox</a>
+            <span class="page_title">Limiter</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle i18n" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            About
-                        </a>
-                        <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <div class="d-none dropdown user_info">
+            <div class="collapse navbar-collapse ms-2" id="navbarNavDropdown">
+                <div class="d-none dropdown user_info ms-auto">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true" style="fill:gray;">
                         <img class="user_icon me-2" src="gui/user_data/icon" width="36" height="36">
                         <span class="username align-middle">UserName</span>
@@ -37,7 +28,7 @@
             </div>
         </div>
     </nav>
-    <div id="main_container" class="container-fluid overflow-auto" style="margin-top:66px;height:calc(100vh - 120px);">
+    <div id="main_container" class="container-fluid overflow-auto" style="margin-top:66px;height:calc(100vh - 100px);">
         <form class="d-none filer_form">
             <input name="filer_host" type="hidden" class="filer_host">
             <input name="filer_port" type="hidden" class="filer_port">
@@ -54,7 +45,7 @@
                 <a class="nav-link i18n" id="limiters-tab" data-bs-toggle="tab" href="#limiters" role="tab" aria-controls="limiters" aria-selected="false">Limiters</a>
             </li>
         </ul>
-        <div class="tab-content overflow-auto" style="height:calc(100vh - 165px);">
+        <div class="tab-content overflow-auto" style="height:calc(100vh - 145px);">
             <div class="tab-pane fade p-2" id="limiters" role="tabpanel" aria-labelledby="limiters-tab">
                 <!-- ターゲットタブのツールバー -->
                 <div class="d-flex align-items-center gap-2 my-2">
@@ -202,7 +193,10 @@
         </div>
     </div>
     <!-- フッター -->
-    <footer class="fixed-bottom text-center p-2 copyright"></footer>
+    <footer>
+        <span class="copyright"></span>
+        <a id="appid_version" href="#" onclick="$(`#versions_modal`).modal(`show`);">cmdbox</a>
+    </footer>
 </body>
 <script type="text/javascript">
     document.querySelector(`body`).style.setProperty(`--bs-body-bg`, `#212529`);

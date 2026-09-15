@@ -16,6 +16,11 @@ $(() => {
     cmdbox.copyright();
     // バージョン情報モーダル初期化
     cmdbox.init_version_modal();
+    // バージョン情報の取得と表示
+    cmdbox.versions().then((versions) => {
+        const version_html = `${versions['appid']}-${versions['version']}`;
+        $('#appid_version').html(version_html);
+    });
     // モーダルボタン初期化
     cmdbox.init_modal_button();
     cmdbox.gui_callback_reconnectInterval_handler = null;

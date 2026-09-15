@@ -7,6 +7,8 @@
     --area-bg-color-10: rgba(0, 247, 255, 0.1);
     --area-bg-color-danger-50: rgba(255, 0, 230, 0.5);
     --area-bg-color-danger-10: rgba(255, 0, 230, 0.1);
+    --font-header: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
 }
 body {
     font-family: var(--font-body);
@@ -50,6 +52,54 @@ body::after {
     z-index: -1;
     pointer-events: none;
 }
+.navbar-brand {
+    font-family:var(--font-header);
+}
+.page_title {
+    color: var(--bs-secondary-color);
+    font-family: var(--font-header);
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+.copyright {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    margin: 0;
+    padding: 0.35rem 0.75rem;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    font-family: var(--font-body);
+    color: var(--bs-secondary-color);
+    background: transparent;
+    border: none;
+    z-index: 100;
+    pointer-events: none;
+}
+#appid_version {
+    position: absolute;
+    bottom: -1rem;
+    right: 0.25rem;
+    transform: translateY(-50%);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    line-height: inherit;
+    color: var(--bs-secondary-color);
+    text-decoration: none;
+    pointer-events: auto;
+    padding: 0.35rem 0.75rem;
+}
+[data-bs-theme="spaceship"] #appid_version {
+    color: var(--text-white-50);
+}
+#appid_version:hover,
+#appid_version:focus-visible {
+    color: var(--bs-emphasis-color);
+    text-decoration: underline;
+}
+
 @keyframes starfield-rotate {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }

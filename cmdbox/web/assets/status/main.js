@@ -6,6 +6,10 @@
 $(() => {
     cmdbox.set_logoicon('.navbar-brand');
     cmdbox.copyright();
+    cmdbox.versions().then((versions) => {
+        const version_html = `${versions['appid']}-${versions['version']}`;
+        $('#appid_version').html(version_html);
+    });
     cmdbox.init_version_modal();
     cmdbox.init_modal_button();
     cmdbox.init_user_info_menu();

@@ -15,21 +15,12 @@
     <nav class="navbar navbar-expand-sm console-header fixed-top p-2">
         <div class="container-fluid">
             <a class="navbar-brand" href="./">cmdbox</a>
+            <span class="page_title">Audit</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle i18n" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            About
-                        </a>
-                        <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <div class="d-none dropdown user_info">
+                <div class="d-none dropdown user_info ms-auto">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true" style="fill:gray;">
                         <img class="user_icon me-2" src="gui/user_data/icon" width="36" height="36">
                         <span class="username align-middle">UserName</span>
@@ -42,7 +33,7 @@
             </div>
         </div>
     </nav>
-    <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="margin-top:66px;height:calc(100vh - 120px);">
+    <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="margin-top:66px;height:calc(100vh - 100px);">
         <ul id="main_tabs" class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" id="metrics-tab" data-bs-toggle="tab" href="#metrics" role="tab" aria-controls="metrics" aria-selected="true">Metrics</a>
@@ -60,21 +51,21 @@
                     <svg width="32" height="32" fill="currentColor" class="bi bi-plus-lg"><use href="#svg_add_btn"></use></svg>
                 </button>
                 <!-- メトリクスグラフ -->
-                <div class="row g-2 m-0 overflow-auto" id="metrics_area" style="height:calc(100vh - 220px);"></div>
+                <div class="row g-2 m-0 overflow-auto" id="metrics_area" style="height:calc(100vh - 200px);"></div>
             </div>
             <div class="tab-pane fade" id="trace" role="tabpanel" aria-labelledby="trace-tab">
                 <button id="search_trace" type="button" class="btn">
                     <svg width="32" height="32" fill="currentColor" class="bi bi-plus-lg"><use href="#svg_search_btn"></use></svg>
                 </button>
                 <!-- トレース一覧 -->
-                <div class="row g-2 mt-1 overflow-auto" id="trace_area" style="height:calc(100vh - 220px);"></div>
+                <div class="row g-2 mt-1 overflow-auto" id="trace_area" style="height:calc(100vh - 200px);"></div>
             </div>
             <div class="tab-pane fade" id="rawlog" role="tabpanel" aria-labelledby="rawlog-tab">
                 <button id="search_rawlog" type="button" class="btn">
                     <svg width="32" height="32" fill="currentColor" class="bi bi-plus-lg"><use href="#svg_search_btn"></use></svg>
                 </button>
                 <!-- 監査ログ一覧 -->
-                <div class="row g-2 mt-1 overflow-auto" id="rawlog_area" style="height:calc(100vh - 220px);"></div>
+                <div class="row g-2 mt-1 overflow-auto" id="rawlog_area" style="height:calc(100vh - 200px);"></div>
             </div>
         </div>
     </div>
@@ -179,7 +170,10 @@
         </div>
     </div>
     <!-- フッター -->
-    <footer class="fixed-bottom text-center p-2 copyright"></footer>
+    <footer>
+        <span class="copyright"></span>
+        <a id="appid_version" href="#" onclick="$(`#versions_modal`).modal(`show`);">cmdbox</a>
+    </footer>
 </body>
 <script type="text/javascript">
     // jqueryの読込み完了までbodyの背景色を設定

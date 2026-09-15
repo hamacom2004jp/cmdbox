@@ -408,10 +408,13 @@ cmdbox.editapikey = async () => {
     cmdbox.process_i18n(editapikey_modal);
     editapikey_modal.modal('show');
 };
+cmdbox.user_language = null;
 cmdbox.getUserLanguage = async () => {
+    if (cmdbox.user_language) return cmdbox.user_language;
     const res = await cmdbox.load_user_data('language', 'default');
     let language = 'ja_JP';
     if (res && res.success) language = res.success;
+    cmdbox.user_language = language;
     return language;
 };
 /**
@@ -449,6 +452,7 @@ cmdbox.editUserLanguage = async () => {
         cmdbox.show_loading();
         const selectedLang = lang_select.find('select').val();
         const result = await cmdbox.save_user_data('language', 'default', selectedLang);
+        cmdbox.user_language = selectedLang;
         cmdbox.message(result, true, true);
         cmdbox.process_i18n();
         cmdbox.hide_loading();

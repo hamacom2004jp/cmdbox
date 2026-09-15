@@ -31,13 +31,18 @@ class FilerDownload(cmdbox_web_exec_cmd.ExecCmd):
                 opt = dict(host=web.redis_host, port=web.redis_port, svname=web.svname, password=web.redis_password,
                            svpath=path, scope=scope, img_thumbnail=img_thumbnail,
                            mode='client', cmd='file_download', client_data=data_dir)
-                opt['capture_stdout'] = nothread = True
+                opt['capture_stdout'] = False
+                nothread = True
                 web.options.audit_exec(req, res, web, body=dict(scope=scope, svpath=path))
                 ret = await self.exec_cmd(req, res, web, 'file_download', opt, nothread, self.appcls)
-                if len(ret) == 0 or 'success' not in ret[0] or 'data' not in ret[0]['success']:
+                if isinstance(ret, list):
+                    if len(ret) == 0:
+                        return common.to_str(ret)
+                    ret = ret[0]
+                if not isinstance(ret, dict) or 'success' not in ret or 'data' not in ret['success']:
                     return common.to_str(ret)
-                mime = ret[0]['success']['mime_type']
-                return StreamingResponse(io.BytesIO(convert.b64str2bytes(ret[0]['success']['data'])),
+                mime = ret['success']['mime_type']
+                return StreamingResponse(io.BytesIO(convert.b64str2bytes(ret['success']['data'])),
                                          headers={'Cache-Control':'no-cache'},
                                          media_type=mime)
             except Exception as e:

@@ -129,25 +129,6 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     perspective: 1000px; /* For 3D transitions */
 }
 
-/* copyright */
-.copyright {
-    color: var(--bs-dropdown-link-color);
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    font-size: 1rem;
-    font-family: var(--font-body);
-    padding: .5rem;
-    z-index: 1;
-}
-/*.copyright {
-    position: absolute;
-    bottom: 10px;
-    right: calc((100vw - var(--console-panel-width)) / 2 - 120px);
-    font-size: 0.8rem;
-    font-family: var(--font-body);
-    padding: .5rem;
-}*/
 [data-bs-theme="spaceship"] .copyright {
     color: var(--text-white-50);
 }

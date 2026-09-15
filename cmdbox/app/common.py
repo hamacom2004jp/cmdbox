@@ -119,7 +119,7 @@ def save_yml(yml_path:Path, data:dict, nolock=True) -> None:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
     save_file(yml_path, _w, nolock=nolock)
 
-def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=True) -> Any:
+def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=True, retry_count:int=5, retry_wait:float=1.0) -> Any:
     """
     ファイルを読み込みます。読み込み時に排他ロックします。
 
@@ -129,6 +129,8 @@ def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=True) -> 
         mode (str, optional): ファイルモード. Defaults to 'r'.
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
         nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.
+        retry_count (int, optional): PermissionError発生時のリトライ回数. Defaults to 5.
+        retry_wait (float, optional): PermissionError発生時の待機秒数. Defaults to 1.0.
     """
     def _load(file_path, func, mode, encoding):
         if 'b' in mode:
@@ -140,28 +142,37 @@ def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=True) -> 
     if nolock:
         return _load(file_path, func, mode, encoding)
     lock_file = f'{file_path}.lock'
-    try:
-        with open(lock_file, 'w') as fd:
-            try:
-                if sys.platform == 'win32':
-                    import msvcrt
-                    msvcrt.locking(fd.fileno(), msvcrt.LK_LOCK, 0)
-                else:
-                    import fcntl
-                    fcntl.lockf(fd, fcntl.LOCK_EX)
-                return _load(file_path, func, mode, encoding)
-            finally:
-                if sys.platform == 'win32':
-                    msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
-                else:
-                    fcntl.lockf(fd, fcntl.LOCK_UN)
-    finally:
+    last_error = None
+    for attempt in range(retry_count):
         try:
-            os.remove(lock_file)
-        except:
-            pass
+            with open(lock_file, 'w') as fd:
+                try:
+                    if sys.platform == 'win32':
+                        import msvcrt
+                        msvcrt.locking(fd.fileno(), msvcrt.LK_LOCK, 0)
+                    else:
+                        import fcntl
+                        fcntl.lockf(fd, fcntl.LOCK_EX)
+                    return _load(file_path, func, mode, encoding)
+                finally:
+                    if sys.platform == 'win32':
+                        msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
+                    else:
+                        fcntl.lockf(fd, fcntl.LOCK_UN)
+        except PermissionError as e:
+            last_error = e
+            if attempt >= retry_count - 1:
+                raise
+            time.sleep(retry_wait)
+        finally:
+            try:
+                os.remove(lock_file)
+            except:
+                pass
+    if last_error is not None:
+        raise last_error
 
-def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True, meta:Dict[str, Any]=None) -> None:
+def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True, meta:Dict[str, Any]=None, retry_count:int=5, retry_wait:float=1.0) -> None:
     """
     ファイルに書き込みます。書き込み時に排他ロックします。
 
@@ -172,6 +183,8 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True, met
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
         nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.
         meta (Dict[str, Any], optional): メタデータ. Defaults to None.
+        retry_count (int, optional): PermissionError発生時のリトライ回数. Defaults to 5.
+        retry_wait (float, optional): PermissionError発生時の待機秒数. Defaults to 1.0.
     """
     def _save(file_path, func, mode, encoding, meta):
         if 'b' in mode:
@@ -185,26 +198,36 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True, met
         _save(file_path, func, mode, encoding, meta)
         return
     lock_file = f'{file_path}.lock'
-    try:
-        with open(lock_file, 'w') as fd:
-            try:
-                if sys.platform == 'win32':
-                    import msvcrt
-                    msvcrt.locking(fd.fileno(), msvcrt.LK_LOCK, 0)
-                else:
-                    import fcntl
-                    fcntl.lockf(fd, fcntl.LOCK_EX)
-                _save(file_path, func, mode, encoding, meta)
-            finally:
-                if sys.platform == 'win32':
-                    msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
-                else:
-                    fcntl.lockf(fd, fcntl.LOCK_UN)
-    finally:
+    last_error = None
+    for attempt in range(retry_count):
         try:
-            os.remove(lock_file)
-        except:
-            pass
+            with open(lock_file, 'w') as fd:
+                try:
+                    if sys.platform == 'win32':
+                        import msvcrt
+                        msvcrt.locking(fd.fileno(), msvcrt.LK_LOCK, 0)
+                    else:
+                        import fcntl
+                        fcntl.lockf(fd, fcntl.LOCK_EX)
+                    _save(file_path, func, mode, encoding, meta)
+                    return
+                finally:
+                    if sys.platform == 'win32':
+                        msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
+                    else:
+                        fcntl.lockf(fd, fcntl.LOCK_UN)
+        except PermissionError as e:
+            last_error = e
+            if attempt >= retry_count - 1:
+                raise
+            time.sleep(retry_wait)
+        finally:
+            try:
+                os.remove(lock_file)
+            except:
+                pass
+    if last_error is not None:
+        raise last_error
 
 def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8', format:str='%Y/%m/%d %H:%M:%S') -> Dict[str, Any]:
     """

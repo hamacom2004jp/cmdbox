@@ -19,10 +19,11 @@
     <nav class="navbar navbar-expand-sm console-header fixed-top p-2">
         <div class="container-fluid">
             <a class="navbar-brand" href="./">cmdbox</a>
+            <span class="page_title">CommandLet</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <div class="collapse navbar-collapse ms-2" id="navbarNavDropdown">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle i18n" href="#" id="fileMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -47,14 +48,6 @@
                             <li><a class="dropdown-item i18n" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle i18n" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            About
-                        </a>
-                        <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
-                        </ul>
-                    </li>
                 </ul>
                 <div class="d-none dropdown user_info">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true" style="fill:gray;">
@@ -69,7 +62,7 @@
             </div>
         </div>
     </nav>
-    <div id="main_container" class="container-fluid overflow-auto" style="margin-top:66px;height:calc(100vh - 120px);">
+    <div id="main_container" class="container-fluid overflow-auto" style="margin-top:66px;height:calc(100vh - 100px);">
         <!-- コマンドリスト -->
         <h2 class="pb-2 border-bottom">
             <span class="i18n">Commands :</span>
@@ -403,7 +396,10 @@
         </div>
     </div>
     <!-- フッター -->
-    <footer class="fixed-bottom text-center p-2 copyright"></footer>
+    <footer>
+        <span class="copyright"></span>
+        <a id="appid_version" href="#" onclick="$(`#versions_modal`).modal(`show`);">cmdbox</a>
+    </footer>
 </body>
 <script type="text/javascript">
     /*// jqueryの読込み完了までbodyの背景色を設定
