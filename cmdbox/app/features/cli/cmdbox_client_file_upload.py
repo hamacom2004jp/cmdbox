@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
+from cmdbox.app.commons import cache, convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -181,12 +181,27 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         svpath = str(svpath).replace('"','').replace('\\','/').replace('//','/')
         svpath = svpath if not svpath.endswith('/') else svpath[:-1]
         lmpath = args.lmpath if hasattr(args, 'lmpath') and isinstance(args.lmpath, list) and args.lmpath else []
+        if not hasattr(self, '_apprun_registrations_cache'):
+            self._apprun_registrations_cache = cache.MemoryCache()
         for p in lmpath:
             if not isinstance(p, str): continue
             if not svpath.startswith(p if not p.endswith('/') else p[:-1]): continue
             p = p if not p.startswith('/') else p[1:]
-            return self._apprun_registrations(data_dir / p, logger, args, msg)
-        return self._apprun_registrations(data_dir, logger, args, msg)
+            path = data_dir / p
+            # キャッシュがあればそれを使用
+            cached = self._apprun_registrations_cache.get(str(path))
+            if cached is not None:
+                return cached
+            ret = self._apprun_registrations(path, logger, args, msg)
+            self._apprun_registrations_cache.set(str(path), ret, 15)
+            return ret
+        # キャッシュがあればそれを使用
+        cached = self._apprun_registrations_cache.get(str(data_dir))
+        if cached is not None:
+            return cached
+        ret = self._apprun_registrations(data_dir, logger, args, msg)
+        self._apprun_registrations_cache.set(str(data_dir), ret, 15)
+        return ret
 
     def _apprun_registrations(self, data_dir, logger, args, msg):
         #total_size = sum(f.stat().st_size for f in data_dir.rglob('*') if f.is_file())
@@ -211,12 +226,26 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         svpath = svpath if not svpath.endswith('/') else svpath[:-1]
         lmpaths = opt.get('lmpaths', [])
         lmpaths = lmpaths if lmpaths and isinstance(lmpaths, list) else []
+        if not hasattr(self, '_svrun_registrations_cache'):
+            self._svrun_registrations_cache = cache.MemoryCache()
         for p in lmpaths:
             if not isinstance(p, str): continue
             if not svpath.startswith(p if not p.endswith('/') else p[:-1]): continue
             p = p if not p.startswith('/') else p[1:]
-            return self._svrun_registrations(data_dir / p, logger, opt, msg)
-        return self._svrun_registrations(data_dir, logger, opt, msg)
+            path = data_dir / p
+            # キャッシュがあればそれを使用
+            cached = self._svrun_registrations_cache.get(str(path))
+            if cached is not None:
+                return cached
+            ret = self._svrun_registrations(data_dir / p, logger, opt, msg)
+            self._svrun_registrations_cache.set(str(path), ret, 15)
+            return ret
+        cached = self._svrun_registrations_cache.get(str(data_dir))
+        if cached is not None:
+            return cached
+        ret = self._svrun_registrations(data_dir, logger, opt, msg)
+        self._svrun_registrations_cache.set(str(data_dir), ret, 15)
+        return ret
 
     def _svrun_registrations(self, data_dir, logger, opt, msg):
         total_size = 0

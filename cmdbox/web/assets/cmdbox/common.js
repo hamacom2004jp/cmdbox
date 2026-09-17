@@ -1464,8 +1464,12 @@ cmdbox.check_cmd = (mode, cmd, error_func=undefined) => {
 cmdbox.user_info = async () => {
     const res = await fetch('gui/user_info', {method: 'GET'});
     if (!res.ok) return null;
-    const user = await res.json()
-    return user;
+    try {
+        const user = await res.json()
+        return user;
+    } catch (e) {
+        return null;
+    }
 };
 /**
  * 新しいパスワード取得
@@ -1880,8 +1884,12 @@ cmdbox.load_user_data = async (cat, key) => {
     if (key) formData.append('key', key);
     const res = await fetch('gui/user_data/load', {method:'POST', body:formData});
     if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, false);
-    const data = await res.json();
-    return data;
+    try {
+        const data = await res.json();
+        return data;
+    } catch (e) {
+        return null;
+    }
 };
 /**
  * ユーザーデータを削除

@@ -52,7 +52,8 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
-    @cache.apprun_cache(exclude_fn=lambda args: hasattr(args,'kwd') and args.kwd and hasattr(args,'groups') and args.groups)
+    # groupオプションがあるためキャッシュは独自実装する
+    #@cache.apprun_cache(exclude_fn=lambda args: hasattr(args,'kwd') and args.kwd and hasattr(args,'groups') and args.groups)
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(kwd=args.kwd, groups=args.groups if hasattr(args, 'groups') else None)
@@ -108,7 +109,8 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
 
-    def get_llmlist(self, kwd:str, data_dir:Path, redis_cli:redis_client.RedisClient, groups:List[str]=None) -> List[Dict[str, Any]]:
+    def get_llmlist(self, kwd:str, data_dir:Path, redis_cli:redis_client.RedisClient,
+                    groups:List[str]=None, cache_clear:bool=False) -> List[Dict[str, Any]]:
         """
         保存されているLLM設定のリストを取得します。
 
@@ -117,6 +119,7 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
             data_dir (Path): データディレクトリのパス
             redis_cli (redis_client.RedisClient): Redisクライアントのインスタンス
             groups (List[str], optional): リクエスト元のユーザーグループのリスト。指定された場合、許可されているグループに含まれる設定のみを返します。
+            cache_clear (bool, optional): Trueの場合、キャッシュをクリアして再読み込みします。デフォルトはFalse。
 
         Returns:
             List[Dict[str, Any]]: LLM設定のリスト
@@ -125,6 +128,8 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
             kwd = '*'
         if groups is None:
             groups = []
+        if not hasattr(self, '_llmlist_cache') or cache_clear:
+            self._llmlist_cache = cache.MemoryCache()
         agent_dir = data_dir / '.agent'
         results: List[Dict[str, Any]] = []
         if agent_dir.exists() and agent_dir.is_dir():
@@ -133,7 +138,11 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
                 name = p.name
                 if not name.startswith('llm-') or not name.endswith('.json'):
                     continue
-                configure = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=False)
+                # キャッシュがあればそれを使用
+                configure = self._llmlist_cache.get(name)
+                if configure is None:
+                    configure = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=True)
+                    self._llmlist_cache.set(name, configure, 60)
                 # グループが指定されている場合、許可されていない設定はスキップ
                 if groups and not self.is_allowed_by_groups(groups, configure.get('user_groups'), redis_cli):
                     continue

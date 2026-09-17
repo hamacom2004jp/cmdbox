@@ -25,8 +25,7 @@
                 "Python: cmdbox server2",
                 "Python: cmdbox web",
                 "Python: cmdbox mcpsv",
-                "Python: cmdbox a2asv",
-                "Python: cmdbox llm_proxy_start"
+                "Python: cmdbox a2asv"
             ]
         }
     ],

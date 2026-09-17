@@ -90,7 +90,7 @@ class LLMDel(feature.OneshotResultEdgeFeature, validator.Validator):
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
-            configure = common.load_file(configure_path, lambda f: json.load(f), encoding='utf-8', nolock=False)
+            configure = common.load_file(configure_path, lambda f: json.load(f), encoding='utf-8', nolock=True)
             request_groups = payload.get('groups')
             if not self.is_allowed_by_groups(request_groups, configure.get('owner_groups'), redis_cli):
                 msg = dict(warn=f"You do not have permission to delete LLM configuration '{llmname}'.")

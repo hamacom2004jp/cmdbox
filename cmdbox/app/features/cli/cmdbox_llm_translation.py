@@ -178,7 +178,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
         """
         cache_path = data_dir / ".agent" / self.TRANSLATION_FILE
         if cache_path.is_file():
-            return common.load_file(cache_path, lambda f: json.load(f), encoding='utf-8', nolock=False)
+            return common.load_file(cache_path, lambda f: json.load(f), encoding='utf-8', nolock=True)
         return {}
 
     def _save_cache(self, data_dir: Path, cache: Dict[str, Any]) -> None:

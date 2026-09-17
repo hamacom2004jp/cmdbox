@@ -225,7 +225,7 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
             if configure_path.exists():
-                before = common.load_file(configure_path, lambda f: json.load(f), encoding='utf-8', nolock=False)
+                before = common.load_file(configure_path, lambda f: json.load(f), encoding='utf-8', nolock=True)
                 if not self.is_allowed_by_groups(groups, before.get('owner_groups'), redis_cli):
                     msg = dict(warn=f"You do not have permission to edit LLM configuration '{name}'.")
                     redis_cli.rpush(reskey, msg)
