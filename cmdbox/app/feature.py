@@ -1,8 +1,8 @@
 from cmdbox import version
-from cmdbox.app import common, edge_tool
+from cmdbox.app import common, edge_tool, web
 from cmdbox.app.commons import redis_client
 from cmdbox.app.web import Web
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from pathlib import Path
 from pydantic import BaseModel, ConfigDict
 from typing import Dict, Any, Tuple, List, Union
@@ -424,3 +424,22 @@ class WebFeature(object):
                 }
         """
         return dict()
+
+    def etag(self, web:web.Web, req:Request, etag_val:str, static:bool=True) -> Tuple[bool, Dict[str, str]]:
+        """
+        etagの検証を行い、If-None-Matchリクエストヘッダの値と合致するかどうかを返します。
+
+        Args:
+            req (Request): クライアントからのリクエストオブジェクト。
+            etag_val (str): 検証するETagの値。
+            static (bool): 静的ファイルかどうか。デフォルトはTrue。
+
+        Returns:
+            Tuple[bool, Dict[str, str]]: ETagが一致するかどうかと、レスポンスヘッダの辞書を返します。
+        """
+        im = req.headers.get('If-None-Match')
+        if web.logger.level == logging.DEBUG or not static:
+            headers = {'Cache-Control':'private, no-cache', 'ETag': etag_val}
+        else:
+            headers = {'Cache-Control':'private, max-age=300', 'ETag': etag_val}
+        return im == etag_val, headers

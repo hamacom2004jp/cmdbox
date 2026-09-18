@@ -36,10 +36,9 @@ class Signin(feature.WebFeature):
         @app.api_route('/{full_path:path}/signin/{next:path}', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def _signin(next:str, req:Request, res:Response, full_path:str=None):
             signin.Signin._enable_cors(req, res)
-            im = req.headers.get('If-None-Match')
-            hs = str(web.signin_html.stat().st_mtime_ns)
-            headers = {'Cache-Control':'private, no-cache', 'ETag': hs, 'Access-Control-Allow-Origin': '*'}
-            if im == hs:
+            em, headers = self.etag(web, req, str(web.signin_html.stat().st_mtime_ns))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
                 return Response(status_code=304, headers=headers)
             if ondemand_load:
                 if not web.signin_html.is_file():

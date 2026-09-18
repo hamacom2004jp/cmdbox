@@ -317,7 +317,7 @@ class LogRecordTCPServer(socketserver.ThreadingTCPServer):
         socketserver.ThreadingTCPServer.__init__(self, (host, port), handler, bind_and_activate=False)
         self.allow_reuse_address = False
         self.allow_reuse_port = False
-        self.request_queue_size = 15
+        self.request_queue_size = 100
         self.abort = 0
         self.timeout = 1
         self.logname = logname

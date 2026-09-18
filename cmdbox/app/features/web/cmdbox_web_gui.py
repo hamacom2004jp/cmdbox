@@ -47,10 +47,9 @@ class Gui(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            im = req.headers.get('If-None-Match')
-            hs = str(web.gui_html.stat().st_mtime_ns)
-            headers = {'Cache-Control':'private, no-cache', 'ETag': hs, 'Access-Control-Allow-Origin': '*'}
-            if im == hs:
+            em, headers = self.etag(web, req, str(web.gui_html.stat().st_mtime_ns))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
                 return Response(status_code=304, headers=headers)
             if ondemand_load:
                 if not web.gui_html.is_file():
@@ -65,15 +64,28 @@ class Gui(feature.WebFeature):
         @app.get('/signin/gui/appid', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         @app.get('/gui/appid', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def appid(req:Request, res:Response):
-            return self.ver.__appid__
+            em, headers = self.etag(web, req, str(self.ver.__appid__))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
+                return Response(status_code=304, headers=headers)
+            return Response(content=self.ver.__appid__, headers=headers)
 
         @app.get('/signin/gui/title', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         @app.get('/gui/title', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def title(req:Request, res:Response):
-            return self.ver.__title__
+            em, headers = self.etag(web, req, str(self.ver.__title__))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
+                return Response(status_code=304, headers=headers)
+            return Response(content=self.ver.__title__, headers=headers)
 
         @app.get('/gui/version_info', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def version_info(req:Request, res:Response):
+            em, headers = self.etag(web, req, str(self.version_info))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
+                return Response(status_code=304, headers=headers)
+            res.headers.update(headers)
             return self.version_info
 
         @app.get('/gui/user_info', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)

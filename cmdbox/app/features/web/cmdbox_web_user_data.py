@@ -28,11 +28,9 @@ class UserData(feature.WebFeature):
             if not categoly or not key:
                 return dict(warn='Category and key are required.')
             sess = req.session['signin']
-
-            im = req.headers.get('If-None-Match')
-            hs = str(web.user_data_hash(sess['uid'], sess['name']))
-            headers = {'Cache-Control':'private, no-cache', 'ETag': hs}
-            if im == hs:
+            em, headers = self.etag(web, req, str(web.user_data_hash(sess['uid'], sess['name'])))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
                 return Response(status_code=304, headers=headers)
             ret = web.user_data(req, sess['uid'], sess['name'], categoly, key)
             res.headers.update(headers)
@@ -87,10 +85,9 @@ class UserData(feature.WebFeature):
             if 'signin' not in req.session or req.session['signin'] is None:
                 return Response(status_code=200, content=svg, media_type='image/svg+xml')
             sess = req.session['signin']
-            im = req.headers.get('If-None-Match')
-            hs = str(web.user_data_hash(sess['uid'], sess['name']))
-            headers = {'Cache-Control':'private, no-cache', 'ETag': hs}
-            if im == hs:
+            em, headers = self.etag(web, req, str(web.user_data_hash(sess['uid'], sess['name'])))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
                 return Response(status_code=200, content=svg, media_type='image/svg+xml')
             ret_b64:str = web.user_data(req, sess['uid'], sess['name'], 'profile', 'icon')
             mimetype = ret_b64[5:ret_b64.index(';base64,')] if ret_b64 and len(ret_b64)>5 else 'image/svg+xml'

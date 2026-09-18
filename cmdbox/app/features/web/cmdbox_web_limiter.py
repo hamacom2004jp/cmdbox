@@ -29,10 +29,9 @@ class Limiter(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            im = req.headers.get('If-None-Match')
-            hs = str(web.limiter_html.stat().st_mtime_ns)
-            headers = {'Cache-Control':'private, no-cache', 'ETag': hs, 'Access-Control-Allow-Origin': '*'}
-            if im == hs:
+            em, headers = self.etag(web, req, str(web.limiter_html.stat().st_mtime_ns))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
                 return Response(status_code=304, headers=headers)
             if ondemand_load:
                 if not web.limiter_html.is_file():

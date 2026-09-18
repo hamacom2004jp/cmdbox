@@ -110,9 +110,9 @@ class DoSignin(cmdbox_web_signin.Signin):
                     web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
                     web.options.audit_exec(req, res, web, body=dict(msg='Wrong password.'), audit_type='auth', user=name)
                     return RedirectResponse(url=f'/signin/{next}?error=1')
-            group_names = list(set(web.signin.__class__.parent_group(signin_data, user['groups'])))
-            group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
-            group_sps = list(set(web.signin.__class__.group_startpage(signin_data, group_names)))
+            group_names = web.signin.__class__.parent_group(signin_data, user['groups'])
+            group_homes = web.signin.__class__.group_home(signin_data, group_names)
+            group_sps = web.signin.__class__.group_startpage(signin_data, group_names)
             if not group_sps or len([sp for sp in group_sps if sp]) <= 0:
                 group_sps = ['gui']
             if not next or next == '':
@@ -322,17 +322,17 @@ class DoSignin(cmdbox_web_signin.Signin):
                     return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
                 group_names, gids = signin.get_groups(access_token, user)
-                group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
-                group_sps = list(set(web.signin.__class__.group_startpage(signin_data, group_names)))
+                group_homes = signin.__class__.group_home(signin_data, group_names)
+                group_sps = signin.__class__.group_startpage(signin_data, group_names)
                 # プランの有効期間内かをチェック
-                if not web.signin.is_open_within_period(group_names):
+                if not signin.is_open_within_period(group_names):
                     return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
                 # セッションに保存
                 _set_session(req, user, email, None, access_token, group_names, group_homes, group_sps, gids)
                 #return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
                 # プラン有効期限通知をチェック
                 notice_query = ''
-                if web.signin.is_notice_expired():
+                if signin.is_notice_expired():
                     notice_query = '?warn=plannotice'
                 html = f"""
                 <html><head><meta http-equiv="refresh" content="0;url=../../{next}{notice_query}"></head>
@@ -384,16 +384,16 @@ class DoSignin(cmdbox_web_signin.Signin):
                         return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                     # グループ取得
                     group_names, gids = saml_signin.get_groups(None, user)
-                    group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
-                    group_sps = list(set(web.signin.__class__.group_startpage(signin_data, group_names)))
+                    group_homes = saml_signin.__class__.group_home(signin_data, group_names)
+                    group_sps = saml_signin.__class__.group_startpage(signin_data, group_names)
                     # プランの有効期間内かをチェック
-                    if not web.signin.is_open_within_period(group_names):
+                    if not saml_signin.is_open_within_period(group_names):
                         return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
                     # セッションに保存
                     _set_session(req, user, email, None, None, group_names, group_homes, group_sps, gids)
                     # プラン有効期限通知をチェック
                     notice_query = ''
-                    if web.signin.is_notice_expired():
+                    if saml_signin.is_notice_expired():
                         notice_query = '?warn=plannotice'
                     # SAML場合、ブラウザ制限によりリダイレクトでセッションクッキーが消えるので、HTMLで移動する
                     html = f"""

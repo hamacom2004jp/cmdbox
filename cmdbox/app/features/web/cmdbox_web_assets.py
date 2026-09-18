@@ -28,10 +28,8 @@ class Assets(feature.WebFeature):
                     if not asset.is_file():
                         raise HTTPException(status_code=404, detail=f'asset is not found. ({asset})')
                     mime, enc = mimetypes.guess_type(path)
-                    im = req.headers.get('If-None-Match')
-                    hs = str(asset.stat().st_mtime_ns)
-                    headers = {'Cache-Control':'private, no-cache', 'ETag': hs}
-                    if im == hs:
+                    em, headers = self.etag(web, req, str(asset.stat().st_mtime_ns))
+                    if em:
                         return Response(status_code=304, headers=headers)
                     with open(asset, 'rb') as f:
                         asset_data = f.read()
@@ -42,9 +40,8 @@ class Assets(feature.WebFeature):
                 @app.get(f'/assets/{path}')
                 async def func(req:Request, res:Response):
                     mime, enc = mimetypes.guess_type(path)
-                    im = req.headers.get('If-None-Match')
-                    headers = {'Cache-Control':'private, no-cache', 'ETag': hs}
-                    if im == hs:
+                    em, headers = self.etag(web, req, hs)
+                    if em:
                         return Response(status_code=304, headers=headers)
                     return StreamingResponse(io.BytesIO(asset_data), media_type=mime, headers=headers)
 

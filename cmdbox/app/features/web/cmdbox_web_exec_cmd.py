@@ -10,6 +10,7 @@ from fastapi.responses import PlainTextResponse, StreamingResponse
 from starlette.datastructures import UploadFile
 from typing import Dict, Any, List, Tuple
 import asyncio
+import concurrent.futures
 import html
 import io
 import json
@@ -20,9 +21,10 @@ import traceback
 import sys
 
 
-# sys.stdout/sys.stdin の差し替えはプロセス全体に影響するため、
-# capture_stdout を使う実行同士は直列化する。
-_CAPTURE_STDIO_LOCK = threading.Lock()
+# CmdboxAppはプロセス内シングルトンで、main()内でlogging・言語設定を更新する。
+# sys.stdout/sys.stdin差し替えもプロセス全体に効くため、コマンド実行は必ず直列化する。
+# 待ち行列は専用executorに持たせ、既定スレッドプールの枯渇を防ぐ。
+_CMD_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="cmdbox_cmd")
 
 
 class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
@@ -280,10 +282,6 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 console = common.create_console(file=old_stdout)
 
                 try:
-                    if _stdin_body is not None:
-                        sys.stdin = io.BytesIO(_stdin_body)
-                    if should_capture_stdout:
-                        sys.stdout = captured_output = io.StringIO()
                     capture_maxsize = opt['capture_maxsize'] if 'capture_maxsize' in opt else self.DEFAULT_CAPTURE_MAXSIZE
                     def to_json(o):
                         res_json = json.loads(o)
@@ -293,23 +291,30 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                             res_json["output_image"] = convert.bytes2b64str(img_bytes)
                             res_json['output_image_name'] = f"{res_json['output_image_name'].strip()}.png"
                         return res_json
-                    if should_capture_stdout:
-                        with _CAPTURE_STDIO_LOCK:
-                            status, ret_main, obj = await asyncio.to_thread(
-                                cmdbox_app.main,
+                    def run_main_serialized() -> Tuple[int, Any, Any, str]:
+                        # stdio差し替えとmain実行を同一スレッドで完結させる。
+                        stdin_bkup = sys.stdin
+                        stdout_bkup = sys.stdout
+                        captured = io.StringIO() if should_capture_stdout else None
+                        try:
+                            if _stdin_body is not None:
+                                sys.stdin = io.BytesIO(_stdin_body)
+                            if captured is not None:
+                                sys.stdout = captured
+                            st, rm, ob = cmdbox_app.main(
                                 args_list=[common.chopdq(o) for o in opt_list],
                                 file_dict=file_dict,
                                 webcall=True,
                                 resqueue=resqueue,
                             )
-                    else:
-                        status, ret_main, obj = await asyncio.to_thread(
-                            cmdbox_app.main,
-                            args_list=[common.chopdq(o) for o in opt_list],
-                            file_dict=file_dict,
-                            webcall=True,
-                            resqueue=resqueue,
-                        )
+                            cap = '' if captured is None else captured.getvalue().strip()
+                            return st, rm, ob, cap
+                        finally:
+                            sys.stdin = stdin_bkup
+                            sys.stdout = stdout_bkup
+
+                    loop = asyncio.get_running_loop()
+                    status, ret_main, obj, captured_output = await loop.run_in_executor(_CMD_EXECUTOR, run_main_serialized)
                     web.logger.disabled = False # ログ出力を有効にする
                     if isinstance(obj, server.Server):
                         cmdbox_app.sv = obj
@@ -343,8 +348,6 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
                 finally:
                     web.logger.disabled = False # ログ出力を有効にする
-                    sys.stdout = old_stdout
-                    sys.stdin = old_stdin
                 if should_capture_stdout:
                     self.callback_console_modal_log_func(web, output)
                 try:

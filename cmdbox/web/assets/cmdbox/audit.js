@@ -402,7 +402,7 @@ $(() => {
     });
     // バージョン情報の取得と表示
     cmdbox.versions().then((versions) => {
-        const version_html = `${versions['appid']}-${versions['version']}`;
+        const version_html = `${versions['title']}-${versions['version']}`;
         $('#appid_version').html(version_html);
     });
     // 多言語対応のためのテキスト翻訳を処理

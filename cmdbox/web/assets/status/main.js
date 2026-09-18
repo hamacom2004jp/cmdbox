@@ -7,7 +7,7 @@ $(() => {
     cmdbox.set_logoicon('.navbar-brand');
     cmdbox.copyright();
     cmdbox.versions().then((versions) => {
-        const version_html = `${versions['appid']}-${versions['version']}`;
+        const version_html = `${versions['title']}-${versions['version']}`;
         $('#appid_version').html(version_html);
     });
     cmdbox.init_version_modal();

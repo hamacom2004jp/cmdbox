@@ -405,7 +405,7 @@ class Web:
                         u['apikeys'][an] = (ak, '-', str(e))
                     except Exception as e:
                         u['apikeys'][an] = (ak, '-', '-')
-            u['groups'] = list(set(self.signin.parent_group(signin_data, u['groups'])))
+            u['groups'] = self.signin.parent_group(signin_data, u['groups'])
             if u['name'] == name:
                 return [u]
             signin_last = self.user_data(None, u['uid'], u['name'], 'signin', 'last_update')
@@ -1052,6 +1052,17 @@ class Web:
             mwparam['cookie_https_only'] = True # セッションハイジャック対策
         app.add_middleware(SessionAutoloadMiddleware)
         app.add_middleware(SessionMiddleware, **mwparam)
+
+        @app.middleware("http")
+        async def remove_session_cookie_on_assets(req:Request, call_next):
+            res:Response = await call_next(req)
+            path = req.url.path if req.url is not None else ''
+            is_assets = path.startswith('/assets/') or path.startswith('/signin/assets/')
+            if is_assets:
+                set_cookies = res.headers.getlist('set-cookie')
+                if set_cookies:
+                    del res.headers['set-cookie']
+            return res
 
         self.init_webfeatures(app)
 

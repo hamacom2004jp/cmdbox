@@ -1,6 +1,6 @@
 from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import PlainTextResponse
 
 
@@ -15,8 +15,9 @@ class Copyright(feature.WebFeature):
         """
         @app.get('/copyright', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def copyright(req:Request, res:Response):
-            signin = web.signin.check_signin(req, res)
-            if signin is not None:
-                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
-            return self.ver.__copyright__
+            em, headers = self.etag(web, req, str(self.ver.__copyright__))
+            headers.update({'Access-Control-Allow-Origin': '*'})
+            if em:
+                return Response(status_code=304, headers=headers)
+            return PlainTextResponse(self.ver.__copyright__, headers=headers)
 
