@@ -233,6 +233,54 @@ class Client(object):
                 common.save_file(download_file, _wd, mode='wb', nolock=False)
         return res_json
 
+    def file_tail(self, svpath:str, scope:str="client", client_data:Path=None,
+                  fwpaths:List[str]=None, rjpaths:List[str]=None,
+                  offset:int=-1, lines:int=200, max_bytes:int=65536, encoding:str='utf-8',
+                  retry_count:int=3, retry_interval:int=5, timeout:int=60):
+        """
+        テキストファイル末尾の内容を取得する
+
+        Args:
+            svpath (str): ファイルパス
+            scope (str, optional): 参照先のスコープ
+            client_data (Path, optional): ローカル参照時のデータフォルダ
+            fwpaths (List[str], optional): 範囲内パス
+            rjpaths (List[str], optional): 範囲外パス
+            offset (int, optional): 読み取り開始オフセット（byte）
+            lines (int, optional): 返却する行数
+            max_bytes (int, optional): 1回で読み取る最大バイト数
+            encoding (str, optional): 文字コード
+            retry_count (int, optional): リトライ回数
+            retry_interval (int, optional): リトライ間隔
+            timeout (int, optional): タイムアウト時間
+
+        Returns:
+            dict: 取得結果
+        """
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_tail(svpath, offset=offset, lines=lines, max_bytes=max_bytes,
+                                          encoding=encoding, fwpaths=fwpaths, rjpaths=rjpaths)
+                return res_json
+            else:
+                self.logger.warning(f"client_data is empty.")
+                return dict(warn=f"client_data is empty.")
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
+            _, res_json = f.file_tail(svpath, offset=offset, lines=lines, max_bytes=max_bytes,
+                                      encoding=encoding, fwpaths=fwpaths, rjpaths=rjpaths)
+            return res_json
+        elif scope == "server":
+            payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths,
+                           offset=offset, lines=lines, max_bytes=max_bytes, encoding=encoding)
+            payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
+            return self.redis_cli.send_cmd('client_file_tail', [payload_b64],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+        else:
+            self.logger.warning(f"scope is invalid. {scope}")
+            return dict(warn=f"scope is invalid. {scope}")
+
     def file_upload(self, svpath:str, upload_file:Path, scope:str="client", client_data:Path=None,
                     fwpaths:List[str]=None, rjpaths:List[str]=None, lmpaths:List[str]=None,
                     meta:Dict[str, Any]=None, mkdir:bool=False, overwrite:bool=False,

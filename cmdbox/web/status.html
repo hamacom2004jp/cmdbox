@@ -59,6 +59,10 @@
                 <i class="fa-solid fa-user-circle fa-xl"></i>
                 <span class="nav-label i18n">Web Session</span>
             </button>
+            <button id="menu_systemlog" class="btn btn-nav-action" title="System Log">
+                <i class="fa-solid fa-file-lines fa-xl"></i>
+                <span class="nav-label i18n">System Log</span>
+            </button>
             <button id="menu_limiter" class="btn btn-nav-action" title="Limiter">
                 <i class="fa-solid fa-gauge-high fa-xl"></i>
                 <span class="nav-label i18n">Limiter</span>
@@ -88,9 +92,24 @@
             <div class="status-surface">
                 <div id="content_server" class="menu-content active">
                     <div class="row g-3">
-                        <div class="col-12 col-xl-4"><div class="stat-card"><div class="stat-title i18n">Total Servers</div><div id="sv_total" class="stat-kpi">-</div></div></div>
-                        <div class="col-12 col-xl-4"><div class="stat-card"><div class="stat-title i18n">Total Requests</div><div id="sv_receive" class="stat-kpi text-success">-</div></div></div>
-                        <div class="col-12 col-xl-4"><div class="stat-card"><div class="stat-title i18n">Last Updated</div><div id="sv_updated" class="stat-kpi stat-kpi-sm">-</div></div></div>
+                        <div class="col-12 col-xl-4">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Total Servers</div>
+                                <div id="sv_total" class="stat-kpi">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-4">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Total Requests</div>
+                                <div id="sv_receive" class="stat-kpi text-success">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-4">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Last Updated</div>
+                                <div id="sv_updated" class="stat-kpi stat-kpi-sm">-</div>
+                            </div>
+                        </div>
                         <div class="col-12"><div class="stat-card"><div class="stat-title i18n">Server Status</div>
                             <table class="table table-sm table-flat table-hover">
                                 <thead><tr>
@@ -110,8 +129,18 @@
 
                 <div id="content_session" class="menu-content">
                     <div class="row g-3">
-                        <div class="col-12 col-xl-6"><div class="stat-card"><div class="stat-title i18n">Active Sessions</div><div id="sess_total" class="stat-kpi text-info">-</div></div></div>
-                        <div class="col-12 col-xl-6"><div class="stat-card"><div class="stat-title i18n">Last Updated</div><div id="sess_updated" class="stat-kpi stat-kpi-sm">-</div></div></div>
+                        <div class="col-12 col-xl-6">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Active Sessions</div>
+                                <div id="sess_total" class="stat-kpi text-info">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-6">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Last Updated</div>
+                                <div id="sess_updated" class="stat-kpi stat-kpi-sm">-</div>
+                            </div>
+                        </div>
                         <div class="col-12">
                             <div class="stat-card">
                                 <div class="stat-title i18n">Session Details</div>
@@ -133,34 +162,184 @@
                     </div>
                 </div>
 
+                <div id="content_systemlog" class="menu-content">
+                    <div class="row g-3">
+                        <div class="col-12 col-xl-8">
+                            <div class="stat-card">
+                                <div class="d-flex flex-wrap align-items-end gap-2 status-log-toolbar">
+                                    <div>
+                                        <label for="svlog_scope" class="form-label mb-1 small i18n">Scope</label>
+                                        <select id="svlog_scope" class="form-select form-select-sm">
+                                            <option value="server" selected>server</option>
+                                            <option value="client">client</option>
+                                            <option value="current">current</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <label for="svlog_file" class="form-label mb-1 small i18n">Log file</label>
+                                        <select id="svlog_file" class="form-select form-select-sm"></select>
+                                    </div>
+                                    <button id="btn_svlog_download" type="button" class="btn btn-outline-secondary btn-sm" title="Download log file" disabled>
+                                        <i class="fas fa-download"></i>
+                                        <span class="i18n ms-1">Download</span>
+                                    </button>
+                                    <div class="d-flex align-items-end gap-1 ms-auto">
+                                        <div>
+                                            <label for="svlog_grep" class="form-label mb-1 small i18n">Grep</label>
+                                            <input id="svlog_grep" type="text" class="form-control form-control-sm" placeholder="keyword">
+                                        </div>
+                                        <button id="btn_svlog_grep" type="button" class="btn btn-outline-info btn-sm" title="Filter displayed log">
+                                            <i class="fas fa-filter"></i>
+                                            <span class="i18n ms-1">Apply</span>
+                                        </button>
+                                        <button id="btn_svlog_grep_clear" type="button" class="btn btn-outline-secondary btn-sm" title="Clear filter">
+                                            <i class="fas fa-xmark"></i>
+                                            <span class="i18n ms-1">Clear</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-4">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Last Updated</div>
+                                <div id="svlog_updated" class="stat-kpi stat-kpi-sm">-</div>
+                            </div>
+                        </div>
+                        <div id="svlog_meta" class="stat-muted mt-2">-</div>
+                        <div class="col-12 mt-0">
+                            <pre id="svlog_tail" class="stat-card tail-log" contenteditable="true"></pre>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="content_limiter" class="menu-content">
                     <div class="row g-3">
-                        <div class="col-12 col-xl-3"><div class="stat-card"><div class="stat-title i18n">Configured Limiters</div><div id="lm_total" class="stat-kpi text-warning">-</div></div></div>
-                        <div class="col-12 col-xl-3"><div class="stat-card"><div class="stat-title i18n">50-80%</div><div id="lm_50to80" class="stat-kpi text-info">-</div></div></div>
-                        <div class="col-12 col-xl-3"><div class="stat-card"><div class="stat-title i18n">Over 80%</div><div id="lm_over80" class="stat-kpi text-danger">-</div></div></div>
-                        <div class="col-12 col-xl-3"><div class="stat-card"><div class="stat-title i18n">Last Updated</div><div id="lm_updated" class="stat-kpi stat-kpi-sm">-</div></div></div>
-                        <div class="col-12"><div class="stat-card"><div class="stat-title i18n">Limiter Details</div><div id="lm_rows" class="limiter-details"></div></div></div>
+                        <div class="col-12 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Configured Limiters</div>
+                                <div id="lm_total" class="stat-kpi text-warning">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">50-80%</div>
+                                <div id="lm_50to80" class="stat-kpi text-info">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Over 80%</div>
+                                <div id="lm_over80" class="stat-kpi text-danger">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Last Updated</div>
+                                <div id="lm_updated" class="stat-kpi stat-kpi-sm">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Limiter Details</div>
+                                <div id="lm_rows" class="limiter-details"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="content_storage" class="menu-content">
                     <div class="row g-3">
-                        <div class="col-12 col-xl-2"><div class="stat-card"><div class="stat-title i18n">Files</div><div id="st_files" class="stat-kpi">-</div></div></div>
-                        <div class="col-12 col-xl-2"><div class="stat-card"><div class="stat-title i18n">Directories</div><div id="st_dirs" class="stat-kpi text-info">-</div></div></div>
-                        <div class="col-12 col-xl-2"><div class="stat-card"><div class="stat-title i18n">Total Size</div><div id="st_size" class="stat-kpi text-success">-</div></div></div>
-                        <div class="col-12 col-xl-2"><div class="stat-card"><div class="stat-title i18n">Scopes</div><div id="st_scopes" class="stat-kpi text-warning">3</div></div></div>
-                        <div class="col-12 col-xl-4"><div class="stat-card"><div class="stat-title i18n">Last Updated</div><div id="st_updated" class="stat-kpi stat-kpi-sm">-</div></div></div>
-                        <div class="col-12"><div class="stat-card"><div class="stat-title i18n">Storage by Scope</div><table class="table table-sm table-flat table-hover"><thead><tr><th>Name</th><th class="text-end">Files</th><th class="text-end">Dirs</th><th class="text-end">Size</th><th>Latest</th></tr></thead><tbody id="st_rows"></tbody></table></div></div>
+                        <div class="col-12 col-xl-2">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Files</div>
+                                <div id="st_files" class="stat-kpi">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-2">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Directories</div>
+                                <div id="st_dirs" class="stat-kpi text-info">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-2">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Total Size</div>
+                                <div id="st_size" class="stat-kpi text-success">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-2">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Scopes</div>
+                                <div id="st_scopes" class="stat-kpi text-warning">3</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-4">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Last Updated</div>
+                                <div id="st_updated" class="stat-kpi stat-kpi-sm">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Storage by Scope</div>
+                                <table class="table table-sm table-flat table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th class="text-end">Files</th>
+                                            <th class="text-end">Dirs</th>
+                                            <th class="text-end">Size</th>
+                                            <th>Latest</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="st_rows"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="content_audit" class="menu-content">
                     <div class="row g-3">
-                        <div class="col-12 col-xl-3"><div class="stat-card"><div class="stat-title i18n">Recent Rows</div><div id="ad_recent" class="stat-kpi">-</div></div></div>
-                        <div class="col-12 col-xl-3"><div class="stat-card"><div class="stat-title i18n">Users</div><div id="ad_users" class="stat-kpi text-success">-</div></div></div>
-                        <div class="col-12 col-xl-3"><div class="stat-card"><div class="stat-title i18n">Latest</div><div id="ad_latest" class="stat-kpi stat-kpi-sm">-</div></div></div>
-                        <div class="col-12 col-xl-3"><div class="stat-card"><div class="stat-title i18n">Last Updated</div><div id="ad_updated" class="stat-kpi stat-kpi-sm">-</div></div></div>
-                        <div class="col-12"><div class="stat-card"><div class="stat-title i18n">Audit Types</div><table class="table table-sm table-flat table-hover"><thead><tr><th>Type</th><th class="text-end">Count</th></tr></thead><tbody id="ad_rows"></tbody></table></div></div>
+                        <div class="col-12 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Recent Rows</div>
+                                <div id="ad_recent" class="stat-kpi">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Users</div>
+                                <div id="ad_users" class="stat-kpi text-success">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Latest</div>
+                                <div id="ad_latest" class="stat-kpi stat-kpi-sm">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Last Updated</div>
+                                <div id="ad_updated" class="stat-kpi stat-kpi-sm">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="stat-card">
+                                <div class="stat-title i18n">Audit Types</div>
+                                <table class="table table-sm table-flat table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th class="text-end">Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ad_rows"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

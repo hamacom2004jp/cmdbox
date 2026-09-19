@@ -50,6 +50,8 @@ audit:
     cmd: write                          # Specify the command to be writed.
     exclude_clmsg_tag:                  # Specify the list of tags to be excluded from the audit log.
     - client_file_is
+    - client_file_list
+    - client_file_tail
     - client_time
     - cmd_check
     - limiter_targets

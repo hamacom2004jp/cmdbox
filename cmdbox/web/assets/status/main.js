@@ -14,6 +14,7 @@ $(() => {
     cmdbox.init_modal_button();
     cmdbox.init_user_info_menu();
     statusPage.initSidebar();
+    statusPage.initServerLogControls();
     statusPage.initAutoRefreshSelector();
 
     $('#btn_status_refresh').off('click').on('click', async () => {
@@ -24,7 +25,7 @@ $(() => {
         // ローカルストレージから前回のメニューを取得、なければ'server'をデフォルトに
         const savedMenu = localStorage.getItem('statusPage_activeMenu') || 'server';
         statusPage.showMenu(savedMenu);
-        await statusPage.refreshActive();
+        await statusPage.refreshActive(true);
         statusPage.loadAutoRefreshInterval().then(() => {
             statusPage.startAutoRefresh();
         });

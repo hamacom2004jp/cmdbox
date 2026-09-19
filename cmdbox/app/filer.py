@@ -399,6 +399,100 @@ class Filer(object):
             self.logger.warning(f"Failed to download {apath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to download {apath}. {e}")
 
+    def file_tail(self, current_path:str, offset:int=-1, lines:int=200, max_bytes:int=65536,
+                  encoding:str='utf-8', fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+        """
+        テキストファイル末尾の内容を取得する
+
+        Args:
+            current_path (str): ファイルパス
+            offset (int, optional): 読み取り開始オフセット（byte）。-1の場合は末尾から取得
+            lines (int, optional): 返却する行数
+            max_bytes (int, optional): 1回で読み取る最大バイト数
+            encoding (str, optional): デコード時の文字コード
+            fwpaths (List[str], optional): 範囲内パス
+            rjpaths (List[str], optional): 範囲外パス
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        if not chk:
+            return self.RESP_WARN, msg
+        chk, abspath, msg = self._file_exists(current_path)
+        if not chk:
+            return self.RESP_WARN, msg
+        apath:str = self._abspath_to_apath(abspath, current_path)
+        if abspath.is_dir():
+            self.logger.warning(f"Path {apath} is directory.")
+            return self.RESP_WARN, dict(warn=f"Path {apath} is directory.")
+
+        try:
+            max_bytes = int(max_bytes)
+            lines = int(lines)
+            offset = int(offset)
+        except Exception:
+            return self.RESP_WARN, dict(warn="offset, lines and max_bytes must be integer values.")
+        if max_bytes <= 0:
+            max_bytes = 65536
+        if lines <= 0:
+            lines = 1
+
+        try:
+            file_size = abspath.stat().st_size
+            file_etag = str(abspath.stat().st_mtime_ns)
+            rotated = False
+            if offset < 0:
+                start = max(file_size - max_bytes, 0)
+            elif offset > file_size:
+                # ローテーション等でファイルが小さくなった場合
+                start = max(file_size - max_bytes, 0)
+                rotated = True
+            else:
+                start = offset
+
+            if start >= file_size:
+                return self.RESP_SUCCESS, dict(success=dict(
+                    name=abspath.name,
+                    svpath=current_path,
+                    data="",
+                    lines=[],
+                    offset=file_size,
+                    file_size=file_size,
+                    etag=file_etag,
+                    not_modified=True,
+                    rotated=rotated,
+                    encoding=encoding,
+                ))
+
+            read_len = min(max_bytes, file_size - start)
+            with open(abspath, 'rb') as f:
+                f.seek(start)
+                raw = f.read(read_len)
+
+            decoded = raw.decode(encoding, errors='replace')
+            rows = decoded.splitlines()
+            if len(rows) > lines:
+                rows = rows[-lines:]
+            data = '\n'.join(rows)
+
+            return self.RESP_SUCCESS, dict(success=dict(
+                name=abspath.name,
+                svpath=current_path,
+                data=data,
+                lines=rows,
+                offset=start + len(raw),
+                file_size=file_size,
+                etag=file_etag,
+                not_modified=False,
+                rotated=rotated,
+                encoding=encoding,
+            ))
+        except Exception as e:
+            self.logger.warning(f"Failed to tail {apath}. {e}")
+            return self.RESP_WARN, dict(warn=f"Failed to tail {apath}. {e}")
+
     def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool,
                     overwrite:bool, fwpaths:List[str]=None, rjpaths:List[str]=None,
                     meta: Dict[str, Any]=None) -> Tuple[int, Dict[str, Any]]:

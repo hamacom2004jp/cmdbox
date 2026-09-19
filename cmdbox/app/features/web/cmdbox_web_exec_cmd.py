@@ -268,6 +268,11 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 opt['output_raw'] = False
                 opt_list, file_dict = web.options.mk_opt_list(opt)
                 opt['output_raw'] = True
+                if "--data" not in opt_list and opt.get('data', None) is not None:
+                    # コマンドオプションで"data"オプションが指定されていない場合がある。
+                    # "--data"オプションが指定されていない場合、opt['data']の内容を追加する。
+                    # このオプションはログファイルの出力先で使用されるため補完する。
+                    opt_list.extend(["--data", str(opt['data'])])
                 old_stdout = sys.stdout
                 old_stdin = sys.stdin
                 if 'capture_stdout' in opt and opt['capture_stdout'] and 'stdin' in opt and opt['stdin'] and _stdin_body is None:
