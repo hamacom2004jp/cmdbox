@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.commons.loghandler &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.commons.loghandler</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.commons.loghandler</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich</span><span class="w"> </span><span class="kn">import</span> <span class="n">highlighter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.theme</span><span class="w"> </span><span class="kn">import</span> <span class="n">Theme</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging.handlers</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socketserver</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+
+
+<div class="viewcode-block" id="Colors">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.Colors">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Colors</span><span class="p">:</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">["</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="s2">";"</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="s2">"m"</span>
+    <span class="c1"># https://pkg.go.dev/github.com/whitedevops/colors</span>
+    <span class="n">ResetAll</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">Bold</span>       <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Dim</span>        <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">Underlined</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">Blink</span>      <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">Reverse</span>    <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">Hidden</span>     <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="n">ResetBold</span>       <span class="o">=</span> <span class="mi">21</span>
+    <span class="n">ResetDim</span>        <span class="o">=</span> <span class="mi">22</span>
+    <span class="n">ResetUnderlined</span> <span class="o">=</span> <span class="mi">24</span>
+    <span class="n">ResetBlink</span>      <span class="o">=</span> <span class="mi">25</span>
+    <span class="n">ResetReverse</span>    <span class="o">=</span> <span class="mi">27</span>
+    <span class="n">ResetHidden</span>     <span class="o">=</span> <span class="mi">28</span>
+
+    <span class="n">Default</span>      <span class="o">=</span> <span class="mi">39</span>
+    <span class="n">Black</span>        <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">Red</span>          <span class="o">=</span> <span class="mi">31</span>
+    <span class="n">Green</span>        <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">Yellow</span>       <span class="o">=</span> <span class="mi">33</span>
+    <span class="n">Blue</span>         <span class="o">=</span> <span class="mi">34</span>
+    <span class="n">Magenta</span>      <span class="o">=</span> <span class="mi">35</span>
+    <span class="n">Cyan</span>         <span class="o">=</span> <span class="mi">36</span>
+    <span class="n">LightGray</span>    <span class="o">=</span> <span class="mi">37</span>
+    <span class="n">DarkGray</span>     <span class="o">=</span> <span class="mi">90</span>
+    <span class="n">LightRed</span>     <span class="o">=</span> <span class="mi">91</span>
+    <span class="n">LightGreen</span>   <span class="o">=</span> <span class="mi">92</span>
+    <span class="n">LightYellow</span>  <span class="o">=</span> <span class="mi">93</span>
+    <span class="n">LightBlue</span>    <span class="o">=</span> <span class="mi">94</span>
+    <span class="n">LightMagenta</span> <span class="o">=</span> <span class="mi">95</span>
+    <span class="n">LightCyan</span>    <span class="o">=</span> <span class="mi">96</span>
+    <span class="n">White</span>        <span class="o">=</span> <span class="mi">97</span>
+
+    <span class="n">BackgroundDefault</span>      <span class="o">=</span> <span class="mi">49</span>
+    <span class="n">BackgroundBlack</span>        <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">BackgroundRed</span>          <span class="o">=</span> <span class="mi">41</span>
+    <span class="n">BackgroundGreen</span>        <span class="o">=</span> <span class="mi">42</span>
+    <span class="n">BackgroundYellow</span>       <span class="o">=</span> <span class="mi">43</span>
+    <span class="n">BackgroundBlue</span>         <span class="o">=</span> <span class="mi">44</span>
+    <span class="n">BackgroundMagenta</span>      <span class="o">=</span> <span class="mi">45</span>
+    <span class="n">BackgroundCyan</span>         <span class="o">=</span> <span class="mi">46</span>
+    <span class="n">BackgroundLightGray</span>    <span class="o">=</span> <span class="mi">47</span>
+    <span class="n">BackgroundDarkGray</span>     <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">BackgroundLightRed</span>     <span class="o">=</span> <span class="mi">101</span>
+    <span class="n">BackgroundLightGreen</span>   <span class="o">=</span> <span class="mi">102</span>
+    <span class="n">BackgroundLightYellow</span>  <span class="o">=</span> <span class="mi">103</span>
+    <span class="n">BackgroundLightBlue</span>    <span class="o">=</span> <span class="mi">104</span>
+    <span class="n">BackgroundLightMagenta</span> <span class="o">=</span> <span class="mi">105</span>
+    <span class="n">BackgroundLightCyan</span>    <span class="o">=</span> <span class="mi">106</span>
+    <span class="n">BackgroundWhite</span>        <span class="o">=</span> <span class="mi">107</span>
+
+    <span class="n">_colorize_suffix</span> <span class="o">=</span> <span class="n">S</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ResetAll</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span>
+
+    <span class="n">option_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"MODE|CMD|SVNAME|GROUPS|FWPATH"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+    <span class="n">product_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"CMDBOX|IINFER|USOUND|GAIAN"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+    <span class="n">success_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW|EXEC"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+    <span class="n">warning_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"WARNING|WARN|CAUTION|NOTICE|STOP|DISCONNECTED|DENY"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+    <span class="n">error_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"ERROR|ALERT|CRITICAL|FATAL|ABORT|FAILED"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="colorize">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.colorize">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">colorize</span><span class="p">(</span><span class="n">s</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">colors</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Colors</span><span class="o">.</span><span class="n">S</span> <span class="o">+</span> <span class="n">Colors</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="n">Colors</span><span class="o">.</span><span class="n">ResetAll</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">colors</span><span class="p">)))</span> <span class="o">+</span> <span class="n">Colors</span><span class="o">.</span><span class="n">E</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">Colors</span><span class="o">.</span><span class="n">_colorize_suffix</span></div>
+
+
+<div class="viewcode-block" id="colorize_msg">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.colorize_msg">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">colorize_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">Colors</span><span class="o">.</span><span class="n">success_word</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">colorize</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\g&lt;0&gt;"</span><span class="p">,</span> <span class="n">Colors</span><span class="o">.</span><span class="n">Green</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">Colors</span><span class="o">.</span><span class="n">warning_word</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">colorize</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\g&lt;0&gt;"</span><span class="p">,</span> <span class="n">Colors</span><span class="o">.</span><span class="n">Yellow</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">Colors</span><span class="o">.</span><span class="n">error_word</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">colorize</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\g&lt;0&gt;"</span><span class="p">,</span> <span class="n">Colors</span><span class="o">.</span><span class="n">Red</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">Colors</span><span class="o">.</span><span class="n">option_word</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">colorize</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\g&lt;0&gt;"</span><span class="p">,</span> <span class="n">Colors</span><span class="o">.</span><span class="n">LightGreen</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">Colors</span><span class="o">.</span><span class="n">product_word</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">colorize</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\g&lt;0&gt;"</span><span class="p">,</span> <span class="n">Colors</span><span class="o">.</span><span class="n">LightBlue</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">msg</span></div>
+
+
+<span class="n">level_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>   <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">colorize</span><span class="p">(</span><span class="s1">'DEBUG'</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Bold</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Cyan</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">:</span>    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">colorize</span><span class="p">(</span><span class="s1">'INFO'</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Bold</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Green</span><span class="p">)</span><span class="si">}</span><span class="s2"> "</span><span class="p">,</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">colorize</span><span class="p">(</span><span class="s1">'WARN'</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Bold</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Yellow</span><span class="p">)</span><span class="si">}</span><span class="s2"> "</span><span class="p">,</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>   <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">colorize</span><span class="p">(</span><span class="s1">'ERROR'</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Bold</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Red</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">:</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">colorize</span><span class="p">(</span><span class="s1">'FATAL'</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">Bold</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">LightGray</span><span class="p">,</span><span class="w"> </span><span class="n">Colors</span><span class="o">.</span><span class="n">BackgroundRed</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+
+<span class="n">level_mapping_nc</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>   <span class="sa">f</span><span class="s2">"DEBUG"</span><span class="p">,</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">:</span>    <span class="sa">f</span><span class="s2">"INFO "</span><span class="p">,</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"WARN "</span><span class="p">,</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>   <span class="sa">f</span><span class="s2">"ERROR"</span><span class="p">,</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">:</span><span class="sa">f</span><span class="s2">"FATAL"</span><span class="p">}</span>
+
+<span class="n">theme</span><span class="o">=</span><span class="n">Theme</span><span class="p">({</span>
+    <span class="s2">"repr.log_debug"</span><span class="p">:</span> <span class="s2">"bold cyan"</span><span class="p">,</span>
+    <span class="s2">"repr.log_info"</span><span class="p">:</span> <span class="s2">"bold green"</span><span class="p">,</span>
+    <span class="s2">"repr.log_warn"</span><span class="p">:</span> <span class="s2">"bold Yellow"</span><span class="p">,</span>
+    <span class="s2">"repr.log_error"</span><span class="p">:</span> <span class="s2">"bold red"</span><span class="p">,</span>
+    <span class="s2">"repr.log_fatal"</span><span class="p">:</span> <span class="s2">"bold red reverse"</span><span class="p">,</span>
+    <span class="s2">"repr.log_option"</span><span class="p">:</span> <span class="s2">"green4 reverse"</span><span class="p">,</span>
+    <span class="s2">"repr.log_product"</span><span class="p">:</span> <span class="s2">"dodger_blue2 reverse"</span><span class="p">,</span>
+    <span class="s2">"repr.log_success"</span><span class="p">:</span> <span class="s2">"green"</span><span class="p">,})</span>
+
+<div class="viewcode-block" id="LogLevelHighlighter">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.LogLevelHighlighter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogLevelHighlighter</span><span class="p">(</span><span class="n">highlighter</span><span class="o">.</span><span class="n">ReprHighlighter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    ログメッセージのログレベルをハイライトします。</span>
+<span class="sd">    """</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#self.highlights = []</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?P&lt;log_debug&gt;DEBUG|EXEC)"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?P&lt;log_info&gt;INFO)"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?P&lt;log_warn&gt;WARN|WARNING|WARN|CAUTION|NOTICE|STOP|DISCONNECTED|DENY)"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?P&lt;log_error&gt;ERROR|ALERT|ABORT|FAILED)"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?P&lt;log_fatal&gt;FATAL|CRITICAL)"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?P&lt;log_option&gt;MODE|CMD|SVNAME|GROUPS|FWPATH)"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?P&lt;log_product&gt;CMDBOX|IINFER|USOUND|GAIAN)"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?P&lt;log_success&gt;SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW)"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">highlights</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ColorfulStreamHandler">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.ColorfulStreamHandler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ColorfulStreamHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    コンソールにカラフルなログメッセージを出力します。</span>
+<span class="sd">    """</span>
+    <span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">(</span><span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">highlighter</span><span class="o">=</span><span class="n">LogLevelHighlighter</span><span class="p">(),</span> <span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ColorfulStreamHandler.emit">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.ColorfulStreamHandler.emit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">LogRecord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#record.levelname = level_mapping[record.levelno]</span>
+        <span class="c1">#record.asctime = colorize(record.asctime, Colors.Bold)</span>
+        <span class="c1">#record.msg = colorize_msg(record.msg)</span>
+        <span class="c1">#super().emit(record)</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">levelname</span> <span class="o">=</span> <span class="n">level_mapping_nc</span><span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">levelno</span><span class="p">]</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">highlight</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="TimedRotatingFileHandler">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.TimedRotatingFileHandler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TimedRotatingFileHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">TimedRotatingFileHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="TimedRotatingFileHandler.emit">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.TimedRotatingFileHandler.emit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">LogRecord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ログ出力時に例外（特に Windows の PermissionError）で処理が止まらないように保護します。</span>
+<span class="sd">        - 通常は親クラスの emit を呼ぶ</span>
+<span class="sd">        - PermissionError 等で回転に失敗した場合はフォールバックして標準エラーへ出力し、処理を継続する</span>
+<span class="sd">        """</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">levelname</span> <span class="o">=</span> <span class="n">level_mapping_nc</span><span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">levelno</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+            <span class="c1"># ローテーションでファイルのリネームに失敗した可能性</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># 一度ストリームを閉じて再試行してみる</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'stream'</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># doRollover を安全に呼ぶ（内部でも例外を捕まえる実装にしている）</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">doRollover</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="c1"># doRollover が失敗しても続行</span>
+                    <span class="k">pass</span>
+                <span class="c1"># 再度 emit を試みる</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="c1"># 最終フォールバック：標準エラーに書く</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="c1"># ここでは何もしない（ログ出力でプロセスが落ちるのを避ける）</span>
+                        <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c1"># どのパスでも例外が出たら最終的に標準エラーへ出力して握りつぶす</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># その他の予期しない例外も握りつぶして標準エラーへ出力</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="TimedRotatingFileHandler.doRollover">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.TimedRotatingFileHandler.doRollover">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doRollover</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Windows 上で os.rename が失敗するケースに備えたフォールバック実装。</span>
+<span class="sd">        まず親クラス実装を試み、PermissionError の場合はファイルのコピーで代替する。</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">doRollover</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># コピー先ファイル名を親クラスと整合する形で作成する</span>
+                <span class="c1"># parent の実装では rolloverAt - interval の時刻を使う</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'baseFilename'</span><span class="p">):</span>
+                    <span class="k">return</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rolloverAt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">))</span>
+                <span class="n">dfn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span> <span class="o">+</span> <span class="s2">"."</span> <span class="o">+</span> <span class="n">timestamp</span>
+                <span class="c1"># 既存のバックアップがあれば削除</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dfn</span><span class="p">):</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dfn</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># ファイルをコピーしてバックアップを作る</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span><span class="p">,</span> <span class="n">dfn</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="c1"># コピーにも失敗したら諦める</span>
+                    <span class="k">pass</span>
+                <span class="c1"># 再オープン</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'stream'</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'delay'</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># ロールオーバー時刻を更新（親実装と同様）</span>
+                <span class="n">newRolloverAt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">computeRollover</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rolloverAt</span> <span class="o">=</span> <span class="n">newRolloverAt</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c1"># ここで失敗しても握りつぶす</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+                <span class="k">return</span></div>
+</div>
+
+
+<div class="viewcode-block" id="SocketHandler">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.SocketHandler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SocketHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">SocketHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketHandler.emit">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.SocketHandler.emit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">LogRecord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">levelname</span> <span class="o">=</span> <span class="n">level_mapping_nc</span><span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">levelno</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="LogRecordRequestHandler">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.LogRecordRequestHandler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogRecordRequestHandler</span><span class="p">(</span><span class="n">socketserver</span><span class="o">.</span><span class="n">StreamRequestHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    ログリクエストを処理するためのハンドラ</span>
+<span class="sd">    """</span>
+<div class="viewcode-block" id="LogRecordRequestHandler.setup">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.LogRecordRequestHandler.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_getLogger</span><span class="p">(),</span> <span class="n">LogRecordTCPServer</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_getLogger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">logname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">logname</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logname</span>
+        <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LogRecordRequestHandler.handle">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.LogRecordRequestHandler.handle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ログリクエストを処理します。</span>
+<span class="sd">        """</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">slen</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">'&gt;L'</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">slen</span><span class="p">)</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">slen</span><span class="p">:</span>
+                <span class="n">chunk</span> <span class="o">=</span> <span class="n">chunk</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">slen</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unPickle</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">makeLogRecord</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handleLogRecord</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LogRecordRequestHandler.unPickle">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.LogRecordRequestHandler.unPickle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unPickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="LogRecordRequestHandler.handleLogRecord">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.LogRecordRequestHandler.handleLogRecord">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handleLogRecord</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getLogger</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="LogRecordTCPServer">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.LogRecordTCPServer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogRecordTCPServer</span><span class="p">(</span><span class="n">socketserver</span><span class="o">.</span><span class="n">ThreadingTCPServer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    ログレコードを受信するためのTCPサーバー。</span>
+<span class="sd">    """</span>
+    <span class="c1"># 停止後すぐにサーバーを再起動できるようにする</span>
+    <span class="n">allow_reuse_address</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logname</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">'localhost'</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">DEFAULT_TCP_LOGGING_PORT</span><span class="p">,</span>
+                 <span class="n">handler</span><span class="o">=</span><span class="n">LogRecordRequestHandler</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コンストラクタ</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logname (str): ログ名</span>
+<span class="sd">            host (str): ホスト名</span>
+<span class="sd">            port (int): ポート番号</span>
+<span class="sd">            handler (socketserver.RequestHandler): リクエストハンドラ</span>
+<span class="sd">            debug (bool): デバッグモード</span>
+<span class="sd">        """</span>
+        <span class="n">socketserver</span><span class="o">.</span><span class="n">ThreadingTCPServer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">),</span> <span class="n">handler</span><span class="p">,</span> <span class="n">bind_and_activate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_reuse_address</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_reuse_port</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request_queue_size</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abort</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logname</span> <span class="o">=</span> <span class="n">logname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">handler</span>
+        <span class="n">LogRecordTCPServer</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+
+<div class="viewcode-block" id="LogRecordTCPServer.serve_until_stopped">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.loghandler.LogRecordTCPServer.serve_until_stopped">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serve_until_stopped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">select</span>
+        <span class="n">abort</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server_bind</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server_activate</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c1"># すでにlogsvが起動中の場合は待機しない</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server_close</span><span class="p">()</span>
+            <span class="n">abort</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">abort</span><span class="p">:</span>
+            <span class="n">rd</span><span class="p">,</span> <span class="n">wr</span><span class="p">,</span> <span class="n">ex</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span>
+                                       <span class="p">[],</span> <span class="p">[],</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rd</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+            <span class="n">abort</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">abort</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

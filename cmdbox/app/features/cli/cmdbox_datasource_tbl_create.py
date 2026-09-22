@@ -68,6 +68,58 @@ class DatasourceTblCreate(datasource_base.DatasourceBase, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
+    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+        payload = dict(
+            dsname=args.dsname,
+            schema=args.schema if hasattr(args, 'schema') else None,
+            tblname=args.tblname,
+            tblcolumns=args.tblcolumns,
+            if_not_exists=args.if_not_exists if hasattr(args, 'if_not_exists') else True,
+        )
+        try:
+            return self.route_apprun(args, payload, logger, tm, pf)
+        except Exception as e:
+            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
+            ret = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
+            return self.RESP_WARN, ret, None
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
+
+    def is_cluster_redirect(self):
+        return False
+
+    def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient,
+              msg: List[str], sessions: Dict[str, Dict[str, Any]]) -> int:
+        reskey = msg[1]
+        payload = json.loads(convert.b64str2str(msg[2]))
+        ret = self._do_run(data_dir, payload, logger)
+        redis_cli.rpush(reskey, ret)
+        return self.RESP_SUCCESS if 'success' in ret else self.RESP_WARN
+
+    def _build_col_def(self, col: Dict[str, Any]) -> str:
+        name = self.validate_identifier(col['name'])
+        col_type = self.validate_col_type(col['type'])
+        parts = [f"{name} {col_type}"]
+        if col.get('primary_key'):
+            parts.append('PRIMARY KEY')
+        if not col.get('nullable', True) and not col.get('primary_key'):
+            parts.append('NOT NULL')
+        if col.get('default') is not None:
+            default_val = col['default']
+            if isinstance(default_val, str):
+                # 文字列リテラルはシングルクォートでエスケープ（シングルクォートを二重に）
+                escaped = default_val.replace("'", "''")
+                parts.append(f"DEFAULT '{escaped}'")
+            else:
+                parts.append(f"DEFAULT {default_val}")
+        return ' '.join(parts)
+
     def _do_run(self, data_dir: Path, payload: Dict[str, Any], logger: logging.Logger) -> Dict[str, Any]:
         conn = None
         try:
@@ -95,55 +147,3 @@ class DatasourceTblCreate(datasource_base.DatasourceBase, validator.Validator):
                     conn.close()
                 except Exception:
                     pass
-
-    @validator.apprun_check
-    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        payload = dict(
-            dsname=args.dsname,
-            schema=args.schema if hasattr(args, 'schema') else None,
-            tblname=args.tblname,
-            tblcolumns=args.tblcolumns,
-            if_not_exists=args.if_not_exists if hasattr(args, 'if_not_exists') else True,
-        )
-        try:
-            return self.route_apprun(args, payload, logger, tm, pf)
-        except Exception as e:
-            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
-            ret = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
-            return self.RESP_WARN, ret, None
-
-    def output_schema(self) -> type:
-        class Data(resdata.Data):
-            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
-        class Result(resdata.Result):
-            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
-        return Result
-
-    def is_cluster_redirect(self):
-        return False
-
-    def _build_col_def(self, col: Dict[str, Any]) -> str:
-        name = self.validate_identifier(col['name'])
-        col_type = self.validate_col_type(col['type'])
-        parts = [f"{name} {col_type}"]
-        if col.get('primary_key'):
-            parts.append('PRIMARY KEY')
-        if not col.get('nullable', True) and not col.get('primary_key'):
-            parts.append('NOT NULL')
-        if col.get('default') is not None:
-            default_val = col['default']
-            if isinstance(default_val, str):
-                # 文字列リテラルはシングルクォートでエスケープ（シングルクォートを二重に）
-                escaped = default_val.replace("'", "''")
-                parts.append(f"DEFAULT '{escaped}'")
-            else:
-                parts.append(f"DEFAULT {default_val}")
-        return ' '.join(parts)
-
-    def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient,
-              msg: List[str], sessions: Dict[str, Dict[str, Any]]) -> int:
-        reskey = msg[1]
-        payload = json.loads(convert.b64str2str(msg[2]))
-        ret = self._do_run(data_dir, payload, logger)
-        redis_cli.rpush(reskey, ret)
-        return self.RESP_SUCCESS if 'success' in ret else self.RESP_WARN

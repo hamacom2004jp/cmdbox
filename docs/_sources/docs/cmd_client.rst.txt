@@ -577,6 +577,94 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "end","bool | null","no","null","終了フラグ"
 
 
+client ( file_tail ) : ``cmdbox -m client -c file_tail <Option>``
+=================================================================
+
+- Get tail contents of a log file under the data folder.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
+    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
+    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--svpath <svpath>","file","","required","/.logs/cmdbox_server.log","","Specify the file path to read."
+    "--fwpath <fwpath>","file","multi","required","","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--rjpath <rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
+    "--scope <scope>","str","","required","server","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
+    "--offset <offset>","int","","","-1","","Specify the read start byte offset. -1 reads from the end of the file."
+    "--lines <lines>","int","","","200","","Specify the maximum number of lines to return."
+    "--max_bytes <max_bytes>","int","","","65536","","Specify the maximum bytes to read in one request."
+    "--encoding <encoding>","str","","","utf-8","","Specify the character encoding used to decode the log file."
+    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","int","","","15","","Specify the maximum waiting time until the server responds."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "save_mode": "string",
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "name": "string",
+        "svpath": "string",
+        "data": "string",
+        "lines": [
+          "string"
+        ],
+        "offset": 0,
+        "file_size": 0,
+        "etag": "string",
+        "not_modified": false,
+        "rotated": false,
+        "encoding": "string"
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.name","str | null","no","null","名前"
+    "success.svpath","str | Path | null","no","null","サーバーパス"
+    "success.data","str | null","no","null","処理結果のデータ"
+    "success.lines","list[str] | null","no","null","ログ行"
+    "success.offset","int | null","no","null","次回読み取りオフセット"
+    "success.file_size","int | null","no","null","ファイルサイズ"
+    "success.etag","str | null","no","null","ETag"
+    "success.not_modified","bool | null","no","null","更新なしフラグ"
+    "success.rotated","bool | null","no","null","ローテーション検知フラグ"
+    "success.encoding","str | null","no","null","文字コード"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
 client ( file_upload ) : ``cmdbox -m client -c file_upload <Option>``
 =====================================================================
 

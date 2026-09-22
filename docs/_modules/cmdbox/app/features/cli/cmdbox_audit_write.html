@@ -1,0 +1,501 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox_audit_write &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox_audit_write</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.cmdbox_audit_write</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">,</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli.audit</span><span class="w"> </span><span class="kn">import</span> <span class="n">audit_base</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitStack</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+
+
+<div class="viewcode-block" id="AuditWrite">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AuditWrite</span><span class="p">(</span><span class="n">audit_base</span><span class="o">.</span><span class="n">AuditBase</span><span class="p">,</span> <span class="n">validator</span><span class="o">.</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="n">RETENTION_CLEANUP_INTERVAL_SEC</span> <span class="o">=</span> <span class="mi">300</span>
+    <span class="n">_last_retention_cleanup_time</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">_retention_cleanup_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_write_time</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_should_run_retention_cleanup</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">with</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_retention_cleanup_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_last_retention_cleanup_time</span> <span class="o">&lt;</span> <span class="bp">cls</span><span class="o">.</span><span class="n">RETENTION_CLEANUP_INTERVAL_SEC</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_last_retention_cleanup_time</span> <span class="o">=</span> <span class="n">now</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="AuditWrite.get_mode">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite.get_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のモードを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[str, List[str]]: モード</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'audit'</span></div>
+
+
+<div class="viewcode-block" id="AuditWrite.get_cmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のコマンドを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: コマンド</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'write'</span></div>
+
+
+<div class="viewcode-block" id="AuditWrite.get_option">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のオプションを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: オプション</span>
+<span class="sd">        """</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_option</span><span class="p">()</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'description_ja'</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"監査を記録します。"</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'description_en'</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Record the audit."</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'choice'</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"client_only"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"サーバーへの接続を行わないようにします。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Do not make connections to the server."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"audit_type"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">AUDITS</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"監査の種類を指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the audit type."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"clmsg_id"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the message ID of the client. If omitted, uuid4 will be generated."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"clmsg_date"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DATETIME</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"クライアントのメッセージ発生日時を指定します。省略した場合はサーバーの現在日時が使用されます。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the date and time the client message occurred. If omitted, the server's current date/time is used."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"clmsg_src"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"クライアントのメッセージの発生源を指定します。通常 `cmdbox.app.feature.Feature` を継承したクラス名を指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the source of client messages. Usually specifies the name of a class that extends `cmdbox.app.feature.Feature` ."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"clmsg_title"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"クライアントのメッセージタイトルを指定します。通常コマンドタイトルを指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the client message title. Usually specifies the command title."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"clmsg_user"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"クライアントのメッセージを発生させたユーザーを指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"SpecSpecifies the user who generated the client message."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"clmsg_body"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DICT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"クライアントのメッセージの本文を辞書形式で指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the body of the client's message in dictionary format."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"clmsg_tag"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"クライアントのメッセージのタグを指定します。後で検索しやすくするために指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the tag for the client's message. Specify to make it easier to search later."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"retention_period_days"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">365</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"監査を保存する日数を指定します。この日数より古い監査は削除します。0以下を指定すると無期限で保存されます。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the number of days to keep the audit. If the number is less than or equal to 0, the audit will be kept indefinitely."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"buffered_interval"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"監査ログ書込みをバッファリングする間隔を秒数で指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the interval, in seconds, for buffering audit log writes."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"exclude_audit_type"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">AUDITS</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"監査ログを記録しない、監査の種類を指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the type of audit for which audit logs will not be recorded."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"exclude_clmsg_src"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"監査ログを記録しない、クライアントのメッセージの発生源を指定します。正規表現で指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the source of client messages for which audit logs are not recorded. Specify using a regular expression."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"exclude_clmsg_title"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"監査ログを記録しない、クライアントのメッセージタイトルを指定します。正規表現で指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the client message titles that should not be logged in the audit log. Specify using a regular expression."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"exclude_clmsg_tag"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"監査ログを記録しない、クライアントのメッセージのタグを指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the tags for client messages that should not be logged in the audit log."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"exclude_clmsg_body"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DICT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description_ja</span><span class="o">=</span><span class="s2">"監査ログを記録しない、クライアントのメッセージの本文を辞書形式で指定します。指定したキーと値をすべて含む場合は記録しません。値は正規表現で指定します。"</span><span class="p">,</span>
+                 <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the body of client messages that should not be logged in the audit log, in dictionary format. "</span> \
+                               <span class="o">+</span><span class="s2">"If a message contains all of the specified keys and values, it will not be logged. Values are specified using regular expressions."</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">opt</span></div>
+
+
+<div class="viewcode-block" id="AuditWrite.apprun">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite.apprun">[docs]</a>
+    <span class="nd">@validator</span><span class="o">.</span><span class="n">apprun_check</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能の実行を行います</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+<span class="sd">            tm (float): 実行開始時間</span>
+<span class="sd">            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">clmsg_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">clmsg_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S'</span><span class="p">)</span> <span class="o">+</span> <span class="n">common</span><span class="o">.</span><span class="n">get_tzoffset_str</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'client_only'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">client_only</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="c1"># クライアントのみの場合は、サーバーへの接続を行わない</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"client_only is True. Not connecting to server. Skip writing the audit log."</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">})</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="c1"># 除外条件のチェック</span>
+        <span class="c1"># 1. audit_typeが除外対象かチェック</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'exclude_audit_type'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_audit_type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">audit_type</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_audit_type</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Audit type '</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">audit_type</span><span class="si">}</span><span class="s2">' is excluded. Skip writing the audit log."</span><span class="p">)</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="c1"># 2. clmsg_srcが除外パターンにマッチするかチェック</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'exclude_clmsg_src'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_src</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_src</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_src</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_src</span><span class="p">):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Message source '</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_src</span><span class="si">}</span><span class="s2">' matches exclude pattern '</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">'. Skip writing the audit log."</span><span class="p">)</span>
+                        <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+                <span class="k">except</span> <span class="n">re</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid regex pattern '</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">' for exclude_clmsg_src: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="c1"># 3. clmsg_titleが除外パターンにマッチするかチェック</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'exclude_clmsg_title'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_title</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_title</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_title</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_title</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Message title '</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_title</span><span class="si">}</span><span class="s2">' matches exclude pattern '</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_title</span><span class="si">}</span><span class="s2">'. Skip writing the audit log."</span><span class="p">)</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">except</span> <span class="n">re</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid regex pattern '</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_title</span><span class="si">}</span><span class="s2">' for exclude_clmsg_title: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="c1"># 4. clmsg_tagが除外対象かチェック</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'exclude_clmsg_tag'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_tag</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_tag</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_tag</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_tag</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Message tag '</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">' is excluded. Skip writing the audit log."</span><span class="p">)</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+        
+        <span class="c1"># 5. clmsg_bodyが除外対象かチェック</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'exclude_clmsg_body'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_body</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_body</span><span class="p">:</span>
+            <span class="c1"># 除外条件の辞書に含まれるすべてのキーと値がclmsg_bodyに含まれているかチェック</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_body</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_body</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_body</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Message body contains exclude pattern </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">exclude_clmsg_body</span><span class="si">}</span><span class="s2">. Skip writing the audit log."</span><span class="p">)</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">payload</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">audit_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">audit_type</span><span class="p">,</span>
+            <span class="n">clmsg_id</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_id</span><span class="p">,</span>
+            <span class="n">clmsg_date</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_date</span><span class="p">,</span>
+            <span class="n">clmsg_src</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_src</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span>
+            <span class="n">clmsg_title</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_title</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span>
+            <span class="n">clmsg_user</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_user</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span>
+            <span class="n">clmsg_body</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_body</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">'</span><span class="si">{}</span><span class="s1">'</span><span class="p">,</span>
+            <span class="n">clmsg_tag</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">clmsg_tag</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">clmsg_tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">'[]'</span><span class="p">,</span>
+            <span class="n">retention_period_days</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retention_period_days</span><span class="p">,</span>
+            <span class="n">pg_enabled</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pg_enabled</span><span class="p">,</span>
+            <span class="n">pg_host</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pg_host</span><span class="p">,</span>
+            <span class="n">pg_port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pg_port</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pg_port</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">pg_user</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pg_user</span><span class="p">,</span>
+            <span class="n">pg_password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pg_password</span><span class="p">,</span>
+            <span class="n">pg_dbname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pg_dbname</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">lt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">lt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_write_time</span> <span class="o">&lt;</span> <span class="n">args</span><span class="o">.</span><span class="n">buffered_interval</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">cl</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">redis_port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">redis_password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+        <span class="n">max_count</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">),</span> <span class="n">max_count</span><span class="p">):</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">max_count</span><span class="p">]</span>
+            <span class="n">chunk_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">max_count</span><span class="p">]</span>
+            <span class="n">cl</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">(),</span> <span class="p">[</span><span class="n">chunk_b64</span><span class="p">],</span>
+                                <span class="n">retry_count</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">nowait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_write_time</span> <span class="o">=</span> <span class="n">lt</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cl</span></div>
+
+
+<div class="viewcode-block" id="AuditWrite.output_schema">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite.output_schema">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Result</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Result</span><span class="p">):</span>
+            <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"成功した場合の結果"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Result</span></div>
+
+
+<div class="viewcode-block" id="AuditWrite.is_cluster_redirect">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite.is_cluster_redirect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: メッセージを転送する場合はTrue</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="AuditWrite.svrun">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite.svrun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+              <span class="n">sessions</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のサーバー側の実行を行います</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data_dir (Path): データディレクトリ</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            redis_cli (redis_client.RedisClient): Redisクライアント</span>
+<span class="sd">            msg (List[str]): 受信メッセージ</span>
+<span class="sd">            sessions (Dict[str, Dict[str, Any]]): セッション情報</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            int: 終了コード</span>
+<span class="sd">        """</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+
+        <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span>
+        <span class="k">with</span> <span class="n">ExitStack</span><span class="p">()</span> <span class="k">as</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="n">conn_map</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">payload</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+                <span class="n">audit_type</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audit_type"</span><span class="p">)</span>
+                <span class="n">clmsg_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clmsg_id"</span><span class="p">)</span>
+                <span class="n">clmsg_date</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clmsg_date"</span><span class="p">)</span>
+                <span class="n">clmsg_src</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clmsg_src"</span><span class="p">)</span>
+                <span class="n">clmsg_title</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clmsg_title"</span><span class="p">)</span>
+                <span class="n">clmsg_user</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clmsg_user"</span><span class="p">)</span>
+                <span class="n">clmsg_body</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clmsg_body"</span><span class="p">)</span>
+                <span class="n">clmsg_tag</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clmsg_tag"</span><span class="p">)</span>
+                <span class="n">pg_enabled</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pg_enabled"</span><span class="p">)</span>
+                <span class="n">pg_host</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pg_host"</span><span class="p">)</span>
+                <span class="n">pg_port</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pg_port"</span><span class="p">)</span>
+                <span class="n">pg_user</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pg_user"</span><span class="p">)</span>
+                <span class="n">pg_password</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pg_password"</span><span class="p">)</span>
+                <span class="n">pg_dbname</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pg_dbname"</span><span class="p">)</span>
+                <span class="n">retention_period_days</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"retention_period_days"</span><span class="p">)</span>
+                <span class="n">svmsg_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+
+                <span class="n">conn_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">pg_enabled</span><span class="p">,</span> <span class="n">pg_host</span><span class="p">,</span> <span class="n">pg_port</span><span class="p">,</span> <span class="n">pg_user</span><span class="p">,</span> <span class="n">pg_password</span><span class="p">,</span> <span class="n">pg_dbname</span><span class="p">)</span>
+                <span class="n">conn</span> <span class="o">=</span> <span class="n">conn_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">conn_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">conn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">initdb</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">pg_enabled</span><span class="p">,</span> <span class="n">pg_host</span><span class="p">,</span> <span class="n">pg_port</span><span class="p">,</span> <span class="n">pg_user</span><span class="p">,</span> <span class="n">pg_password</span><span class="p">,</span> <span class="n">pg_dbname</span><span class="p">)</span>
+                    <span class="n">conn</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">enter_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">pg_enabled</span><span class="p">,</span> <span class="n">pg_host</span><span class="p">,</span> <span class="n">pg_port</span><span class="p">,</span> <span class="n">pg_user</span><span class="p">,</span> <span class="n">pg_password</span><span class="p">,</span> <span class="n">pg_dbname</span><span class="p">))</span>
+                    <span class="n">conn_map</span><span class="p">[</span><span class="n">conn_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">conn</span>
+
+                <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">reskey</span><span class="o">=</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">audit_type</span><span class="o">=</span><span class="n">audit_type</span><span class="p">,</span> <span class="n">clmsg_id</span><span class="o">=</span><span class="n">clmsg_id</span><span class="p">,</span> <span class="n">clmsg_date</span><span class="o">=</span><span class="n">clmsg_date</span><span class="p">,</span> <span class="n">clmsg_src</span><span class="o">=</span><span class="n">clmsg_src</span><span class="p">,</span>
+                                <span class="n">clmsg_title</span><span class="o">=</span><span class="n">clmsg_title</span><span class="p">,</span> <span class="n">clmsg_user</span><span class="o">=</span><span class="n">clmsg_user</span><span class="p">,</span> <span class="n">clmsg_body</span><span class="o">=</span><span class="n">clmsg_body</span><span class="p">,</span> <span class="n">clmsg_tag</span><span class="o">=</span><span class="n">clmsg_tag</span><span class="p">,</span>
+                                <span class="n">svmsg_id</span><span class="o">=</span><span class="n">svmsg_id</span><span class="p">,</span> <span class="n">pg_enabled</span><span class="o">=</span><span class="n">pg_enabled</span><span class="p">,</span> <span class="n">retention_period_days</span><span class="o">=</span><span class="n">retention_period_days</span><span class="p">,</span>
+                                <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="o">=</span><span class="n">redis_cli</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">st</span></div>
+
+
+<div class="viewcode-block" id="AuditWrite.write">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_audit_write.AuditWrite.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">audit_type</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">clmsg_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">clmsg_date</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">clmsg_src</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">clmsg_title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+              <span class="n">clmsg_user</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">clmsg_body</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">clmsg_tag</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">svmsg_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+              <span class="n">pg_enabled</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">retention_period_days</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+              <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        監査ログを書き込む</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            conn: データベース接続</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            audit_type (str): 監査の種類</span>
+<span class="sd">            clmsg_id (str): クライアントメッセージID</span>
+<span class="sd">            clmsg_date (str): クライアントメッセージ発生日時</span>
+<span class="sd">            clmsg_src (str): クライアントメッセージの発生源</span>
+<span class="sd">            clmsg_title (str): クライアントメッセージのタイトル</span>
+<span class="sd">            clmsg_user (str): クライアントメッセージの発生させたユーザー</span>
+<span class="sd">            clmsg_body (str): クライアントメッセージの本文</span>
+<span class="sd">            clmsg_tag (str): クライアントメッセージのタグ</span>
+<span class="sd">            svmsg_id (str): サーバーメッセージID</span>
+<span class="sd">            pg_enabled (bool): PostgreSQLを使用する場合はTrue</span>
+<span class="sd">            retention_period_days (int): 監査を保存する日数</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            redis_cli (redis_client.RedisClient): Redisクライアント</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: レスポンスコード</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">max_retry</span> <span class="o">=</span> <span class="mi">5</span>
+            <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retry</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">svmsg_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S'</span><span class="p">)</span> <span class="o">+</span> <span class="n">common</span><span class="o">.</span><span class="n">get_tzoffset_str</span><span class="p">()</span>
+                    <span class="n">run_retention_cleanup</span> <span class="o">=</span> <span class="n">retention_period_days</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">retention_period_days</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_run_retention_cleanup</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">pg_enabled</span><span class="p">:</span>
+                        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'''</span>
+<span class="s1">                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, </span>
+<span class="s1">                                            svmsg_id, svmsg_date)</span>
+<span class="s1">                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)</span>
+<span class="s1">                        '''</span><span class="p">,</span> <span class="p">(</span><span class="n">audit_type</span><span class="p">,</span> <span class="n">clmsg_id</span><span class="p">,</span> <span class="n">clmsg_date</span><span class="p">,</span> <span class="n">clmsg_src</span><span class="p">,</span> <span class="n">clmsg_title</span><span class="p">,</span> <span class="n">clmsg_user</span><span class="p">,</span> <span class="n">clmsg_body</span><span class="p">,</span> <span class="n">clmsg_tag</span><span class="p">,</span> <span class="n">svmsg_id</span><span class="p">,</span> <span class="n">svmsg_date</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">run_retention_cleanup</span><span class="p">:</span>
+                            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'DELETE FROM audit WHERE svmsg_date &lt; datetime(CURRENT_TIMESTAMP, ?)'</span><span class="p">,</span>
+                                            <span class="p">(</span><span class="sa">f</span><span class="s1">'-</span><span class="si">{</span><span class="n">retention_period_days</span><span class="si">}</span><span class="s1"> days'</span><span class="p">,))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'''</span>
+<span class="s1">                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, </span>
+<span class="s1">                                            svmsg_id, svmsg_date)</span>
+<span class="s1">                            VALUES (</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">)</span>
+<span class="s1">                        '''</span><span class="p">,</span> <span class="p">(</span><span class="n">audit_type</span><span class="p">,</span> <span class="n">clmsg_id</span><span class="p">,</span> <span class="n">clmsg_date</span><span class="p">,</span> <span class="n">clmsg_src</span><span class="p">,</span> <span class="n">clmsg_title</span><span class="p">,</span> <span class="n">clmsg_user</span><span class="p">,</span> <span class="n">clmsg_body</span><span class="p">,</span> <span class="n">clmsg_tag</span><span class="p">,</span> <span class="n">svmsg_id</span><span class="p">,</span> <span class="n">svmsg_date</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">run_retention_cleanup</span><span class="p">:</span>
+                            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"DELETE FROM audit WHERE svmsg_date &lt; CURRENT_TIMESTAMP + </span><span class="si">%s</span><span class="s2"> "</span><span class="p">,</span>
+                                            <span class="p">(</span><span class="sa">f</span><span class="s1">'-</span><span class="si">{</span><span class="n">retention_period_days</span><span class="si">}</span><span class="s1"> day'</span><span class="p">,))</span>
+                    <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                    <span class="n">rescode</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                    <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">rescode</span>
+                <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">OperationalError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># SQLiteのロック競合時のみ再試行する</span>
+                    <span class="n">is_locked</span> <span class="o">=</span> <span class="p">(</span><span class="ow">not</span> <span class="n">pg_enabled</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">'database is locked'</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_locked</span> <span class="ow">or</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="n">max_retry</span><span class="p">:</span>
+                        <span class="k">raise</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">conn</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="n">wait_sec</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">attempt</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Audit write retry due to sqlite lock. attempt=</span><span class="si">{</span><span class="n">attempt</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_retry</span><span class="si">}</span><span class="s2">, wait=</span><span class="si">{</span><span class="n">wait_sec</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait_sec</span><span class="p">)</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">cursor</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to write: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Failed to write: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

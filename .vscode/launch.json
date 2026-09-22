@@ -25,7 +25,8 @@
                 "Python: cmdbox server2",
                 "Python: cmdbox web",
                 "Python: cmdbox mcpsv",
-                "Python: cmdbox a2asv"
+                "Python: cmdbox a2asv",
+                "Python: cmdbox llm_proxy_start"
             ]
         }
     ],
@@ -82,7 +83,8 @@
             "type": "python",
             "request": "launch",
             "args": ["-m","a2asv","-c","start","--signin_file",".cmdbox/user_list.yml",
-                     "--debug", "--gunicorn_workers", "5", "--data", "./.client_data"],
+                     "--debug", "--gunicorn_workers", "5", "--data", "./.client_data",
+                     "--boot_user", "admin"],
             "module": "cmdbox",
             "console": "integratedTerminal",
             "consoleTitle": "cmdbox a2asv",

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app package &mdash; cmdbox 2026/09/13 documentation</title>
+  <title>cmdbox.app package &mdash; cmdbox 2026/09/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f36998f3"></script>
+      <script src="../_static/documentation_options.js?v=fa416c26"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -435,6 +435,36 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Redisサーバーからの応答</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.client.Client.file_tail">
+<span class="sig-name descname"><span class="pre">file_tail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'client'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fwpaths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rjpaths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">65536</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/client.html#Client.file_tail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.client.Client.file_tail" title="Link to this definition"></a></dt>
+<dd><p>テキストファイル末尾の内容を取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>svpath</strong> (<em>str</em>) -- ファイルパス</p></li>
+<li><p><strong>scope</strong> (<em>str</em><em>, </em><em>optional</em>) -- 参照先のスコープ</p></li>
+<li><p><strong>client_data</strong> (<em>Path</em><em>, </em><em>optional</em>) -- ローカル参照時のデータフォルダ</p></li>
+<li><p><strong>fwpaths</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- 範囲内パス</p></li>
+<li><p><strong>rjpaths</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- 範囲外パス</p></li>
+<li><p><strong>offset</strong> (<em>int</em><em>, </em><em>optional</em>) -- 読み取り開始オフセット（byte）</p></li>
+<li><p><strong>lines</strong> (<em>int</em><em>, </em><em>optional</em>) -- 返却する行数</p></li>
+<li><p><strong>max_bytes</strong> (<em>int</em><em>, </em><em>optional</em>) -- 1回で読み取る最大バイト数</p></li>
+<li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) -- 文字コード</p></li>
+<li><p><strong>retry_count</strong> (<em>int</em><em>, </em><em>optional</em>) -- リトライ回数</p></li>
+<li><p><strong>retry_interval</strong> (<em>int</em><em>, </em><em>optional</em>) -- リトライ間隔</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>取得結果</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
@@ -970,7 +1000,7 @@ config (dict): 設定</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cmdbox.app.common.load_file">
-<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">load_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nolock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#load_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.load_file" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">load_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nolock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_wait</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#load_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.load_file" title="Link to this definition"></a></dt>
 <dd><p>ファイルを読み込みます。読み込み時に排他ロックします。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -980,6 +1010,8 @@ config (dict): 設定</p>
 <li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em>) -- ファイルモード. Defaults to 'r'.</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) -- エンコーディング. Defaults to 'utf-8'.</p></li>
 <li><p><strong>nolock</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 排他ロックを行わない場合はTrue. Defaults to True.</p></li>
+<li><p><strong>retry_count</strong> (<em>int</em><em>, </em><em>optional</em>) -- PermissionError発生時のリトライ回数. Defaults to 5.</p></li>
+<li><p><strong>retry_wait</strong> (<em>float</em><em>, </em><em>optional</em>) -- PermissionError発生時の待機秒数. Defaults to 1.0.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1250,7 +1282,7 @@ config (dict): 設定</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cmdbox.app.common.save_file">
-<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">save_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nolock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#save_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.save_file" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">save_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nolock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_wait</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#save_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.save_file" title="Link to this definition"></a></dt>
 <dd><p>ファイルに書き込みます。書き込み時に排他ロックします。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1261,6 +1293,8 @@ config (dict): 設定</p>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) -- エンコーディング. Defaults to 'utf-8'.</p></li>
 <li><p><strong>nolock</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 排他ロックを行わない場合はTrue. Defaults to True.</p></li>
 <li><p><strong>meta</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>optional</em>) -- メタデータ. Defaults to None.</p></li>
+<li><p><strong>retry_count</strong> (<em>int</em><em>, </em><em>optional</em>) -- PermissionError発生時のリトライ回数. Defaults to 5.</p></li>
+<li><p><strong>retry_wait</strong> (<em>float</em><em>, </em><em>optional</em>) -- PermissionError発生時の待機秒数. Defaults to 1.0.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1705,14 +1739,14 @@ bool: 監査ログを記録する場合はTrue</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.feature.Feature.is_allowed_by_groups">
-<span class="sig-name descname"><span class="pre">is_allowed_by_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_cli</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RedisClient</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.is_allowed_by_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.is_allowed_by_groups" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">is_allowed_by_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_cli</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient" title="cmdbox.app.commons.redis_client.RedisClient"><span class="pre">RedisClient</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.is_allowed_by_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.is_allowed_by_groups" title="Link to this definition"></a></dt>
 <dd><p>リクエストユーザーが許可グループに含まれるか判定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>request_groups</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) -- リクエストユーザーの所属グループ</p></li>
 <li><p><strong>allowed_groups</strong> (<em>Any</em>) -- 許可グループ（None/str/list[str] を許容）</p></li>
-<li><p><strong>redis_cli</strong> (<em>redis_client.RedisClient</em>) -- Redisクライアント</p></li>
+<li><p><strong>redis_cli</strong> (<a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient" title="cmdbox.app.commons.redis_client.RedisClient"><em>redis_client.RedisClient</em></a>) -- Redisクライアント</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1754,14 +1788,14 @@ bool: 監査ログを記録する場合はTrue</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.feature.Feature.svrun">
-<span class="sig-name descname"><span class="pre">svrun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_cli</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RedisClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sessions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.svrun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.svrun" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">svrun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_cli</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient" title="cmdbox.app.commons.redis_client.RedisClient"><span class="pre">RedisClient</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sessions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.svrun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.svrun" title="Link to this definition"></a></dt>
 <dd><p>この機能のサーバー側の実行を行います</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data_dir</strong> (<em>Path</em>) -- データディレクトリ</p></li>
 <li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
-<li><p><strong>redis_cli</strong> (<em>redis_client.RedisClient</em>) -- Redisクライアント</p></li>
+<li><p><strong>redis_cli</strong> (<a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient" title="cmdbox.app.commons.redis_client.RedisClient"><em>redis_client.RedisClient</em></a>) -- Redisクライアント</p></li>
 <li><p><strong>msg</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) -- 受信メッセージ</p></li>
 <li><p><strong>sessions</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>) -- セッション情報</p></li>
 </ul>
@@ -2016,6 +2050,27 @@ bool: 監査ログを記録する場合はTrue</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.feature.WebFeature.etag">
+<span class="sig-name descname"><span class="pre">etag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">web</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cmdbox.app.web.Web" title="cmdbox.app.web.Web"><span class="pre">Web</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etag_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#WebFeature.etag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.WebFeature.etag" title="Link to this definition"></a></dt>
+<dd><p>etagの検証を行い、If-None-Matchリクエストヘッダの値と合致するかどうかを返します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<em>Request</em>) -- クライアントからのリクエストオブジェクト。</p></li>
+<li><p><strong>etag_val</strong> (<em>str</em>) -- 検証するETagの値。</p></li>
+<li><p><strong>static</strong> (<em>bool</em>) -- 静的ファイルかどうか。デフォルトはTrue。</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ETagが一致するかどうかと、レスポンスヘッダの辞書を返します。</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[bool, Dict[str, str]]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -2358,6 +2413,32 @@ dict: メッセージ</p>
 <li><p><strong>fwpaths</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- 範囲内かどうかを示すパスのリスト. Defaults to None.</p></li>
 <li><p><strong>rjpaths</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- 範囲外かどうかを示すパスのリスト. Defaults to None.</p></li>
 <li><p><strong>notexist_ok</strong> (<em>bool</em><em>, </em><em>optional</em>) -- ディレクトリが存在しない場合にエラーを出さないかどうか. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>レスポンスコード
+dict: メッセージ</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.filer.Filer.file_tail">
+<span class="sig-name descname"><span class="pre">file_tail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">65536</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fwpaths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rjpaths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/filer.html#Filer.file_tail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.filer.Filer.file_tail" title="Link to this definition"></a></dt>
+<dd><p>テキストファイル末尾の内容を取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_path</strong> (<em>str</em>) -- ファイルパス</p></li>
+<li><p><strong>offset</strong> (<em>int</em><em>, </em><em>optional</em>) -- 読み取り開始オフセット（byte）。-1の場合は末尾から取得</p></li>
+<li><p><strong>lines</strong> (<em>int</em><em>, </em><em>optional</em>) -- 返却する行数</p></li>
+<li><p><strong>max_bytes</strong> (<em>int</em><em>, </em><em>optional</em>) -- 1回で読み取る最大バイト数</p></li>
+<li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) -- デコード時の文字コード</p></li>
+<li><p><strong>fwpaths</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- 範囲内パス</p></li>
+<li><p><strong>rjpaths</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- 範囲外パス</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

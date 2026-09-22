@@ -427,6 +427,8 @@ def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging
     Returns:
         logging.Logger: ロガー
     """
+    if ver is None:
+        ver = version
     logger = logging.getLogger(ver.__appid__)
     set_common_value('webcall', webcall)
     if not webcall:

@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox_limiter_targets &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox_limiter_targets</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.cmdbox_limiter_targets</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">limiter</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">,</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdbox_limiter_counter</span><span class="p">,</span> <span class="n">cmdbox_limiter_evidences</span><span class="p">,</span> <span class="n">cmdbox_limiter_list</span><span class="p">,</span> <span class="n">cmdbox_limiter_load</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+
+<div class="viewcode-block" id="LimiterTargets">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_limiter_targets.LimiterTargets">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LimiterTargets</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">OneshotResultEdgeFeature</span><span class="p">,</span> <span class="n">validator</span><span class="o">.</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limiter_list</span> <span class="o">=</span> <span class="n">cmdbox_limiter_list</span><span class="o">.</span><span class="n">LimiterList</span><span class="p">(</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limiter_load</span> <span class="o">=</span> <span class="n">cmdbox_limiter_load</span><span class="o">.</span><span class="n">LimiterLoad</span><span class="p">(</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limiter_counter</span> <span class="o">=</span> <span class="n">cmdbox_limiter_counter</span><span class="o">.</span><span class="n">LimiterCounter</span><span class="p">(</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limiter_evidences</span> <span class="o">=</span> <span class="n">cmdbox_limiter_evidences</span><span class="o">.</span><span class="n">LimiterEvidences</span><span class="p">(</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LimiterTargets.get_mode">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_limiter_targets.LimiterTargets.get_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="s1">'limiter'</span></div>
+
+
+<div class="viewcode-block" id="LimiterTargets.get_cmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_limiter_targets.LimiterTargets.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">'targets'</span></div>
+
+
+<div class="viewcode-block" id="LimiterTargets.get_option">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_limiter_targets.LimiterTargets.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">description_ja</span><span class="o">=</span><span class="s2">"LimitedFeature を継承しているFeature一覧を取得します。"</span><span class="p">,</span>
+            <span class="n">description_en</span><span class="o">=</span><span class="s2">"Gets the list of Features that inherit from LimitedFeature."</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"host"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_host</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーのサービスホストを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service host of the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"port"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_port</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーのサービスポートを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service port of the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"password"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_PASSWD</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="si">}</span><span class="s2">` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Specify the access password of the Redis server (optional). If omitted, `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="si">}</span><span class="s2">` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"svname"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_svname</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"readonly"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"サーバーのサービス名を指定します。省略時は `server` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service name of the inference server. If omitted, `server` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"retry_count"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"retry_interval"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーに再接続までの秒数を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the number of seconds before reconnecting to the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"timeout"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"60"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"サーバーの応答が返ってくるまでの最大待ち時間を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the maximum waiting time until the server responds."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"scope"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"server"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s2">"client"</span><span class="p">,</span> <span class="s2">"current"</span><span class="p">,</span> <span class="s2">"server"</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."</span><span class="p">,),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"filter_target_mode"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">choice_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">webmode</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span> <span class="p">[</span><span class="s1">''</span><span class="p">]</span><span class="o">+</span><span class="n">op</span><span class="o">.</span><span class="n">get_mode_keys</span><span class="p">(),</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"対象モードで絞り込みます。指定した場合、そのモードのみの結果を返します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Filter by target mode. If specified, returns results for that mode only."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"filter_target_cmd"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[],</span>
+                     <span class="n">callcmd</span><span class="o">=</span><span class="s2">"async () =&gt; {"</span>
+                             <span class="o">+</span> <span class="s2">"const res = await get_cmds($(</span><span class="se">\"</span><span class="s2">[name='filter_target_mode']</span><span class="se">\"</span><span class="s2">).val());"</span>
+                             <span class="o">+</span> <span class="s2">"const py_load_cmd = await cmdbox.load_cmd($(</span><span class="se">\"</span><span class="s2">[name='title']</span><span class="se">\"</span><span class="s2">).val());"</span>
+                             <span class="o">+</span> <span class="s2">"const val = py_load_cmd['filter_target_cmd'];"</span>
+                             <span class="o">+</span> <span class="s2">"$(</span><span class="se">\"</span><span class="s2">[name='filter_target_cmd']</span><span class="se">\"</span><span class="s2">).empty();"</span>
+                             <span class="o">+</span> <span class="s2">"res.map(elm=&gt;{$(</span><span class="se">\"</span><span class="s2">[name='filter_target_cmd']</span><span class="se">\"</span><span class="s2">).append('&lt;option value=</span><span class="se">\"</span><span class="s2">'+elm+'</span><span class="se">\"</span><span class="s2">&gt;'+elm+'&lt;/option&gt;');});"</span>
+                             <span class="o">+</span> <span class="s2">"$(</span><span class="se">\"</span><span class="s2">[name='filter_target_cmd']</span><span class="se">\"</span><span class="s2">).val(val);"</span>
+                             <span class="o">+</span> <span class="s2">"}"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"対象コマンドで絞り込みます。指定した場合、そのコマンドのみの結果を返します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Filter by target command. If specified, returns results for that command only."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"filter_limiter_name"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"リミッター名で絞り込みます。指定した場合、そのリミッター名のみの結果を返します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Filter by limiter name. If specified, returns results for that limiter only."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"include_history"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"エビデンスファイルの履歴情報を含めるかどうかを指定します。`True` の場合、履歴情報は出力されます。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies whether to include history information in the evidence file. If set to `True`, the history information is included in the output."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"reflesh_counter"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"カウンタを最新化するかどうかを指定します。Trueを指定すると、カウンタが最新化されます。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies whether to update the counter. If set to True, the counter is updated."</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_limiter_matches</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">feat_mode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">feat_cmd</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">target_mode</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'target_mode'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target_mode</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feat_mode</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">target_mode</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">feat_mode</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">feat_mode</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">target_mode</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">target_cmd</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'target_cmd'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target_cmd</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">feat_cmd</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">target_cmd</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">target_option</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'target_option'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target_option</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feat_mode</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">target_option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'mode'</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">feat_mode</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feat_mode</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">target_option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'mode'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">target_option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'mode'</span><span class="p">)</span> <span class="o">!=</span> <span class="n">feat_mode</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">target_option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'cmd'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">target_option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'cmd'</span><span class="p">)</span> <span class="o">!=</span> <span class="n">feat_cmd</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Options</span><span class="p">,</span> <span class="n">lt</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">filter_target_mode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                         <span class="n">filter_target_cmd</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">filter_limiter_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                         <span class="n">resolver_fn</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">get_mode_keys</span><span class="p">():</span>
+            <span class="c1"># target_mode で絞り込み</span>
+            <span class="k">if</span> <span class="n">filter_target_mode</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filter_target_mode</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">get_cmd_keys</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+                <span class="c1"># target_cmd で絞り込み</span>
+                <span class="k">if</span> <span class="n">filter_target_cmd</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filter_target_cmd</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
+                <span class="n">feat</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get_cmd_feature</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">limiter</span><span class="o">.</span><span class="n">LimitedFeature</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">feat_mode</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">get_mode</span><span class="p">()</span>
+                <span class="n">feat_cmd</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">get_cmd</span><span class="p">()</span>
+                <span class="n">matched_limiters</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">lt</span><span class="p">:</span>
+                    <span class="c1"># limiter_name で絞り込み</span>
+                    <span class="k">if</span> <span class="n">filter_limiter_name</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filter_limiter_name</span><span class="p">):</span>
+                        <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limiter_matches</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">feat_mode</span><span class="p">,</span> <span class="n">feat_cmd</span><span class="p">):</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">cfg</span> <span class="o">=</span> <span class="n">resolver_fn</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                    <span class="n">matched_limiters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">filter_limiter_name</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">matched_limiters</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="n">feat_mode</span><span class="p">,</span>
+                    <span class="n">cmd</span><span class="o">=</span><span class="n">feat_cmd</span><span class="p">,</span>
+                    <span class="n">limiters</span><span class="o">=</span><span class="n">matched_limiters</span><span class="p">,</span>
+                <span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_limiter_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                                <span class="n">pf</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">entry</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">load_args</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">load_args</span><span class="o">.</span><span class="n">limiter_name</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span>
+        <span class="c1"># 制限設定をロード</span>
+        <span class="n">st_l</span><span class="p">,</span> <span class="n">res_l</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limiter_load</span><span class="o">.</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">load_args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">st_l</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">:</span>
+            <span class="n">cfg</span> <span class="o">=</span> <span class="n">res_l</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'limiter_name'</span><span class="p">:</span> <span class="n">entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]}</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">}</span>
+
+        <span class="c1"># Counter を取得</span>
+        <span class="n">st_c</span><span class="p">,</span> <span class="n">res_c</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limiter_counter</span><span class="o">.</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">load_args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">st_c</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="s1">'counter'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="s1">'counter'</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="c1"># Evidences を取得</span>
+        <span class="n">ev_args</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">ev_args</span><span class="o">.</span><span class="n">limiter_name</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span>
+        <span class="n">ev_args</span><span class="o">.</span><span class="n">include_history</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'include_history'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">st_e</span><span class="p">,</span> <span class="n">res_e</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limiter_evidences</span><span class="o">.</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">ev_args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">st_e</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="s1">'evidences'</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="s1">'evidences'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">cfg</span>
+
+<div class="viewcode-block" id="LimiterTargets.apprun">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_limiter_targets.LimiterTargets.apprun">[docs]</a>
+    <span class="nd">@validator</span><span class="o">.</span><span class="n">apprun_check</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'scope'</span><span class="p">,</span> <span class="s1">'server'</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="s1">'server'</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">filter_target_mode</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'filter_target_mode'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">filter_target_cmd</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'filter_target_cmd'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">filter_limiter_name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'filter_limiter_name'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">include_history</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'include_history'</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">reflesh_counter</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'reflesh_counter'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">payload_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+            <span class="n">cl</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">redis_port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">redis_password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">(),</span> <span class="p">[</span><span class="n">payload_b64</span><span class="p">],</span>
+                                        <span class="n">retry_count</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">nowait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cl</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cl</span>
+
+        <span class="n">options</span> <span class="o">=</span> <span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+        <span class="n">st</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limiter_list</span><span class="o">.</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">st</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">lt</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="c1"># 絞り込み条件を取得</span>
+        <span class="n">filter_target_mode</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'filter_target_mode'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">filter_target_cmd</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'filter_target_cmd'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">filter_limiter_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'filter_limiter_name'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_targets</span><span class="p">(</span>
+            <span class="n">options</span><span class="p">,</span>
+            <span class="n">lt</span><span class="p">,</span>
+            <span class="n">filter_target_mode</span><span class="p">,</span>
+            <span class="n">filter_target_cmd</span><span class="p">,</span>
+            <span class="n">filter_limiter_name</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">entry</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_limiter_client</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">,</span> <span class="n">entry</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">results</span><span class="p">))</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="LimiterTargets.output_schema">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_limiter_targets.LimiterTargets.output_schema">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">TargetRecord</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Base</span><span class="p">):</span>
+            <span class="n">mode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"フィーチャーのモード"</span><span class="p">)</span>
+            <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"フィーチャーのコマンド"</span><span class="p">)</span>
+            <span class="n">limiters</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"適合する制限設定の詳細内容リスト"</span><span class="p">)</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Data</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Data</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TargetRecord</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"処理結果のデータ"</span><span class="p">)</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Result</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Result</span><span class="p">):</span>
+            <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Data</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"成功した場合の結果"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Result</span></div>
+
+
+<div class="viewcode-block" id="LimiterTargets.is_cluster_redirect">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_limiter_targets.LimiterTargets.is_cluster_redirect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="LimiterTargets.svrun">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_limiter_targets.LimiterTargets.svrun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span> <span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+              <span class="n">sessions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">reskey</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+            <span class="n">filter_target_mode</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'filter_target_mode'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">filter_target_cmd</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'filter_target_cmd'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">filter_limiter_name</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'filter_limiter_name'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">include_history</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'include_history'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">reflesh_counter</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'reflesh_counter'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">lt</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">limiter_dir</span> <span class="o">=</span> <span class="n">data_dir</span> <span class="o">/</span> <span class="s1">'.limiter'</span>
+            <span class="k">if</span> <span class="n">limiter_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">limiter_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">limiter_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"limiter-*.json"</span><span class="p">)):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">stem</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'limiter-'</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                    <span class="k">with</span> <span class="n">p</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">cfg</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                    <span class="n">lt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">'limiter-'</span><span class="p">):],</span>
+                        <span class="n">limiter_title</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'limiter_title'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">target_mode</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'target_mode'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">target_cmd</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'target_cmd'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">target_option</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'target_option'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">history_end</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'history_end'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                    <span class="p">))</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_targets</span><span class="p">(</span>
+                <span class="n">options</span><span class="p">,</span>
+                <span class="n">lt</span><span class="p">,</span>
+                <span class="n">filter_target_mode</span><span class="p">,</span>
+                <span class="n">filter_target_cmd</span><span class="p">,</span>
+                <span class="n">filter_limiter_name</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">entry</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_limiter_server</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span>
+                                                           <span class="n">include_history</span><span class="o">=</span><span class="n">include_history</span><span class="p">,</span> <span class="n">reflesh_counter</span><span class="o">=</span><span class="n">reflesh_counter</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">results</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mode</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cmd</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mode</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cmd</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_limiter_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span> <span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span>
+                                <span class="n">limiter_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">include_history</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">reflesh_counter</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limiter_load</span><span class="o">.</span><span class="n">_load_limiter_config</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">limiter_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">cfg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'limiter_name'</span><span class="p">:</span> <span class="n">limiter_name</span><span class="p">}</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">reflesh_counter</span><span class="p">:</span>
+            <span class="n">lmt</span> <span class="o">=</span> <span class="n">limiter</span><span class="o">.</span><span class="n">Limiter</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="n">redis_client</span><span class="o">=</span><span class="n">redis_cli</span><span class="p">,</span> <span class="n">flush_interval</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">reload_interval</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">limiter_counter</span><span class="o">.</span><span class="n">_reflesh_counter</span><span class="p">(</span><span class="n">lmt</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">limiter_name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">'server'</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">())</span>
+
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">'counter'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limiter_counter</span><span class="o">.</span><span class="n">_load_limiter_counter</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">limiter_name</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span>
+                                                                    <span class="n">scope</span><span class="o">=</span><span class="s1">'server'</span><span class="p">,</span> <span class="n">load_history</span><span class="o">=</span><span class="n">include_history</span><span class="p">)</span>
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">'evidences'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limiter_evidences</span><span class="o">.</span><span class="n">_load_evidences</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">limiter_name</span><span class="p">,</span> <span class="n">include_history</span><span class="o">=</span><span class="n">include_history</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cfg</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

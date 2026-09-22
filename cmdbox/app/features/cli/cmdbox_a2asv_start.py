@@ -100,6 +100,9 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="gunicorn_timeout", type=Options.T_INT, default=900, required=False, multi=False, hide=True, choice=None,
                      description_ja="gunicornワーカーのタイムアウトの時間を秒で指定します。",
                      description_en="Specify the timeout duration of the gunicorn worker in seconds."),
+                dict(opt="boot_user", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="起動時に使用するユーザー名を指定します。このユーザーのAPIキーがMCPサーバーの認証に使用されます。",
+                     description_en="Specify the user name to use at startup. This user's API key will be used for MCP server authentication."),
                 dict(opt="reasoning_effort", type=Options.T_STR, default="auto", required=False, multi=False, hide=False,
                      choice=["auto", "off", "on", "low", "medium", "high", "xhigh"], choice_edit=True,
                     description_ja="エージェントで思考の連鎖の深さを指定します。'auto', 'off', 'on', 'low', 'medium', 'high', 'xhigh' などが指定できますが、使用するモデルによってはサポートされていない場合があります。",
@@ -128,6 +131,46 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
 
             sign = signin.getDefaultInstance(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver, self.language)
             self.a2a = a2a_mod.A2a(logger, Path(args.data), sign, self.appcls, self.ver)
+            
+            # boot_user のAPIキーを取得
+            boot_user_apikey = None
+            if hasattr(args, 'boot_user') and args.boot_user is not None:
+                if signin_data is not None and 'users' in signin_data:
+                    boot_user_info = next((u for u in signin_data['users'] if u.get('name') == args.boot_user), None)
+                    if boot_user_info is not None:
+                        uid = boot_user_info.get('uid')
+                        username = boot_user_info.get('name')
+                        try:
+                            # _web.user_data を使用してAPIキーを取得
+                            apikeys = _web.user_data(None, str(uid), username, 'apikey')
+                            if apikeys and isinstance(apikeys, dict) and len(apikeys) > 0:
+                                # 最初のAPIキーを取得
+                                first_key = next(iter(apikeys.keys()))
+                                first_value = apikeys[first_key]
+                                # valueが辞書の場合と文字列の場合に対応
+                                if isinstance(first_value, dict):
+                                    # 辞書の場合は、その辞書内の最初のキーを取得
+                                    if len(first_value) > 0:
+                                        boot_user_apikey = next(iter(first_value.keys()))
+                                else:
+                                    # 文字列の場合はそのまま使用
+                                    boot_user_apikey = first_value
+                                if boot_user_apikey:
+                                    logger.info(f"Boot user '{args.boot_user}' API key loaded.")
+                                else:
+                                    logger.warning(f"No valid API key found for boot user '{args.boot_user}'.")
+                            else:
+                                logger.warning(f"No API keys configured for boot user '{args.boot_user}'.")
+                        except Exception as e:
+                            logger.warning(f"Failed to load boot_user API key: {e}")
+                    else:
+                        logger.warning(f"Boot user '{args.boot_user}' not found in signin_data.")
+                else:
+                    logger.warning("signin_data is None or does not contain 'users'.")
+            
+            if boot_user_apikey is not None:
+                args.boot_user_apikey = boot_user_apikey
+            
             a2a_app:FastAPI = await self.a2a.create_a2aserver(logger, args, _web)
 
             # SSL/paths を Path に揃える

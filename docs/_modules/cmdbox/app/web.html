@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2026/09/06 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2026/09/19 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=cfafd609"></script>
+      <script src="../../../_static/documentation_options.js?v=437aa58f"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -505,7 +505,7 @@
                         <span class="n">u</span><span class="p">[</span><span class="s1">'apikeys'</span><span class="p">][</span><span class="n">an</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ak</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
                     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                         <span class="n">u</span><span class="p">[</span><span class="s1">'apikeys'</span><span class="p">][</span><span class="n">an</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ak</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">)</span>
-            <span class="n">u</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">parent_group</span><span class="p">(</span><span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">])))</span>
+            <span class="n">u</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">parent_group</span><span class="p">(</span><span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">u</span><span class="p">]</span>
             <span class="n">signin_last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="s1">'signin'</span><span class="p">,</span> <span class="s1">'last_update'</span><span class="p">)</span>
@@ -1191,6 +1191,17 @@
             <span class="n">mwparam</span><span class="p">[</span><span class="s1">'cookie_https_only'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># セッションハイジャック対策</span>
         <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SessionAutoloadMiddleware</span><span class="p">)</span>
         <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SessionMiddleware</span><span class="p">,</span> <span class="o">**</span><span class="n">mwparam</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">middleware</span><span class="p">(</span><span class="s2">"http"</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">remove_session_cookie_on_assets</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">call_next</span><span class="p">):</span>
+            <span class="n">res</span><span class="p">:</span><span class="n">Response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span> <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">''</span>
+            <span class="n">is_assets</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'/assets/'</span><span class="p">)</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'/signin/assets/'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_assets</span><span class="p">:</span>
+                <span class="n">set_cookies</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">'set-cookie'</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">set_cookies</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">'set-cookie'</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">res</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">init_webfeatures</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 

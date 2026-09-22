@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.test.gen_cli_docs &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.test.gen_cli_docs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.test.gen_cli_docs</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""コマンドリファレンスRST生成ツール。</span>
+
+<span class="sd">gen_cli_spec.py が生成した cli-command-specifications.json を元に、</span>
+<span class="sd">docs_src/docs/ 配下のコマンドリファレンスRSTファイルを新規生成します。</span>
+
+<span class="sd">既存のRSTファイルがある場合は上書きします。</span>
+
+<span class="sd">使い方 (Python API):</span>
+<span class="sd">    from cmdbox.app.features.cli.test import gen_cli_docs</span>
+<span class="sd">    result = gen_cli_docs.generate(</span>
+<span class="sd">        specs_dir=Path("Specifications"),</span>
+<span class="sd">        docs_dir=Path("docs_src/docs"),</span>
+<span class="sd">        mode_filter=None,   # None で全モード</span>
+<span class="sd">        cmd_filter=None,    # None で全コマンド</span>
+<span class="sd">        dry_run=False,</span>
+<span class="sd">    )</span>
+<span class="sd">"""</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_json_default</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""json.dumps の default 関数。シリアライズ不可なオブジェクトを文字列化します。"""</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="generate">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_docs.generate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+    <span class="n">specs_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">docs_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">mode_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cmd_filter</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""詳細設計書の内容からコマンドリファレンスRSTを生成します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        specs_dir: Specificationsディレクトリのパス（cli-command-specifications.json が存在する）</span>
+<span class="sd">        docs_dir: cmd_*.rst を出力するディレクトリのパス</span>
+<span class="sd">        mode_filter: 生成対象をモード名でフィルタ。None で全モード</span>
+<span class="sd">        cmd_filter: 生成対象をコマンド名でフィルタ。None で全コマンド</span>
+<span class="sd">        dry_run: True のとき実際にはファイルを書き込まない（変更内容のみ返す）</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        generated, skipped, errors を含む辞書</span>
+<span class="sd">    """</span>
+    <span class="n">json_file</span> <span class="o">=</span> <span class="n">specs_dir</span> <span class="o">/</span> <span class="s2">"cli-command-specifications.json"</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">json_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">generated</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">skipped</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">errors</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">"cli-command-specifications.json not found: </span><span class="si">{</span><span class="n">json_file</span><span class="si">}</span><span class="s2">"</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="n">documents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+
+    <span class="c1"># フィルタ適用</span>
+    <span class="k">if</span> <span class="n">mode_filter</span><span class="p">:</span>
+        <span class="n">documents</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">documents</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mode"</span><span class="p">)</span> <span class="o">==</span> <span class="n">mode_filter</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cmd_filter</span><span class="p">:</span>
+        <span class="n">documents</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">documents</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cmd"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cmd_filter</span><span class="p">]</span>
+
+    <span class="c1"># mode -&gt; list of spec でグループ化（コマンド順を保持）</span>
+    <span class="n">by_mode</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">:</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s2">"mode"</span><span class="p">]</span>
+        <span class="n">by_mode</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+    <span class="n">generated</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">skipped</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">errors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">mode</span><span class="p">,</span> <span class="n">specs</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">by_mode</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="n">rst_path</span> <span class="o">=</span> <span class="n">docs_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"cmd_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">.rst"</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">_render_rst</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">specs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dry_run</span><span class="p">:</span>
+            <span class="n">docs_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">rst_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+        <span class="n">generated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rst_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'[dry-run] '</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">dry_run</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">''</span><span class="si">}</span><span class="s2">Generated: </span><span class="si">{</span><span class="n">rst_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">generated</span><span class="o">=</span><span class="n">generated</span><span class="p">,</span> <span class="n">skipped</span><span class="o">=</span><span class="n">skipped</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_render_rst</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">specs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""1モード分のRSTコンテンツを生成します。"""</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># ファイルヘッダ</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">".. -*- coding: utf-8 -*-</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="n">page_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Command Reference ( </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2"> mode )"</span>
+    <span class="n">title_bar</span> <span class="o">=</span> <span class="s2">"*"</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">page_title</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">title_bar</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">page_title</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">title_bar</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"List of </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2"> mode commands.</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_render_command_section</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">spec</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_render_command_section</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""1コマンド分のRSTセクションを生成します。"""</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="s2">"cmd"</span><span class="p">]</span>
+    <span class="n">desc_en</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description_en"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parameters"</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="n">lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># セクション見出し</span>
+    <span class="n">section_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2"> ( </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> ) : ``cmdbox -m </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> &lt;Option&gt;``"</span>
+    <span class="n">underline</span> <span class="o">=</span> <span class="s2">"="</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">section_title</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">section_title</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">underline</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="c1"># 概要説明</span>
+    <span class="k">if</span> <span class="n">desc_en</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">_split_sentences</span><span class="p">(</span><span class="n">desc_en</span><span class="p">):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- </span><span class="si">{</span><span class="n">sentence</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="c1"># パラメータがなければ csv-table を省略</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="c1"># csv-table</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">".. csv-table::</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"    :widths: 20, 8, 8, 8, 12, 18, 26</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"    :header-rows: 1</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'    "Option","Type","Multi","Required","Default","Choices","Description"</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="n">short</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"short"</span><span class="p">)</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"required"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">ptype</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+        <span class="n">multi</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"multi"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"default"</span><span class="p">)</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"choices"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description_en"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">short</span><span class="p">:</span>
+            <span class="n">opt_display</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"-</span><span class="si">{</span><span class="n">short</span><span class="si">}</span><span class="s2">, --</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&gt;"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">opt_display</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"--</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&gt;"</span>
+
+        <span class="n">required_str</span> <span class="o">=</span> <span class="s2">"required"</span> <span class="k">if</span> <span class="n">required</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="n">multi_str</span> <span class="o">=</span> <span class="s2">"multi"</span> <span class="k">if</span> <span class="n">multi</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="n">default_str</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">default</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"&lt;br&gt;"</span><span class="p">)</span>
+        <span class="n">choices_str</span> <span class="o">=</span> <span class="s2">" | "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">)</span> <span class="k">if</span> <span class="n">choices</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'    "</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">opt_display</span><span class="p">)</span><span class="si">}</span><span class="s1">","</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">ptype</span><span class="p">)</span><span class="si">}</span><span class="s1">",'</span>
+            <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">multi_str</span><span class="si">}</span><span class="s1">","</span><span class="si">{</span><span class="n">required_str</span><span class="si">}</span><span class="s1">",'</span>
+            <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">default_str</span><span class="p">)</span><span class="si">}</span><span class="s1">","</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">choices_str</span><span class="p">)</span><span class="si">}</span><span class="s1">",'</span>
+            <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span><span class="si">}</span><span class="s1">"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="p">)</span>
+
+    <span class="c1"># 出力スキーマ</span>
+    <span class="n">output_schema</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"output_schema"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output_schema</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">schema_title</span> <span class="o">=</span> <span class="s2">"Output Schema"</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"**</span><span class="si">{</span><span class="n">schema_title</span><span class="si">}</span><span class="s2">**</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">output_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"class_name"</span><span class="p">,</span> <span class="s2">"Result"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"This command implements ``output_schema()`` returning ``</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2">`` model.</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">json_example</span> <span class="o">=</span> <span class="n">output_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"json_example"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">json_example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">".. code-block:: json</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">json_line</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_example</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">_json_default</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">json_line</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">output_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"fields"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">".. csv-table::</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"    :widths: 25, 10, 10, 15, 40</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"    :header-rows: 1</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'    "Field","Type","Required","Default","Description"</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+                <span class="n">ftype</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+                <span class="n">frequired</span> <span class="o">=</span> <span class="s2">"yes"</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"required"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"no"</span>
+                <span class="n">fdefault</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"default"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+                <span class="n">fdesc</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">'    "</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="si">}</span><span class="s1">","</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">ftype</span><span class="p">)</span><span class="si">}</span><span class="s1">",'</span>
+                    <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">frequired</span><span class="si">}</span><span class="s1">","</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">fdefault</span><span class="p">)</span><span class="si">}</span><span class="s1">","</span><span class="si">{</span><span class="n">_escape_csv</span><span class="p">(</span><span class="n">fdesc</span><span class="p">)</span><span class="si">}</span><span class="s1">"</span><span class="se">\n</span><span class="s1">'</span>
+                <span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">lines</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_split_sentences</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""英文を文単位に分割します（ピリオド＋スペースで区切る）。"""</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?&lt;=\.)\s+"</span><span class="p">,</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sentences</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_escape_csv</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""RST csv-table内でダブルクォートをエスケープします。"""</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'"'</span><span class="p">,</span> <span class="s1">'""'</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

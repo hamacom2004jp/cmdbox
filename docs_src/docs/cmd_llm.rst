@@ -55,7 +55,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "value": null
           }
         ],
-        "data": null
+        "data": null,
+        "token_usage": {}
       },
       "warn": {},
       "error": {},
@@ -72,6 +73,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","any | null","no","null","処理結果のデータ"
+    "success.token_usage","dict[str, any] | null","no","null","トークン使用量"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -402,11 +404,16 @@ llm ( proxy_start ) : ``cmdbox -m llm -c proxy_start <Option>``
     "--proxy_listen_port <proxy_listen_port>","int","","","4000","","Specify the listening port of LiteLLM Proxy. Default is `4000`."
     "--proxy_workers <proxy_workers>","int","","","3","","Specify the number of workers for LiteLLM Proxy. Default is `3`."
     "--proxy_apikey <proxy_apikey>","str","","required","","","Specify the API key for LiteLLM Proxy. It must start with 'sk-'."
-    "--llm <llm>","str","multi","required","","","Specify multiple LLM configuration names to register to the proxy. The specified order is used as failover priority."
+    "--llm_config <llm_config>","file","","","","","Directly specify the LiteLLM Proxy config file (config.yml). When specified, --llm options are ignored."
+    "--llm <llm>","str","multi","","","","Specify multiple LLM configuration names to register to the proxy. The specified order is used as failover priority."
     "--num_retries <num_retries>","int","","","2","","Specify retry count for LiteLLM Router."
-    "--request_timeout <request_timeout>","int","","","60","","Specify request timeout seconds for LiteLLM Proxy."
+    "--request_timeout <request_timeout>","int","","","90","","Specify request timeout seconds for LiteLLM Proxy. 90 seconds recommended for production."
     "--allowed_fails <allowed_fails>","int","","","3","","Specify failure threshold for cooldown."
-    "--cooldown_time <cooldown_time>","int","","","30","","Specify cooldown duration in seconds."
+    "--cooldown_time <cooldown_time>","int","","","60","","Specify cooldown duration in seconds. 60 seconds recommended for production."
+    "--connection_timeout <connection_timeout>","int","","","10","","Specify connection timeout seconds to LLM. Improves stability under high load."
+    "--cache_responses <cache_responses>","bool","","","False","","Enable response caching. Improves performance and reduces load."
+    "--max_retries_per_call <max_retries_per_call>","int","","","3","","Specify max retries per LLM call."
+    "--enable_polling_logs <enable_polling_logs>","bool","","","False","","Enable polling logs."
 
 **Output Schema**
 
@@ -640,7 +647,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "value": null
           }
         ],
-        "data": {}
+        "data": {},
+        "token_usage": {}
       },
       "warn": {},
       "error": {},
@@ -657,6 +665,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","dict[str, str] | null","no","null","翻訳結果。{元の単語: 翻訳後の文字列} の辞書形式。"
+    "success.token_usage","dict[str, any] | null","no","null","トークン使用量"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"

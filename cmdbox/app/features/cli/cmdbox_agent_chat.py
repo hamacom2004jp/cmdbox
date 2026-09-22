@@ -242,6 +242,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             artifacts: Union[List[Artifact], None] = pydantic.Field(default=None, description="アーティファクト内容")
             wav_b64: Union[str, None] = pydantic.Field(default=None, description="Base64エンコードされたWAVデータ")
             ressize: Union[int, None] = pydantic.Field(default=None, description="Agentが返したレスポンスのサイズ")
+            token_usage: Union[Dict[str, int], None] = pydantic.Field(default=None, description="トークン使用量")
         class SubResult(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         class Result(resdata.Result):
@@ -1086,6 +1087,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
         run_config = RunConfig(streaming_mode=StreamingMode.NONE)
         resval = []
+        token_usage = dict(prompt_tokens=0, completion_tokens=0, total_tokens=0)
         async with aclosing(runner.run_async(user_id=user_name,
                                                 session_id=agent_session.id,
                                                 new_message=content,
@@ -1109,6 +1111,12 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     flags['function_response'] = is_func_response
                     if st != self.RESP_SUCCESS:
                         outputs['warn'] = msg
+
+                    if hasattr(event, "usage_metadata") and event.usage_metadata:
+                        meta = event.usage_metadata
+                        token_usage['prompt_tokens'] += getattr(meta, "prompt_token_count", 0)
+                        token_usage['completion_tokens'] += getattr(meta, "completion_token_count", 0)
+                        token_usage['total_tokens'] += getattr(meta, "total_token_count", 0)
 
                     calls = ev.get_function_calls() or []
                     if calls:
@@ -1169,7 +1177,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 raise e
 
         msg = dict(success=dict(message=f"Chat '{runner_name}' completed.",
-                                ressize=len(convert.str2b64str(common.to_str(resval)))),
+                                ressize=len(convert.str2b64str(common.to_str(resval))),
+                                token_usage=token_usage),
                                 end=True)
         redis_cli.rpush(reskey, msg)
         await run_iter.aclose()
@@ -1226,4 +1235,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         return msg_size
 
     def svrun_credit(self, data_dir, logger, opt, msg):
-        return 1
+        data = msg.get('success', {}).get('token_usage', {})
+        if not data:
+            return 0
+        return data.get('total_tokens', 0)

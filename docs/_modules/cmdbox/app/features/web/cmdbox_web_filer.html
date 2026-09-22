@@ -1,0 +1,187 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.web.cmdbox_web_filer &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.web.cmdbox_web_filer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.web.cmdbox_web_filer</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">Web</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTMLResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="Filer">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_filer.Filer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Filer</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="p">):</span>
+<div class="viewcode-block" id="Filer.route">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_filer.Filer.route">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        webモードのルーティングを設定します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            app (FastAPI): FastAPIオブジェクト</span>
+<span class="sd">        """</span>
+        <span class="n">ondemand_load</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ondemand_load</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">filer_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">filer_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'filer_html is not found. (</span><span class="si">{</span><span class="n">web</span><span class="o">.</span><span class="n">filer_html</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">filer_html</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">filer_html_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/filer'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/filer'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">filer</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="n">signin</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_signin</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">signin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">signin</span>
+            <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">filer_html</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime_ns</span><span class="p">))</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'Access-Control-Allow-Origin'</span><span class="p">:</span> <span class="s1">'*'</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">em</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">304</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ondemand_load</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">filer_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'filer_html is not found. (</span><span class="si">{</span><span class="n">web</span><span class="o">.</span><span class="n">filer_html</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">filer_html</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">filer_html_data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Filer.toolmenu">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_filer.Filer.toolmenu">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toolmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ツールメニューの情報を返します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: ツールメニュー情報</span>
+<span class="sd">        </span>
+<span class="sd">        Sample:</span>
+<span class="sd">            {</span>
+<span class="sd">                'filer': {</span>
+<span class="sd">                    'html': 'Filer',</span>
+<span class="sd">                    'href': 'filer',</span>
+<span class="sd">                    'target': '_blank',</span>
+<span class="sd">                    'css_class': 'dropdown-item',</span>
+<span class="sd">                    'onclick': 'alert("filer")'</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">filer</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">html</span><span class="o">=</span><span class="s1">'Filer'</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s1">'filer'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">'_blank'</span><span class="p">,</span> <span class="n">css_class</span><span class="o">=</span><span class="s1">'dropdown-item'</span><span class="p">))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

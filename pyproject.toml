@@ -10,7 +10,7 @@ readme = "README.md"
 authors = [
     { name = "hamacom2004jp", email = "hamacom2004jp@gmail.com" },
 ]
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.10"
 keywords = [
     "audit",
@@ -30,7 +30,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
     "Natural Language :: Japanese",
     "Programming Language :: Python",
     "Topic :: Utilities"
@@ -142,26 +141,15 @@ cmdbox = "cmdbox.app.app:main"
 # setuptools固有の設定 (setup.cfgに相当する内容をsetuptoolsテーブルで記述)
 # ----------------------------------------------------------------------
 [tool.setuptools]
-packages = [
-    "cmdbox",
-    "cmdbox.app",
-    "cmdbox.app.auth",
-    "cmdbox.app.commons",
-    "cmdbox.app.features.cli",
-    "cmdbox.app.features.cli.agent",
-    "cmdbox.app.features.cli.audit",
-    "cmdbox.app.features.cli.cmdbox",
-    "cmdbox.app.features.cli.datasource",
-    "cmdbox.app.features.cli.excel",
-    "cmdbox.app.features.cli.rag",
-    "cmdbox.app.features.cli.test",
-    "cmdbox.app.features.web",
-    "cmdbox.extensions"
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cmdbox*"]
+# Exclude non-Python directories that don't contain __init__.py
+exclude = [
+    "cmdbox.edge"
 ]
-
-[tool.setuptools.dynamic]
-version = { attr = "cmdbox.version.__version__" }
-
 [tool.setuptools.package-data]
 # setup()のpackage_dataとexclude_package_dataに相当
 cmdbox = [
@@ -172,7 +160,6 @@ cmdbox = [
     "docker/**",
     "docker/**/*",
     "licenses/*",
-    "tools/datas/**",
     "web/**",
     "web/**/*",
 ]

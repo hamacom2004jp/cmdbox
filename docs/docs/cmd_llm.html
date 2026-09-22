@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/09/13 documentation</title>
+  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/09/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f36998f3"></script>
+      <script src="../_static/documentation_options.js?v=fa416c26"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -343,7 +343,8 @@
 <span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"token_usage"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -393,49 +394,55 @@
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-even"><td><p>warn</p></td>
+<tr class="row-even"><td><p>success.token_usage</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>トークン使用量</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<tr class="row-even"><td><p>warn.save_mode</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>保存モード</p></td>
 </tr>
-<tr class="row-even"><td><p>warn.performance</p></td>
+<tr class="row-odd"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>error</p></td>
+<tr class="row-even"><td><p>error</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.save_mode</p></td>
+<tr class="row-odd"><td><p>error.save_mode</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>保存モード</p></td>
 </tr>
-<tr class="row-odd"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>output_schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-odd"><td><p>end</p></td>
+<tr class="row-even"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1571,15 +1578,23 @@
 <td></td>
 <td><p>Specify the API key for LiteLLM Proxy. It must start with 'sk-'.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llm &lt;llm&gt;</p></td>
+<tr class="row-even"><td><p>--llm_config &lt;llm_config&gt;</p></td>
+<td><p>file</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Directly specify the LiteLLM Proxy config file (config.yml). When specified, --llm options are ignored.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llm &lt;llm&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
-<td><p>required</p></td>
+<td></td>
 <td></td>
 <td></td>
 <td><p>Specify multiple LLM configuration names to register to the proxy. The specified order is used as failover priority.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--num_retries &lt;num_retries&gt;</p></td>
+<tr class="row-even"><td><p>--num_retries &lt;num_retries&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1587,15 +1602,15 @@
 <td></td>
 <td><p>Specify retry count for LiteLLM Router.</p></td>
 </tr>
-<tr class="row-even"><td><p>--request_timeout &lt;request_timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--request_timeout &lt;request_timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
-<td><p>60</p></td>
+<td><p>90</p></td>
 <td></td>
-<td><p>Specify request timeout seconds for LiteLLM Proxy.</p></td>
+<td><p>Specify request timeout seconds for LiteLLM Proxy. 90 seconds recommended for production.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--allowed_fails &lt;allowed_fails&gt;</p></td>
+<tr class="row-even"><td><p>--allowed_fails &lt;allowed_fails&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1603,13 +1618,45 @@
 <td></td>
 <td><p>Specify failure threshold for cooldown.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cooldown_time &lt;cooldown_time&gt;</p></td>
+<tr class="row-odd"><td><p>--cooldown_time &lt;cooldown_time&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
-<td><p>30</p></td>
+<td><p>60</p></td>
 <td></td>
-<td><p>Specify cooldown duration in seconds.</p></td>
+<td><p>Specify cooldown duration in seconds. 60 seconds recommended for production.</p></td>
+</tr>
+<tr class="row-even"><td><p>--connection_timeout &lt;connection_timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>10</p></td>
+<td></td>
+<td><p>Specify connection timeout seconds to LLM. Improves stability under high load.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--cache_responses &lt;cache_responses&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Enable response caching. Improves performance and reduces load.</p></td>
+</tr>
+<tr class="row-even"><td><p>--max_retries_per_call &lt;max_retries_per_call&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specify max retries per LLM call.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--enable_polling_logs &lt;enable_polling_logs&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Enable polling logs.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2411,7 +2458,8 @@
 <span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">    </span><span class="nt">"token_usage"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -2461,49 +2509,55 @@
 <td><p>null</p></td>
 <td><p>翻訳結果。{元の単語: 翻訳後の文字列} の辞書形式。</p></td>
 </tr>
-<tr class="row-even"><td><p>warn</p></td>
+<tr class="row-even"><td><p>success.token_usage</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>トークン使用量</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<tr class="row-even"><td><p>warn.save_mode</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>保存モード</p></td>
 </tr>
-<tr class="row-even"><td><p>warn.performance</p></td>
+<tr class="row-odd"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>error</p></td>
+<tr class="row-even"><td><p>error</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.save_mode</p></td>
+<tr class="row-odd"><td><p>error.save_mode</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>保存モード</p></td>
 </tr>
-<tr class="row-odd"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>output_schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-odd"><td><p>end</p></td>
+<tr class="row-even"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>

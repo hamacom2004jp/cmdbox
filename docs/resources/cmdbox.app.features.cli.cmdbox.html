@@ -1,0 +1,454 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox package &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/resources/cmdbox.app.features.cli.cmdbox.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmdbox-app-features-cli-cmdbox-package">
+<h1>cmdbox.app.features.cli.cmdbox package<a class="headerlink" href="#cmdbox-app-features-cli-cmdbox-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-cmdbox.app.features.cli.cmdbox.cmdbox_base">
+<span id="cmdbox-app-features-cli-cmdbox-cmdbox-base-module"></span><h2>cmdbox.app.features.cli.cmdbox.cmdbox_base module<a class="headerlink" href="#module-cmdbox.app.features.cli.cmdbox.cmdbox_base" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.cmdbox.cmdbox_base.</span></span><span class="sig-name descname"><span class="pre">CmdboxBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.OneshotEdgeFeature" title="cmdbox.app.feature.OneshotEdgeFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">OneshotEdgeFeature</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.copy_scripts">
+<span class="sig-name descname"><span class="pre">copy_scripts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.copy_scripts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.copy_scripts" title="Link to this definition"></a></dt>
+<dd><p>モジュール内のスクリプトをホストにコピーします。
+:param logger: ロガー
+:type logger: logging.Logger
+:param container: コンテナ名
+:type container: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>コピー先のパス</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.down">
+<span class="sig-name descname"><span class="pre">down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.down"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.down" title="Link to this definition"></a></dt>
+<dd><p>コンテナを停止します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.exec">
+<span class="sig-name descname"><span class="pre">exec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.exec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.exec" title="Link to this definition"></a></dt>
+<dd><p>cmdboxサーバーコンテナ内で任意のコマンドを実行します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>command</strong> (<em>str</em>) -- 実行するコマンド</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.get_imgname">
+<span class="sig-name descname"><span class="pre">get_imgname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.get_imgname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.get_imgname" title="Link to this definition"></a></dt>
+<dd><p>イメージ名を取得します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>イメージ名</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.get_option">
+<span class="sig-name descname"><span class="pre">get_option</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.get_option"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.get_option" title="Link to this definition"></a></dt>
+<dd><p>この機能のオプションを返します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>オプション</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.load" title="Link to this definition"></a></dt>
+<dd><p>tar形式で保存されたcmdboxサーバーのイメージをロードします。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>install_tag</strong> (<em>str</em>) -- インストールタグ</p></li>
+<li><p><strong>file</strong> (<em>str</em>) -- ロードするtarファイルパス</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.logs">
+<span class="sig-name descname"><span class="pre">logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">follow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.logs" title="Link to this definition"></a></dt>
+<dd><p>cmdboxサーバーのログを表示します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>follow</strong> (<em>bool</em>) -- ログ出力をフォローするかどうか</p></li>
+<li><p><strong>number</strong> (<em>int</em>) -- ログの最後から指定行数出力する</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_default">
+<span class="sig-name descname"><span class="pre">make_compose_default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.make_compose_default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_default" title="Link to this definition"></a></dt>
+<dd><p>デフォルトのdocker-compose.ymlを作成します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>imgname</strong> (<em>str</em>) -- イメージ名</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>composeファイルの内容
+Path: compose_path</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_pgsql">
+<span class="sig-name descname"><span class="pre">make_compose_pgsql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_pgsqlver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.make_compose_pgsql"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_pgsql" title="Link to this definition"></a></dt>
+<dd><p>pgsql用のdocker-compose.ymlを作成します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>imgname</strong> (<em>str</em>) -- イメージ名</p></li>
+<li><p><strong>install_pgsqlver</strong> (<em>str</em>) -- インストールするPostgreSQLのバージョン</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>composeファイルの内容
+Path: compose_path</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_redis">
+<span class="sig-name descname"><span class="pre">make_compose_redis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.make_compose_redis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_redis" title="Link to this definition"></a></dt>
+<dd><p>redis用のdocker-compose.ymlを作成します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>imgname</strong> (<em>str</em>) -- イメージ名</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>composeファイルの内容
+Path: compose_path</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_server">
+<span class="sig-name descname"><span class="pre">make_compose_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_sh_tgt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.make_compose_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_server" title="Link to this definition"></a></dt>
+<dd><p>server用のdocker-compose.ymlを作成します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>imgname</strong> (<em>str</em>) -- イメージ名</p></li>
+<li><p><strong>user</strong> (<em>str</em>) -- ホストのユーザー名</p></li>
+<li><p><strong>data</strong> (<em>str</em>) -- ホストのデータ保存先ディレクトリパス</p></li>
+<li><p><strong>start_sh_tgt</strong> (<em>str</em>) -- コンテナ内のstart.shのパス</p></li>
+<li><p><strong>install_use_gpu</strong> (<em>bool</em>) -- GPUを使用してインストールするかどうか</p></li>
+<li><p><strong>install_tag</strong> (<em>str</em>) -- インストールタグ</p></li>
+<li><p><strong>language</strong> (<em>str</em>) -- 言語</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>composeファイルの内容
+Path: compose_path</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.reboot">
+<span class="sig-name descname"><span class="pre">reboot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.reboot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.reboot" title="Link to this definition"></a></dt>
+<dd><p>コンテナを再起動します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> (<em>List</em>) -- 呼出元のパフォーマンス情報</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.save" title="Link to this definition"></a></dt>
+<dd><p>cmdboxサーバーのイメージをtar形式で保存します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+<li><p><strong>install_tag</strong> (<em>str</em>) -- インストールタグ</p></li>
+<li><p><strong>file</strong> (<em>str</em>) -- 保存先ファイルパス</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.uninstall">
+<span class="sig-name descname"><span class="pre">uninstall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.uninstall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.uninstall" title="Link to this definition"></a></dt>
+<dd><p>コンテナをアンインストールします。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.up">
+<span class="sig-name descname"><span class="pre">up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/cmdbox/cmdbox_base.html#CmdboxBase.up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.up" title="Link to this definition"></a></dt>
+<dd><p>コンテナを起動します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>compose_path</strong> (<em>str</em>) -- docker-compose.ymlファイルパス</p></li>
+<li><p><strong>container</strong> (<em>str</em>) -- コンテナ名</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.cmdbox">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cmdbox.app.features.cli.cmdbox" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

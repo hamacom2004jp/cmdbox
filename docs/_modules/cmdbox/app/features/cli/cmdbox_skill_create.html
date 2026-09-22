@@ -1,0 +1,310 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox_skill_create &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox_skill_create</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.cmdbox_skill_create</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
+
+
+<div class="viewcode-block" id="SkillCreate">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_skill_create.SkillCreate">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SkillCreate</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">OneshotResultEdgeFeature</span><span class="p">,</span> <span class="n">validator</span><span class="o">.</span><span class="n">Validator</span><span class="p">):</span>
+<div class="viewcode-block" id="SkillCreate.get_mode">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_skill_create.SkillCreate.get_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="s1">'skill'</span></div>
+
+
+<div class="viewcode-block" id="SkillCreate.get_cmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_skill_create.SkillCreate.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">'create'</span></div>
+
+
+<div class="viewcode-block" id="SkillCreate.get_option">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_skill_create.SkillCreate.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">description_ja</span><span class="o">=</span><span class="s2">"コマンド定義ファイルを元に Agent Skill の zip を作成します。"</span><span class="p">,</span>
+            <span class="n">description_en</span><span class="o">=</span><span class="s2">"Create an Agent Skill zip from a command definition file."</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"data"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DIR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_data</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="sa">f</span><span class="s2">"省略した時は `$HOME/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="sa">f</span><span class="s2">"When omitted, `$HOME/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"from_cmd_title"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[],</span>
+                     <span class="n">callcmd</span><span class="o">=</span><span class="s2">"async () =&gt; {await cmdbox.callcmd('cmd','list',</span><span class="si">{}</span><span class="s2">,"</span>
+                            <span class="o">+</span> <span class="s2">"(res)=&gt;{const val = $(</span><span class="se">\"</span><span class="s2">[name='from_cmd_title']</span><span class="se">\"</span><span class="s2">).val();"</span>
+                            <span class="o">+</span> <span class="s2">"$(</span><span class="se">\"</span><span class="s2">[name='from_cmd_title']</span><span class="se">\"</span><span class="s2">).empty().append('&lt;option&gt;&lt;/option&gt;');"</span>
+                            <span class="o">+</span> <span class="s2">"res['data'].forEach(elm=&gt;{$(</span><span class="se">\"</span><span class="s2">[name='from_cmd_title']</span><span class="se">\"</span><span class="s2">).append('&lt;option value=</span><span class="se">\"</span><span class="s2">'+elm[</span><span class="se">\"</span><span class="s2">title</span><span class="se">\"</span><span class="s2">]+'</span><span class="se">\"</span><span class="s2">&gt;'+elm[</span><span class="se">\"</span><span class="s2">title</span><span class="se">\"</span><span class="s2">]+'&lt;/option&gt;');});"</span>
+                            <span class="o">+</span> <span class="s2">"$(</span><span class="se">\"</span><span class="s2">[name='from_cmd_title']</span><span class="se">\"</span><span class="s2">).val(val);"</span>
+                            <span class="o">+</span> <span class="s2">"},$(</span><span class="se">\"</span><span class="s2">[name='from_cmd_title']</span><span class="se">\"</span><span class="s2">).val(),'from_cmd_title');"</span>
+                            <span class="o">+</span> <span class="s2">"}"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"スキル化するコマンドタイトルを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the command title to convert into a skill."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"skill_name"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"作成するスキル名を指定します。省略時は from_cmd_title から生成します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the skill name. If omitted, generated from from_cmd_title."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"skill_instruction"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_TEXT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"SKILL.md 本文の instruction を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the instruction body in SKILL.md."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"output_file"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FILE</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fileio</span><span class="o">=</span><span class="s2">"out"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"出力する zip ファイルパスを指定します。省略時はカレントに `&lt;skill_name&gt;.zip` を作成します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Output zip file path. If omitted, creates `&lt;skill_name&gt;.zip` in current directory."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"overwrite"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"出力先が既に存在する場合に上書きします。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Overwrite when output file already exists."</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SkillCreate.apprun">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_skill_create.SkillCreate.apprun">[docs]</a>
+    <span class="nd">@validator</span><span class="o">.</span><span class="n">apprun_check</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+               <span class="n">pf</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_data</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="n">instruction</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'skill_instruction'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_skill_zip</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+            <span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">,</span>
+            <span class="n">from_cmd_title</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">from_cmd_title</span><span class="p">),</span>
+            <span class="n">skill_name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'skill_name'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="n">skill_instruction</span><span class="o">=</span><span class="n">instruction</span><span class="p">,</span>
+            <span class="n">output_file</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'output_file'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="n">overwrite</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'overwrite'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_skill_zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">from_cmd_title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="n">skill_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">skill_instruction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cmd_path</span> <span class="o">=</span> <span class="n">data_dir</span> <span class="o">/</span> <span class="s1">'.cmds'</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">'cmd-</span><span class="si">{</span><span class="n">from_cmd_title</span><span class="si">}</span><span class="s1">.json'</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">cmd_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Command file not found: '</span><span class="si">{</span><span class="n">cmd_path</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+            <span class="n">cmd_opt</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">cmd_path</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmd_opt</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">'mode'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">or</span> <span class="s1">'cmd'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid command file format: '</span><span class="si">{</span><span class="n">cmd_path</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+        <span class="c1"># ADK compatibility: prefer lowercase kebab-case.</span>
+        <span class="n">name_src</span> <span class="o">=</span> <span class="n">skill_name</span> <span class="k">if</span> <span class="n">skill_name</span> <span class="k">else</span> <span class="n">from_cmd_title</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name_src</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">'[^a-z0-9-]+'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">'-{2,}'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">'-'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">'skill_name is empty after normalization.'</span><span class="p">)</span>
+
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">cmd_opt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'mode'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd_opt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'cmd'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">cmd_opt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'description'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">description</span><span class="p">:</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="s1">'description_ja'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">description</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="s1">'description_en'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">description</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Execute cmdbox command '</span><span class="si">{</span><span class="n">from_cmd_title</span><span class="si">}</span><span class="s2">'."</span>
+        <span class="k">if</span> <span class="n">skill_instruction</span><span class="p">:</span>
+            <span class="n">instruction</span> <span class="o">=</span> <span class="n">skill_instruction</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">instruction</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"このスキルは cmdbox の登録済みコマンドを実行するための補助スキルです。</span><span class="se">\n\n</span><span class="s2">"</span>
+                <span class="s2">"実行手順:</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"1. 必要な引数を利用者に確認する。</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"2. モードとコマンドを固定し、必要に応じて追加オプションを組み立てる。</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"3. 実行前に破壊的操作かどうかを確認する。</span><span class="se">\n\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"- from_cmd_title: </span><span class="si">{</span><span class="n">from_cmd_title</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"- mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"- cmd: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span>
+                <span class="s2">"詳細な既定パラメータは `references/command.json` を参照してください。"</span>
+            <span class="p">)</span>
+
+        <span class="n">out_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="k">if</span> <span class="n">output_file</span> <span class="k">else</span> <span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.zip'</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="n">out_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Output file already exists: '</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+            <span class="n">out_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'skill_create_'</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+            <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">tmpdir</span> <span class="o">/</span> <span class="n">name</span>
+            <span class="n">refs</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="s1">'references'</span>
+            <span class="n">refs</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="p">(</span><span class="n">refs</span> <span class="o">/</span> <span class="s1">'command.json'</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">cmd_opt</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">description</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'</span><span class="se">\r\n</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'"'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\\</span><span class="s1">"'</span><span class="p">)</span>
+            <span class="n">skill_md</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"---</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"name: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"description: </span><span class="se">\"</span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="se">\"\n</span><span class="s2">"</span>
+                <span class="s2">"---</span><span class="se">\n\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">instruction</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="p">)</span>
+            <span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s1">'SKILL.md'</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+                <span class="n">skill_md</span><span class="p">,</span>
+                <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s1">'*'</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                        <span class="k">continue</span>
+                    <span class="n">arcname</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">root</span><span class="p">))</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+                    <span class="n">zf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">arcname</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Created skill zip '</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">' from from_cmd_title='</span><span class="si">{</span><span class="n">from_cmd_title</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">from_cmd_title</span><span class="o">=</span><span class="n">from_cmd_title</span><span class="p">,</span>
+            <span class="n">skill_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">output_file</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span>
+            <span class="n">skill_md</span><span class="o">=</span><span class="s1">'SKILL.md'</span><span class="p">,</span>
+            <span class="n">command_ref</span><span class="o">=</span><span class="s1">'references/command.json'</span><span class="p">,</span>
+        <span class="p">))</span>
+
+<div class="viewcode-block" id="SkillCreate.output_schema">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_skill_create.SkillCreate.output_schema">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Data</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Data</span><span class="p">):</span>
+            <span class="n">from_cmd_title</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"元コマンドタイトル"</span><span class="p">)</span>
+            <span class="n">skill_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"作成したスキル名"</span><span class="p">)</span>
+            <span class="n">output_file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"作成したzipファイル"</span><span class="p">)</span>
+            <span class="n">skill_md</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"zip内SKILL.mdパス"</span><span class="p">)</span>
+            <span class="n">command_ref</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"zip内コマンド参照JSONパス"</span><span class="p">)</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Result</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Result</span><span class="p">):</span>
+            <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Data</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"成功した場合の結果"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Result</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

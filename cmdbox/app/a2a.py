@@ -198,6 +198,11 @@ class A2a(mcp.Mcp):
                 if mcpsv_conf is None:
                     logger.warning(f"MCPServer config '{mcpserver_name}' is empty.")
                     continue
+                # boot_user_apikey が設定されている場合、MCPサーバーのAPIキーを設定
+                if hasattr(args, 'boot_user_apikey') and args.boot_user_apikey is not None:
+                    mcpsv_conf['mcpserver_apikey'] = args.boot_user_apikey
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"MCPServer '{mcpserver_name}' apikey set from boot_user_apikey")
                 if mcpsv_conf.get('mcpserver_apikey', None) is None and not mcpsv_conf.get('mcpserver_delegated_auth', False):
                     logger.warning(f"MCPServer config '{mcpserver_name}' does not have apikey.")
                     continue

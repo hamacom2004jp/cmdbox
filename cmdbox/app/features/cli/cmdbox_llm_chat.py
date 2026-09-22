@@ -169,6 +169,7 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
     def output_schema(self) -> type:
         class Data(resdata.Data):
             data: Union[Any, None] = pydantic.Field(default=None, description="処理結果のデータ")
+            token_usage: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="トークン使用量")
         class Result(resdata.Result):
             success: Union[Data, str, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -386,11 +387,14 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 res.append(dict(role=message.get("role"), content=message.get("content")))
         else:
             raise ValueError(f"Unsupported LLM provider: {llmprov}")
-        return self.RESP_SUCCESS, dict(success=dict(data=res))
+        token_usage = response.get("usage", {})
+        token_usage = dict(prompt_tokens=token_usage.get("prompt_tokens"),
+                           completion_tokens=token_usage.get("completion_tokens"),
+                           total_tokens=token_usage.get("total_tokens"))
+        return self.RESP_SUCCESS, dict(success=dict(data=res, token_usage=token_usage))
 
     def svrun_credit(self, data_dir, logger, opt, msg):
-        data = msg.get('success', {}).get('data', [])
+        data = msg.get('success', {}).get('token_usage', {})
         if not data:
             return 0
-        return len(data)
-
+        return data.get('total_tokens', 0)

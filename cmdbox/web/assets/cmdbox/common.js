@@ -2631,7 +2631,18 @@ cmdbox.audit_write = async (audit_type, clmsg_src, clmsg_title, clmsg_body={}, c
         return {'warn': e.toString()};
     }
 };
-
+/**
+ * SHA-256 ハッシュを計算する
+ * @param {string} data ハッシュ化したい文字列
+ * @returns {Promise<string>} ハッシュ値（16進数）
+ */
+cmdbox.hash = async (data) => {
+    const msgUint8 = new TextEncoder().encode(data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+};
 /**
  * すべてのBootstrapモーダルが開かれた時にcmdbox.audit_writeを呼び出す
  * Bootstrap内部の処理に差し込むことで、動的に生成されるモーダルにも対応

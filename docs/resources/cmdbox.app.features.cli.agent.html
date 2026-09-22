@@ -1,0 +1,522 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.agent package &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.agent package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/resources/cmdbox.app.features.cli.agent.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmdbox-app-features-cli-agent-package">
+<h1>cmdbox.app.features.cli.agent package<a class="headerlink" href="#cmdbox-app-features-cli-agent-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-cmdbox.app.features.cli.agent.agant_base">
+<span id="cmdbox-app-features-cli-agent-agant-base-module"></span><h2>cmdbox.app.features.cli.agent.agant_base module<a class="headerlink" href="#module-cmdbox.app.features.cli.agent.agant_base" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.agant_base.AgentBase">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.agant_base.</span></span><span class="sig-name descname"><span class="pre">AgentBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/agant_base.html#AgentBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.agant_base.AgentBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.ResultEdgeFeature" title="cmdbox.app.feature.ResultEdgeFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultEdgeFeature</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.agant_base.AgentBase.apply_prompt_param">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">apply_prompt_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/agant_base.html#AgentBase.apply_prompt_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.agant_base.AgentBase.apply_prompt_param" title="Link to this definition"></a></dt>
+<dd><p>テキスト中のプレースホルダーを prompt_param の値で置換します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) -- 置換対象のテキスト</p></li>
+<li><p><strong>prompt_param</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- プレースホルダーに対応するパラメータ</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>置換後のテキスト</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.agant_base.AgentBase.create_agent_session">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create_agent_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_service</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/agant_base.html#AgentBase.create_agent_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.agant_base.AgentBase.create_agent_session" title="Link to this definition"></a></dt>
+<dd><p>セッションを作成します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_service</strong> (<em>BaseSessionService</em>) -- セッションサービス</p></li>
+<li><p><strong>runner_name</strong> (<em>str</em>) -- ランナー名</p></li>
+<li><p><strong>user_name</strong> (<em>str</em>) -- ユーザー名</p></li>
+<li><p><strong>session_id</strong> (<em>str</em>) -- セッションID</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>セッション</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.agant_base.AgentBase.create_session_service">
+<span class="sig-name descname"><span class="pre">create_session_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/agant_base.html#AgentBase.create_session_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.agant_base.AgentBase.create_session_service" title="Link to this definition"></a></dt>
+<dd><p>セッションサービスを作成します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>data_dir</strong> (<em>Path</em>) -- データディレクトリ</p></li>
+<li><p><strong>ds_conf</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- データソースの設定</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>セッションサービス</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>BaseSessionService</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.agant_base.AgentBase.gen_msg">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gen_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/agant_base.html#AgentBase.gen_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.agant_base.AgentBase.gen_msg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.agant_base.AgentBase.load_conf">
+<span class="sig-name descname"><span class="pre">load_conf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runner_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/agant_base.html#AgentBase.load_conf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.agant_base.AgentBase.load_conf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.agent.dangerous_sequence">
+<span id="cmdbox-app-features-cli-agent-dangerous-sequence-module"></span><h2>cmdbox.app.features.cli.agent.dangerous_sequence module<a class="headerlink" href="#module-cmdbox.app.features.cli.agent.dangerous_sequence" title="Link to this heading"></a></h2>
+<p>危険な文字シーケンス検知プラグイン</p>
+<p>SQL コメント、ヌルバイト、16進数エスケープなどの危険な文字パターンを検知します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.dangerous_sequence.</span></span><span class="sig-name descname"><span class="pre">DangerousSequencePlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/dangerous_sequence.html#DangerousSequencePlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>危険な文字シーケンスを検知して無害化するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin.PATTERNS">
+<span class="sig-name descname"><span class="pre">PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('(?i)(--\\s+|#\\s+|;)',</span> <span class="pre">&lt;function</span> <span class="pre">DangerousSequencePlugin.&lt;lambda&gt;&gt;),</span> <span class="pre">('(\\x00|\\x1a)',</span> <span class="pre">&lt;function</span> <span class="pre">DangerousSequencePlugin.&lt;lambda&gt;&gt;),</span> <span class="pre">('(\\\\x[0-9a-f]{2})',</span> <span class="pre">&lt;function</span> <span class="pre">DangerousSequencePlugin.&lt;lambda&gt;&gt;)]</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin.PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/dangerous_sequence.html#DangerousSequencePlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして危険な文字シーケンスを無害化</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/dangerous_sequence.html#DangerousSequencePlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして危険な文字シーケンスを無害化</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin.sanitize_text">
+<span class="sig-name descname"><span class="pre">sanitize_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/dangerous_sequence.html#DangerousSequencePlugin.sanitize_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.dangerous_sequence.DangerousSequencePlugin.sanitize_text" title="Link to this definition"></a></dt>
+<dd><p>指定されたテキストを危険な文字シーケンスから無害化</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.agent.detection_malicious_keyword">
+<span id="cmdbox-app-features-cli-agent-detection-malicious-keyword-module"></span><h2>cmdbox.app.features.cli.agent.detection_malicious_keyword module<a class="headerlink" href="#module-cmdbox.app.features.cli.agent.detection_malicious_keyword" title="Link to this heading"></a></h2>
+<p>悪意のあるキーワード検知プラグイン</p>
+<p>危険なキーワードやコマンドのパターンを検知します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_malicious_keyword.MaliciousKeywordDetectionPlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.detection_malicious_keyword.</span></span><span class="sig-name descname"><span class="pre">MaliciousKeywordDetectionPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_malicious_keyword.html#MaliciousKeywordDetectionPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_malicious_keyword.MaliciousKeywordDetectionPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>悪意のあるキーワードを検知するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_malicious_keyword.MaliciousKeywordDetectionPlugin.PATTERNS">
+<span class="sig-name descname"><span class="pre">PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['(?i)\\b(drop\\s+database|truncate\\s+table|exec\\s+xp_|sp_oacreate)',</span> <span class="pre">'(?i)(\\bignore\\b|\\bby\\s+pass\\b|\\badmin\\b.*?\\bpassword\\b)',</span> <span class="pre">'(?i)(union\\s+all\\s+select)']</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_malicious_keyword.MaliciousKeywordDetectionPlugin.PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_malicious_keyword.MaliciousKeywordDetectionPlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_malicious_keyword.html#MaliciousKeywordDetectionPlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_malicious_keyword.MaliciousKeywordDetectionPlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして悪意のあるキーワードを検知</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_malicious_keyword.MaliciousKeywordDetectionPlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_malicious_keyword.html#MaliciousKeywordDetectionPlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_malicious_keyword.MaliciousKeywordDetectionPlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして悪意のあるキーワードを検知</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.agent.detection_sql_injection">
+<span id="cmdbox-app-features-cli-agent-detection-sql-injection-module"></span><h2>cmdbox.app.features.cli.agent.detection_sql_injection module<a class="headerlink" href="#module-cmdbox.app.features.cli.agent.detection_sql_injection" title="Link to this heading"></a></h2>
+<p>SQL インジェクション検知プラグイン</p>
+<p>SQL インジェクション攻撃パターンを検知し、PromptInjectionException を発生させます。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_sql_injection.SQLInjectionDetectionPlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.detection_sql_injection.</span></span><span class="sig-name descname"><span class="pre">SQLInjectionDetectionPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_sql_injection.html#SQLInjectionDetectionPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_sql_injection.SQLInjectionDetectionPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>SQL インジェクション攻撃を検知するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_sql_injection.SQLInjectionDetectionPlugin.PATTERNS">
+<span class="sig-name descname"><span class="pre">PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['(?i)\\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\\b.*?(?:from|into|values|set|where|;)',</span> <span class="pre">&quot;(?i)('\\s*or\\s*'|'\\s*or\\s*1\\s*=\\s*1|--\\s*|;.*?(union|select|insert))&quot;,</span> <span class="pre">'(?i)(\\bor\\b\\s*1\\s*=\\s*1|\\bor\\b\\s*true\\b)',</span> <span class="pre">'(?i)(xp_cmdshell|exec\\s+sp_|sp_executesql)',</span> <span class="pre">&quot;(?i)(sqlmap|'</span> <span class="pre">and</span> <span class="pre">'1'='1)&quot;]</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_sql_injection.SQLInjectionDetectionPlugin.PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_sql_injection.SQLInjectionDetectionPlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_sql_injection.html#SQLInjectionDetectionPlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_sql_injection.SQLInjectionDetectionPlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして SQL インジェクションを検知</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_sql_injection.SQLInjectionDetectionPlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_sql_injection.html#SQLInjectionDetectionPlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_sql_injection.SQLInjectionDetectionPlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして SQL インジェクションを検知</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.agent.detection_template_injection">
+<span id="cmdbox-app-features-cli-agent-detection-template-injection-module"></span><h2>cmdbox.app.features.cli.agent.detection_template_injection module<a class="headerlink" href="#module-cmdbox.app.features.cli.agent.detection_template_injection" title="Link to this heading"></a></h2>
+<p>Jinja2 テンプレートインジェクション検知プラグイン</p>
+<p>Jinja2 テンプレートエンジンを対象とした SSTI（Server-Side Template Injection）パターンを検知します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_template_injection.TemplateInjectionDetectionPlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.detection_template_injection.</span></span><span class="sig-name descname"><span class="pre">TemplateInjectionDetectionPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_template_injection.html#TemplateInjectionDetectionPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_template_injection.TemplateInjectionDetectionPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>Jinja2/テンプレートインジェクション攻撃を検知するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_template_injection.TemplateInjectionDetectionPlugin.PATTERNS">
+<span class="sig-name descname"><span class="pre">PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['\\{\\{.*?__.*?\\}\\}',</span> <span class="pre">'\\{\\{.*?self\\._TemplateModule__dict__.*?\\}\\}',</span> <span class="pre">'\\{%.*?import.*?%\\}',</span> <span class="pre">'\\{\\{.*?config\\.items\\(\\).*?\\}\\}',</span> <span class="pre">'\\{\\{.*?request\\.environ.*?\\}\\}',</span> <span class="pre">'{{.*?popen.*?}}',</span> <span class="pre">'{{.*?system.*?}}']</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_template_injection.TemplateInjectionDetectionPlugin.PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_template_injection.TemplateInjectionDetectionPlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_template_injection.html#TemplateInjectionDetectionPlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_template_injection.TemplateInjectionDetectionPlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして Jinja2 テンプレートインジェクションを検知</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.detection_template_injection.TemplateInjectionDetectionPlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_template_injection.html#TemplateInjectionDetectionPlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.detection_template_injection.TemplateInjectionDetectionPlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして Jinja2 テンプレートインジェクションを検知</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.agent.javascript_injection">
+<span id="cmdbox-app-features-cli-agent-javascript-injection-module"></span><h2>cmdbox.app.features.cli.agent.javascript_injection module<a class="headerlink" href="#module-cmdbox.app.features.cli.agent.javascript_injection" title="Link to this heading"></a></h2>
+<p>JavaScript/HTML インジェクション無害化プラグイン</p>
+<p>XSS（クロスサイトスクリプティング）および HTML インジェクション攻撃パターンを無害化します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.javascript_injection.</span></span><span class="sig-name descname"><span class="pre">JavaScriptInjectionPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/javascript_injection.html#JavaScriptInjectionPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>JavaScript/HTML インジェクション攻撃を無害化するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin.JS_PATTERNS">
+<span class="sig-name descname"><span class="pre">JS_PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('javascript:',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">('on\\w+\\s*=\\s*[\\&quot;\']?.*?[\\&quot;\']',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">('eval\\s*\\(',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">('new\\s+Function\\s*\\(',</span> <span class="pre">re.IGNORECASE)]</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin.JS_PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/javascript_injection.html#JavaScriptInjectionPlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして JavaScript/HTML インジェクションを無害化</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/javascript_injection.html#JavaScriptInjectionPlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして JavaScript インジェクションを無害化</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin.sanitize_text">
+<span class="sig-name descname"><span class="pre">sanitize_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/javascript_injection.html#JavaScriptInjectionPlugin.sanitize_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.javascript_injection.JavaScriptInjectionPlugin.sanitize_text" title="Link to this definition"></a></dt>
+<dd><p>指定されたテキストを JavaScript/HTML インジェクションから無害化</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.agent.prompt_injection_common">
+<span id="cmdbox-app-features-cli-agent-prompt-injection-common-module"></span><h2>cmdbox.app.features.cli.agent.prompt_injection_common module<a class="headerlink" href="#module-cmdbox.app.features.cli.agent.prompt_injection_common" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.prompt_injection_common.PromptInjectionException">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.prompt_injection_common.</span></span><span class="sig-name descname"><span class="pre">PromptInjectionException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matched_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/prompt_injection_common.html#PromptInjectionException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.prompt_injection_common.PromptInjectionException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>プロンプトインジェクション検知時の例外</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.prompt_injection_common.PromptInjectionException.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/prompt_injection_common.html#PromptInjectionException.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.prompt_injection_common.PromptInjectionException.to_dict" title="Link to this definition"></a></dt>
+<dd><p>例外情報を辞書形式で取得</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.agent">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cmdbox.app.features.cli.agent" title="Link to this heading"></a></h2>
+<p>プロンプトインジェクション検知パッケージ</p>
+<p>複数の検知プラグインとユーティリティクラスを提供します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.DangerousSequencePlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.</span></span><span class="sig-name descname"><span class="pre">DangerousSequencePlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/dangerous_sequence.html#DangerousSequencePlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.DangerousSequencePlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>危険な文字シーケンスを検知して無害化するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.DangerousSequencePlugin.PATTERNS">
+<span class="sig-name descname"><span class="pre">PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('(?i)(--\\s+|#\\s+|;)',</span> <span class="pre">&lt;function</span> <span class="pre">DangerousSequencePlugin.&lt;lambda&gt;&gt;),</span> <span class="pre">('(\\x00|\\x1a)',</span> <span class="pre">&lt;function</span> <span class="pre">DangerousSequencePlugin.&lt;lambda&gt;&gt;),</span> <span class="pre">('(\\\\x[0-9a-f]{2})',</span> <span class="pre">&lt;function</span> <span class="pre">DangerousSequencePlugin.&lt;lambda&gt;&gt;)]</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.DangerousSequencePlugin.PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.DangerousSequencePlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/dangerous_sequence.html#DangerousSequencePlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.DangerousSequencePlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして危険な文字シーケンスを無害化</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.DangerousSequencePlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/dangerous_sequence.html#DangerousSequencePlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.DangerousSequencePlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして危険な文字シーケンスを無害化</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.DangerousSequencePlugin.sanitize_text">
+<span class="sig-name descname"><span class="pre">sanitize_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/dangerous_sequence.html#DangerousSequencePlugin.sanitize_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.DangerousSequencePlugin.sanitize_text" title="Link to this definition"></a></dt>
+<dd><p>指定されたテキストを危険な文字シーケンスから無害化</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.</span></span><span class="sig-name descname"><span class="pre">JavaScriptInjectionPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/javascript_injection.html#JavaScriptInjectionPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>JavaScript/HTML インジェクション攻撃を無害化するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin.JS_PATTERNS">
+<span class="sig-name descname"><span class="pre">JS_PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('javascript:',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">('on\\w+\\s*=\\s*[\\&quot;\']?.*?[\\&quot;\']',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">('eval\\s*\\(',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">('new\\s+Function\\s*\\(',</span> <span class="pre">re.IGNORECASE)]</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin.JS_PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/javascript_injection.html#JavaScriptInjectionPlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして JavaScript/HTML インジェクションを無害化</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/javascript_injection.html#JavaScriptInjectionPlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして JavaScript インジェクションを無害化</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin.sanitize_text">
+<span class="sig-name descname"><span class="pre">sanitize_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/javascript_injection.html#JavaScriptInjectionPlugin.sanitize_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.JavaScriptInjectionPlugin.sanitize_text" title="Link to this definition"></a></dt>
+<dd><p>指定されたテキストを JavaScript/HTML インジェクションから無害化</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.MaliciousKeywordDetectionPlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.</span></span><span class="sig-name descname"><span class="pre">MaliciousKeywordDetectionPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_malicious_keyword.html#MaliciousKeywordDetectionPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.MaliciousKeywordDetectionPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>悪意のあるキーワードを検知するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.MaliciousKeywordDetectionPlugin.PATTERNS">
+<span class="sig-name descname"><span class="pre">PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['(?i)\\b(drop\\s+database|truncate\\s+table|exec\\s+xp_|sp_oacreate)',</span> <span class="pre">'(?i)(\\bignore\\b|\\bby\\s+pass\\b|\\badmin\\b.*?\\bpassword\\b)',</span> <span class="pre">'(?i)(union\\s+all\\s+select)']</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.MaliciousKeywordDetectionPlugin.PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.MaliciousKeywordDetectionPlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_malicious_keyword.html#MaliciousKeywordDetectionPlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.MaliciousKeywordDetectionPlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして悪意のあるキーワードを検知</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.MaliciousKeywordDetectionPlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_malicious_keyword.html#MaliciousKeywordDetectionPlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.MaliciousKeywordDetectionPlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして悪意のあるキーワードを検知</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.PromptInjectionException">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.</span></span><span class="sig-name descname"><span class="pre">PromptInjectionException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matched_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/prompt_injection_common.html#PromptInjectionException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.PromptInjectionException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>プロンプトインジェクション検知時の例外</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.PromptInjectionException.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/prompt_injection_common.html#PromptInjectionException.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.PromptInjectionException.to_dict" title="Link to this definition"></a></dt>
+<dd><p>例外情報を辞書形式で取得</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.SQLInjectionDetectionPlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.</span></span><span class="sig-name descname"><span class="pre">SQLInjectionDetectionPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_sql_injection.html#SQLInjectionDetectionPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.SQLInjectionDetectionPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>SQL インジェクション攻撃を検知するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.SQLInjectionDetectionPlugin.PATTERNS">
+<span class="sig-name descname"><span class="pre">PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['(?i)\\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\\b.*?(?:from|into|values|set|where|;)',</span> <span class="pre">&quot;(?i)('\\s*or\\s*'|'\\s*or\\s*1\\s*=\\s*1|--\\s*|;.*?(union|select|insert))&quot;,</span> <span class="pre">'(?i)(\\bor\\b\\s*1\\s*=\\s*1|\\bor\\b\\s*true\\b)',</span> <span class="pre">'(?i)(xp_cmdshell|exec\\s+sp_|sp_executesql)',</span> <span class="pre">&quot;(?i)(sqlmap|'</span> <span class="pre">and</span> <span class="pre">'1'='1)&quot;]</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.SQLInjectionDetectionPlugin.PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.SQLInjectionDetectionPlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_sql_injection.html#SQLInjectionDetectionPlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.SQLInjectionDetectionPlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして SQL インジェクションを検知</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.SQLInjectionDetectionPlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_sql_injection.html#SQLInjectionDetectionPlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.SQLInjectionDetectionPlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして SQL インジェクションを検知</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.TemplateInjectionDetectionPlugin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.agent.</span></span><span class="sig-name descname"><span class="pre">TemplateInjectionDetectionPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_template_injection.html#TemplateInjectionDetectionPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.TemplateInjectionDetectionPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></p>
+<p>Jinja2/テンプレートインジェクション攻撃を検知するプラグイン</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.TemplateInjectionDetectionPlugin.PATTERNS">
+<span class="sig-name descname"><span class="pre">PATTERNS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['\\{\\{.*?__.*?\\}\\}',</span> <span class="pre">'\\{\\{.*?self\\._TemplateModule__dict__.*?\\}\\}',</span> <span class="pre">'\\{%.*?import.*?%\\}',</span> <span class="pre">'\\{\\{.*?config\\.items\\(\\).*?\\}\\}',</span> <span class="pre">'\\{\\{.*?request\\.environ.*?\\}\\}',</span> <span class="pre">'{{.*?popen.*?}}',</span> <span class="pre">'{{.*?system.*?}}']</span></span><a class="headerlink" href="#cmdbox.app.features.cli.agent.TemplateInjectionDetectionPlugin.PATTERNS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.TemplateInjectionDetectionPlugin.on_event_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InvocationContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Event</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_template_injection.html#TemplateInjectionDetectionPlugin.on_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.TemplateInjectionDetectionPlugin.on_event_callback" title="Link to this definition"></a></dt>
+<dd><p>イベントをチェックして Jinja2 テンプレートインジェクションを検知</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.agent.TemplateInjectionDetectionPlugin.on_user_message_callback">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_user_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/agent/detection_template_injection.html#TemplateInjectionDetectionPlugin.on_user_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.agent.TemplateInjectionDetectionPlugin.on_user_message_callback" title="Link to this definition"></a></dt>
+<dd><p>ユーザーメッセージをチェックして Jinja2 テンプレートインジェクションを検知</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

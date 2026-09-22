@@ -1,0 +1,1183 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.test.gen_cli_spec &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.test.gen_cli_spec</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.test.gen_cli_spec</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""CLIコマンド詳細設計書生成ツール。</span>
+
+<span class="sd">cmdboxを拡張して作成したコマンドでも利用できるよう、</span>
+<span class="sd">フィーチャーパッケージ名や出力先をパラメータとして受け取ります。</span>
+
+<span class="sd">使い方 (コマンドライン):</span>
+<span class="sd">    python -m cmdbox.tools.test.generate_cli_specifications \\</span>
+<span class="sd">        --feature-package myapp.app.features.cli \\</span>
+<span class="sd">        --output-dir path/to/Specifications \\</span>
+<span class="sd">        --root-dir path/to/project</span>
+
+<span class="sd">使い方 (Python API):</span>
+<span class="sd">    from cmdbox.tools.test.generate_cli_specifications import generate</span>
+<span class="sd">    generate(</span>
+<span class="sd">        feature_package="myapp.app.features.cli",</span>
+<span class="sd">        output_dir=Path("path/to/Specifications"),</span>
+<span class="sd">        root_dir=Path("path/to/project"),</span>
+<span class="sd">        appcls=MyApp,</span>
+<span class="sd">        ver=my_version_module,</span>
+<span class="sd">    )</span>
+<span class="sd">"""</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">feature</span> <span class="k">as</span> <span class="n">feature_module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">module</span> <span class="k">as</span> <span class="n">module_loader</span>
+
+
+<span class="n">TYPE_LABELS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"int"</span><span class="p">:</span> <span class="s2">"整数"</span><span class="p">,</span>
+    <span class="s2">"float"</span><span class="p">:</span> <span class="s2">"浮動小数"</span><span class="p">,</span>
+    <span class="s2">"bool"</span><span class="p">:</span> <span class="s2">"真偽値"</span><span class="p">,</span>
+    <span class="s2">"str"</span><span class="p">:</span> <span class="s2">"文字列"</span><span class="p">,</span>
+    <span class="s2">"date"</span><span class="p">:</span> <span class="s2">"日付"</span><span class="p">,</span>
+    <span class="s2">"datetime"</span><span class="p">:</span> <span class="s2">"日時"</span><span class="p">,</span>
+    <span class="s2">"dict"</span><span class="p">:</span> <span class="s2">"辞書"</span><span class="p">,</span>
+    <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"複数行文字列"</span><span class="p">,</span>
+    <span class="s2">"file"</span><span class="p">:</span> <span class="s2">"ファイル"</span><span class="p">,</span>
+    <span class="s2">"dir"</span><span class="p">:</span> <span class="s2">"ディレクトリ"</span><span class="p">,</span>
+    <span class="s2">"passwd"</span><span class="p">:</span> <span class="s2">"パスワード"</span><span class="p">,</span>
+    <span class="s2">"mlist"</span><span class="p">:</span> <span class="s2">"複数選択リスト"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">RESULT_VAR_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"msg"</span><span class="p">,</span> <span class="s2">"ret"</span><span class="p">,</span> <span class="s2">"res"</span><span class="p">,</span> <span class="s2">"row"</span><span class="p">,</span> <span class="s2">"result"</span><span class="p">}</span>
+
+<span class="n">REDIS_LABELS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">feature_module</span><span class="o">.</span><span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">:</span> <span class="s2">"不要"</span><span class="p">,</span>
+    <span class="n">feature_module</span><span class="o">.</span><span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_MEIGHT</span><span class="p">:</span> <span class="s2">"任意"</span><span class="p">,</span>
+    <span class="n">feature_module</span><span class="o">.</span><span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_TRUE</span><span class="p">:</span> <span class="s2">"必須"</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="MethodInfo">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MethodInfo</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">defining_class</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">docstring</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">result_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">statuses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">source_lines</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="generate">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.generate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+    <span class="n">feature_package</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">root_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cmdbox_"</span><span class="p">,</span>
+    <span class="n">appcls</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ver</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ja_JP"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""フィーチャーパッケージからCLIコマンド仕様を生成します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        feature_package: フィーチャーを含むPythonパッケージ名</span>
+<span class="sd">                         (例: "cmdbox.app.features.cli", "myapp.app.features.cli")</span>
+<span class="sd">        output_dir: 仕様書の出力先ディレクトリ</span>
+<span class="sd">        root_dir: プロジェクトルートディレクトリ (ソースファイルの相対パス計算に使用)</span>
+<span class="sd">        prefix: フィーチャーモジュールのファイル名プレフィックス (デフォルト: "cmdbox_")</span>
+<span class="sd">        appcls: アプリケーションクラス (省略時はCmdBoxAppを使用)</span>
+<span class="sd">        ver: バージョンモジュール (省略時はcmdbox.versionを使用)</span>
+<span class="sd">        language: 言語設定 (デフォルト: "ja_JP")</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        生成された仕様書の辞書リスト</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">appcls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">CmdBoxApp</span>
+        <span class="n">appcls</span> <span class="o">=</span> <span class="n">CmdBoxApp</span>
+    <span class="k">if</span> <span class="n">ver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">_ver</span>
+        <span class="n">ver</span> <span class="o">=</span> <span class="n">_ver</span>
+
+    <span class="n">docs_dir</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"cli"</span>
+    <span class="n">index_file</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"README.md"</span>
+    <span class="n">json_file</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"cli-command-specifications.json"</span>
+
+    <span class="n">features</span> <span class="o">=</span> <span class="n">module_loader</span><span class="o">.</span><span class="n">load_features</span><span class="p">(</span>
+        <span class="n">feature_package</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+        <span class="n">excludes</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span>
+        <span class="n">ver</span><span class="o">=</span><span class="n">ver</span><span class="p">,</span>
+        <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">docs_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">documents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">features</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="n">mode</span><span class="p">]):</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="n">cmd</span><span class="p">])</span>
+            <span class="n">feature_obj</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"feature"</span><span class="p">)</span>
+            <span class="n">documents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">build_command_spec</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">feature_obj</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">docs_dir</span><span class="p">,</span> <span class="n">root_dir</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="n">_write_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+    <span class="n">_write_index</span><span class="p">(</span><span class="n">documents</span><span class="p">,</span> <span class="n">index_file</span><span class="p">,</span> <span class="n">json_file</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">documents</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">_json_default</span><span class="p">),</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"generated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span><span class="si">}</span><span class="s2"> command specifications"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">index_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">documents</span></div>
+
+
+
+<div class="viewcode-block" id="build_command_spec">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.build_command_spec">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_command_spec</span><span class="p">(</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">feature_obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">option_def</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">docs_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">root_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""フィーチャーオブジェクトから完全なコマンド仕様を構築します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mode: コマンドモード (例: 'app', 'sv')</span>
+<span class="sd">        cmd: コマンド名</span>
+<span class="sd">        feature_obj: フィーチャーオブジェクトのインスタンス</span>
+<span class="sd">        option_def: フィーチャーのオプション定義</span>
+<span class="sd">        docs_dir: マークダウン出力先ディレクトリ</span>
+<span class="sd">        root_dir: プロジェクトルートディレクトリ</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        完全なコマンド仕様を含む辞書</span>
+<span class="sd">    """</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">feature_obj</span><span class="o">.</span><span class="vm">__class__</span>
+    <span class="n">source_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsourcefile</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">relative_source</span> <span class="o">=</span> <span class="n">source_file</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">root_dir</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">relative_source</span> <span class="o">=</span> <span class="n">source_file</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+    <span class="n">file_text</span> <span class="o">=</span> <span class="n">source_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">file_text</span><span class="p">)</span>
+
+    <span class="n">method_infos</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">collect_method_info</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source_file</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"apprun"</span><span class="p">,</span> <span class="s2">"svrun"</span><span class="p">,</span> <span class="s2">"is_cluster_redirect"</span><span class="p">]</span>
+    <span class="p">}</span>
+    <span class="n">helper_methods</span> <span class="o">=</span> <span class="n">collect_helper_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source_file</span><span class="p">)</span>
+
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">docs_dir</span> <span class="o">/</span> <span class="n">mode</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">.md"</span>
+    <span class="n">output_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">parameter_specs</span> <span class="o">=</span> <span class="n">_normalize_parameters</span><span class="p">(</span><span class="n">option_def</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"choice"</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="n">status_candidates</span> <span class="o">=</span> <span class="n">_ordered_unique</span><span class="p">(</span>
+        <span class="n">method_infos</span><span class="p">[</span><span class="s2">"apprun"</span><span class="p">]</span><span class="o">.</span><span class="n">statuses</span> <span class="o">+</span> <span class="n">method_infos</span><span class="p">[</span><span class="s2">"svrun"</span><span class="p">]</span><span class="o">.</span><span class="n">statuses</span>
+    <span class="p">)</span>
+    <span class="n">result_keys</span> <span class="o">=</span> <span class="n">_ordered_unique</span><span class="p">(</span>
+        <span class="n">method_infos</span><span class="p">[</span><span class="s2">"apprun"</span><span class="p">]</span><span class="o">.</span><span class="n">result_keys</span> <span class="o">+</span> <span class="n">method_infos</span><span class="p">[</span><span class="s2">"svrun"</span><span class="p">]</span><span class="o">.</span><span class="n">result_keys</span>
+    <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">output_file_rel</span> <span class="o">=</span> <span class="n">output_path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">root_dir</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">output_file_rel</span> <span class="o">=</span> <span class="n">output_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+    <span class="n">spec</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"mode"</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
+        <span class="s2">"cmd"</span><span class="p">:</span> <span class="n">cmd</span><span class="p">,</span>
+        <span class="s2">"description_ja"</span><span class="p">:</span> <span class="n">option_def</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description_ja"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"description_en"</span><span class="p">:</span> <span class="n">option_def</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description_en"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"class_name"</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="s2">"module_name"</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+        <span class="s2">"base_classes"</span><span class="p">:</span> <span class="p">[</span><span class="n">base</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">object</span><span class="p">],</span>
+        <span class="s2">"source_file"</span><span class="p">:</span> <span class="n">relative_source</span><span class="p">,</span>
+        <span class="s2">"output_file"</span><span class="p">:</span> <span class="n">output_file_rel</span><span class="p">,</span>
+        <span class="s2">"use_redis"</span><span class="p">:</span> <span class="n">option_def</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"use_redis"</span><span class="p">),</span>
+        <span class="s2">"nouse_webmode"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">option_def</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"nouse_webmode"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+        <span class="s2">"use_agent"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">option_def</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"use_agent"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+        <span class="s2">"cluster_redirect"</span><span class="p">:</span> <span class="n">_resolve_cluster_redirect</span><span class="p">(</span><span class="n">feature_obj</span><span class="p">,</span> <span class="n">method_infos</span><span class="p">[</span><span class="s2">"is_cluster_redirect"</span><span class="p">]),</span>
+        <span class="s2">"parameters"</span><span class="p">:</span> <span class="n">parameter_specs</span><span class="p">,</span>
+        <span class="s2">"statuses"</span><span class="p">:</span> <span class="n">status_candidates</span><span class="p">,</span>
+        <span class="s2">"result_keys"</span><span class="p">:</span> <span class="n">result_keys</span><span class="p">,</span>
+        <span class="s2">"method_infos"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"defining_class"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">defining_class</span><span class="p">,</span>
+                <span class="s2">"docstring"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">docstring</span><span class="p">,</span>
+                <span class="s2">"steps"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span>
+                <span class="s2">"result_keys"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">result_keys</span><span class="p">,</span>
+                <span class="s2">"statuses"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">statuses</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">method_infos</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">},</span>
+        <span class="s2">"helper_methods"</span><span class="p">:</span> <span class="n">helper_methods</span><span class="p">,</span>
+        <span class="s2">"output_schema"</span><span class="p">:</span> <span class="n">_extract_output_schema</span><span class="p">(</span><span class="n">feature_obj</span><span class="p">),</span>
+        <span class="s2">"test_viewpoints"</span><span class="p">:</span> <span class="n">_build_test_viewpoints</span><span class="p">(</span><span class="n">parameter_specs</span><span class="p">,</span> <span class="n">method_infos</span><span class="p">),</span>
+        <span class="s2">"generated_at"</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s2">"seconds"</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="n">output_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">_render_markdown</span><span class="p">(</span><span class="n">spec</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spec</span></div>
+
+
+
+<div class="viewcode-block" id="find_class_node">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.find_class_node">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_class_node</span><span class="p">(</span><span class="n">tree</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ast</span><span class="o">.</span><span class="n">ClassDef</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""ASTから名前でクラス定義ノードを検索します。"""</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">ClassDef</span><span class="p">)</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">class_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">node</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="collect_method_info">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.collect_method_info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">collect_method_info</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">source_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">method_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MethodInfo</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""メソッドの詳細情報を収集します。"""</span>
+    <span class="n">defining_class</span> <span class="o">=</span> <span class="n">_resolve_defining_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">defining_class</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+    <span class="n">method_node</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method_node</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unexpected node for </span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">method_node</span><span class="p">)</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">_summarize_method</span><span class="p">(</span><span class="n">method_node</span><span class="p">)</span>
+    <span class="n">result_keys</span> <span class="o">=</span> <span class="n">collect_result_keys</span><span class="p">(</span><span class="n">method_node</span><span class="p">)</span>
+    <span class="n">statuses</span> <span class="o">=</span> <span class="n">collect_statuses</span><span class="p">(</span><span class="n">method_node</span><span class="p">)</span>
+    <span class="n">docstring</span> <span class="o">=</span> <span class="n">_clean_text</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">get_docstring</span><span class="p">(</span><span class="n">method_node</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">start_line</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsourcelines</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">source_lines</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">start_line</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">start_line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="n">source_lines</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="k">return</span> <span class="n">MethodInfo</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">method_name</span><span class="p">,</span>
+        <span class="n">defining_class</span><span class="o">=</span><span class="n">defining_class</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="n">docstring</span><span class="o">=</span><span class="n">docstring</span><span class="p">,</span>
+        <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span>
+        <span class="n">result_keys</span><span class="o">=</span><span class="n">result_keys</span><span class="p">,</span>
+        <span class="n">statuses</span><span class="o">=</span><span class="n">statuses</span><span class="p">,</span>
+        <span class="n">source_lines</span><span class="o">=</span><span class="n">source_lines</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="collect_helper_methods">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.collect_helper_methods">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">collect_helper_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">source_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""クラス内の補助メソッド情報を収集します。"""</span>
+    <span class="n">helper_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"__init__"</span><span class="p">}:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"__init__"</span><span class="p">,</span> <span class="s2">"get_mode"</span><span class="p">,</span> <span class="s2">"get_cmd"</span><span class="p">,</span> <span class="s2">"get_option"</span><span class="p">,</span> <span class="s2">"apprun"</span><span class="p">,</span> <span class="s2">"svrun"</span><span class="p">,</span> <span class="s2">"is_cluster_redirect"</span><span class="p">}:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">helper_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="n">helpers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">helper_names</span><span class="p">):</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">collect_method_info</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source_file</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">helpers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s2">"defining_class"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">defining_class</span><span class="p">,</span>
+                <span class="s2">"docstring"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">docstring</span><span class="p">,</span>
+                <span class="s2">"steps"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span>
+                <span class="s2">"result_keys"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">result_keys</span><span class="p">,</span>
+                <span class="s2">"statuses"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">statuses</span><span class="p">,</span>
+                <span class="s2">"source_lines"</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">source_lines</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">helpers</span></div>
+
+
+
+<div class="viewcode-block" id="collect_result_keys">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.collect_result_keys">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">collect_result_keys</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""returnステートメントと代入からの結果辞書キーを抽出します。"""</span>
+    <span class="n">keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Assign</span><span class="p">):</span>
+            <span class="n">target_names</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">id</span>
+                <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">child</span><span class="o">.</span><span class="n">targets</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">target_names</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">RESULT_VAR_NAMES</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_extract_dict_keys</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AnnAssign</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">RESULT_VAR_NAMES</span> <span class="ow">or</span> <span class="n">child</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_extract_dict_keys</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Return</span><span class="p">)</span> <span class="ow">and</span> <span class="n">child</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_extract_return_result_keys</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_ordered_unique</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="collect_statuses">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.collect_statuses">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">collect_statuses</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""ASTからステータスコード (RESP_* 属性と整数定数) を抽出します。"""</span>
+    <span class="n">statuses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s2">"self"</span>
+            <span class="ow">and</span> <span class="n">child</span><span class="o">.</span><span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"RESP_"</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">statuses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">value</span> <span class="ow">in</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">}:</span>
+                <span class="n">statuses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"INT_</span><span class="si">{</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_ordered_unique</span><span class="p">(</span><span class="n">statuses</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># 内部ユーティリティ関数 (プレフィックス _ )</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_defining_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">method_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">base</span>
+    <span class="k">return</span> <span class="bp">cls</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_summarize_method</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">FunctionDef</span> <span class="o">|</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">statements</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">body</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">body</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expr</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">body</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">for</span> <span class="n">stmt</span> <span class="ow">in</span> <span class="n">body</span><span class="p">:</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">_summarize_statement</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="p">:</span>
+            <span class="n">statements</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">statements</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">"実装の主要ステップは自動抽出できませんでした。ソースコードを確認してください。"</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_summarize_statement</span><span class="p">(</span><span class="n">stmt</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">stmt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">If</span><span class="p">):</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">_shorten</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">test</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">_contains_return</span><span class="p">(</span><span class="n">stmt</span><span class="p">):</span>
+            <span class="n">statuses</span> <span class="o">=</span> <span class="n">collect_statuses</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">collect_result_keys</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+            <span class="n">status_text</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">statuses</span><span class="p">)</span> <span class="k">if</span> <span class="n">statuses</span> <span class="k">else</span> <span class="s2">"戻り値あり"</span>
+            <span class="n">key_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"。結果キー: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">keys</span> <span class="k">else</span> <span class="s2">""</span>
+            <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"条件 </span><span class="si">{</span><span class="n">condition</span><span class="si">}</span><span class="s2"> を満たす場合は早期終了し、</span><span class="si">{</span><span class="n">status_text</span><span class="si">}{</span><span class="n">key_text</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="n">_collect_call_names</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">call_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"。主な呼出: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">calls</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">calls</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"条件 </span><span class="si">{</span><span class="n">condition</span><span class="si">}</span><span class="s2"> に応じて分岐する</span><span class="si">{</span><span class="n">call_text</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">For</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFor</span><span class="p">)):</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">_shorten</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">target</span><span class="p">))</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">_shorten</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">iter</span><span class="p">))</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="n">_collect_call_names</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">call_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"。主な呼出: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">calls</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">calls</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterator</span><span class="si">}</span><span class="s2"> を走査し、</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> ごとに処理する</span><span class="si">{</span><span class="n">call_text</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">While</span><span class="p">):</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">_shorten</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">test</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"条件 </span><span class="si">{</span><span class="n">condition</span><span class="si">}</span><span class="s2"> のあいだ繰り返し処理する"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Try</span><span class="p">):</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="n">_collect_call_names</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">call_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"。主な呼出: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">calls</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">calls</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"例外処理を伴って処理する</span><span class="si">{</span><span class="n">call_text</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">stmt</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="n">exc</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">if</span> <span class="n">handler</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"Exception"</span>
+            <span class="n">statuses</span> <span class="o">=</span> <span class="n">collect_statuses</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">collect_result_keys</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">statuses</span><span class="p">:</span>
+                <span class="n">suffix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"終了コード候補: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">statuses</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="n">suffix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"結果キー: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">joined</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"（</span><span class="si">{</span><span class="s1">' / '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span><span class="si">}</span><span class="s2">）"</span> <span class="k">if</span> <span class="n">suffix</span> <span class="k">else</span> <span class="s2">""</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2"> を捕捉した場合の代替経路を持つ</span><span class="si">{</span><span class="n">joined</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">With</span><span class="p">):</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_shorten</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">context_expr</span><span class="p">))</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">stmt</span><span class="o">.</span><span class="n">items</span><span class="p">)</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="n">_collect_call_names</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">call_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"。主な呼出: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">calls</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">calls</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"コンテキスト </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2"> を利用して処理する</span><span class="si">{</span><span class="n">call_text</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">Assign</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AnnAssign</span><span class="p">)):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">):</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Assign</span><span class="p">):</span>
+                <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">_shorten</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">target</span><span class="p">))</span> <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">stmt</span><span class="o">.</span><span class="n">targets</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">_shorten</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">target</span><span class="p">))]</span>
+            <span class="n">callee</span> <span class="o">=</span> <span class="n">_shorten</span><span class="p">(</span><span class="n">_call_name</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span><span class="si">}</span><span class="s2"> に </span><span class="si">{</span><span class="n">callee</span><span class="si">}</span><span class="s2"> の結果を格納する"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expr</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">):</span>
+        <span class="n">callee</span> <span class="o">=</span> <span class="n">_shorten</span><span class="p">(</span><span class="n">_call_name</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">callee</span><span class="si">}</span><span class="s2"> を呼び出す"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Return</span><span class="p">):</span>
+        <span class="n">statuses</span> <span class="o">=</span> <span class="n">collect_statuses</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">collect_result_keys</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">statuses</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"終了コード </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">statuses</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"結果キー </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parts</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="w"> </span><span class="s1">' / '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span><span class="w"> </span><span class="si">}</span><span class="s2"> を返却する"</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_shorten</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">value</span><span class="p">))</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">stmt</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'None'</span><span class="si">}</span><span class="s2"> を返却する"</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_contains_return</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Return</span><span class="p">)</span> <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_collect_call_names</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">calls</span> <span class="o">=</span> <span class="n">_ordered_unique</span><span class="p">(</span>
+        <span class="n">_shorten</span><span class="p">(</span><span class="n">_call_name</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">call</span> <span class="k">for</span> <span class="n">call</span> <span class="ow">in</span> <span class="n">calls</span> <span class="k">if</span> <span class="n">call</span><span class="p">][:</span><span class="mi">6</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_call_name</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">func</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_call_name_from_attribute</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_call_name_from_attribute</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span> <span class="o">=</span> <span class="n">node</span>
+    <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">current</span><span class="p">))</span>
+    <span class="k">return</span> <span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">parts</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_dict_keys</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s2">"dict"</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">keywords</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">keyword</span><span class="o">.</span><span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyword</span><span class="o">.</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">keys</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_return_result_keys</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">elts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_extract_dict_keys</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">elts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">_extract_dict_keys</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="n">normalized</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"choice"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">display_choices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choice</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">display_choices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">choice</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"opt"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">display_choices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">choice</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">display_choices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">normalized</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"opt"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                <span class="s2">"short"</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"short"</span><span class="p">),</span>
+                <span class="s2">"type"</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                <span class="s2">"type_label"</span><span class="p">:</span> <span class="n">TYPE_LABELS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))),</span>
+                <span class="s2">"required"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"required"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+                <span class="s2">"default"</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"default"</span><span class="p">),</span>
+                <span class="s2">"multi"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"multi"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+                <span class="s2">"hide"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"hide"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+                <span class="s2">"fileio"</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"fileio"</span><span class="p">),</span>
+                <span class="s2">"web"</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"web"</span><span class="p">),</span>
+                <span class="s2">"choices"</span><span class="p">:</span> <span class="n">display_choices</span><span class="p">,</span>
+                <span class="s2">"description_ja"</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description_ja"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                <span class="s2">"description_en"</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description_en"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">normalized</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_cluster_redirect</span><span class="p">(</span><span class="n">feature_obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">method_info</span><span class="p">:</span> <span class="n">MethodInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">feature_obj</span><span class="o">.</span><span class="n">is_cluster_redirect</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"不明"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_test_viewpoints</span><span class="p">(</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">method_infos</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MethodInfo</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">viewpoints</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">required_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s2">"required"</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">param</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="n">required_params</span><span class="p">:</span>
+        <span class="n">viewpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"必須パラメータ </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">required_params</span><span class="p">)</span><span class="si">}</span><span class="s2"> が不足した場合の警告応答を確認する"</span><span class="p">)</span>
+
+    <span class="n">choice_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s2">"choices"</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="n">choice_params</span><span class="p">:</span>
+        <span class="n">viewpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"選択肢を持つパラメータ </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">choice_params</span><span class="p">)</span><span class="si">}</span><span class="s2"> の境界値と不正値を確認する"</span><span class="p">)</span>
+
+    <span class="n">multi_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s2">"multi"</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="n">multi_params</span><span class="p">:</span>
+        <span class="n">viewpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"複数値パラメータ </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">multi_params</span><span class="p">)</span><span class="si">}</span><span class="s2"> の 0 件・1 件・複数件入力を確認する"</span><span class="p">)</span>
+
+    <span class="n">result_keys</span> <span class="o">=</span> <span class="n">_ordered_unique</span><span class="p">(</span>
+        <span class="n">method_infos</span><span class="p">[</span><span class="s2">"apprun"</span><span class="p">]</span><span class="o">.</span><span class="n">result_keys</span> <span class="o">+</span> <span class="n">method_infos</span><span class="p">[</span><span class="s2">"svrun"</span><span class="p">]</span><span class="o">.</span><span class="n">result_keys</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">result_keys</span><span class="p">:</span>
+        <span class="n">viewpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"結果オブジェクトのキー </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result_keys</span><span class="p">)</span><span class="si">}</span><span class="s2"> が期待どおり構成されることを確認する"</span><span class="p">)</span>
+
+    <span class="n">statuses</span> <span class="o">=</span> <span class="n">_ordered_unique</span><span class="p">(</span>
+        <span class="n">method_infos</span><span class="p">[</span><span class="s2">"apprun"</span><span class="p">]</span><span class="o">.</span><span class="n">statuses</span> <span class="o">+</span> <span class="n">method_infos</span><span class="p">[</span><span class="s2">"svrun"</span><span class="p">]</span><span class="o">.</span><span class="n">statuses</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">statuses</span><span class="p">:</span>
+        <span class="n">viewpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"終了コード </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">statuses</span><span class="p">)</span><span class="si">}</span><span class="s2"> の到達条件をそれぞれ検証する"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">viewpoints</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_render_markdown</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s2">"# </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"## 基本情報"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"| 項目 | 内容 |"</span><span class="p">,</span>
+        <span class="s2">"| --- | --- |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| mode | </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">])</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| cmd | </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">])</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| クラス | </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'class_name'</span><span class="p">])</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| モジュール | </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'module_name'</span><span class="p">])</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| 実装ファイル | </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'source_file'</span><span class="p">])</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| 継承元 | </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'base_classes'</span><span class="p">][:</span><span class="mi">4</span><span class="p">]))</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| Redis | </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">REDIS_LABELS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'use_redis'</span><span class="p">],</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'use_redis'</span><span class="p">])))</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| Web モード禁止 | </span><span class="si">{</span><span class="s1">'はい'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">spec</span><span class="p">[</span><span class="s1">'nouse_webmode'</span><span class="p">]</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'いいえ'</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| Agent 利用 | </span><span class="si">{</span><span class="s1">'はい'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">spec</span><span class="p">[</span><span class="s1">'use_agent'</span><span class="p">]</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'いいえ'</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"| クラスタ転送 | </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'cluster_redirect'</span><span class="p">]))</span><span class="si">}</span><span class="s2"> |"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"## 概要"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"- 日本語: </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">'description_ja'</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'記載なし'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"- 英語: </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">'description_en'</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'記載なし'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"## パラメータ"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"| パラメータ | 型 | 必須 | 複数 | 非表示 | デフォルト | 選択肢 | 説明 |"</span><span class="p">,</span>
+        <span class="s2">"| --- | --- | --- | --- | --- | --- | --- | --- |"</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">spec</span><span class="p">[</span><span class="s2">"parameters"</span><span class="p">]:</span>
+        <span class="n">default_text</span> <span class="o">=</span> <span class="n">_format_default</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">"default"</span><span class="p">])</span>
+        <span class="n">choices_text</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">"choices"</span><span class="p">])</span> <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s2">"choices"</span><span class="p">]</span> <span class="k">else</span> <span class="s2">"-"</span>
+        <span class="n">param_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"-</span><span class="si">{</span><span class="n">param</span><span class="p">[</span><span class="s1">'short'</span><span class="p">]</span><span class="si">}</span><span class="s2">, --</span><span class="si">{</span><span class="n">param</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s2">"short"</span><span class="p">]</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"--</span><span class="si">{</span><span class="n">param</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">"| </span><span class="si">{name}</span><span class="s2"> | </span><span class="si">{type_label}</span><span class="s2"> | </span><span class="si">{required}</span><span class="s2"> | </span><span class="si">{multi}</span><span class="s2"> | </span><span class="si">{hide}</span><span class="s2"> | </span><span class="si">{default}</span><span class="s2"> | </span><span class="si">{choices}</span><span class="s2"> | </span><span class="si">{desc}</span><span class="s2"> |"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">param_name</span><span class="p">),</span>
+                <span class="n">type_label</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">"type_label"</span><span class="p">]),</span>
+                <span class="n">required</span><span class="o">=</span><span class="s2">"はい"</span> <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s2">"required"</span><span class="p">]</span> <span class="k">else</span> <span class="s2">"いいえ"</span><span class="p">,</span>
+                <span class="n">multi</span><span class="o">=</span><span class="s2">"はい"</span> <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s2">"multi"</span><span class="p">]</span> <span class="k">else</span> <span class="s2">"いいえ"</span><span class="p">,</span>
+                <span class="n">hide</span><span class="o">=</span><span class="s2">"はい"</span> <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s2">"hide"</span><span class="p">]</span> <span class="k">else</span> <span class="s2">"いいえ"</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">default_text</span><span class="p">),</span>
+                <span class="n">choices</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">choices_text</span><span class="p">),</span>
+                <span class="n">desc</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">"description_ja"</span><span class="p">]</span> <span class="ow">or</span> <span class="n">param</span><span class="p">[</span><span class="s2">"description_en"</span><span class="p">]</span> <span class="ow">or</span> <span class="s2">"-"</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">""</span><span class="p">,</span>
+            <span class="s2">"## 処理内容"</span><span class="p">,</span>
+            <span class="s2">""</span><span class="p">,</span>
+            <span class="n">_render_method_section</span><span class="p">(</span><span class="s2">"apprun"</span><span class="p">,</span> <span class="n">spec</span><span class="p">[</span><span class="s2">"method_infos"</span><span class="p">][</span><span class="s2">"apprun"</span><span class="p">]),</span>
+            <span class="s2">""</span><span class="p">,</span>
+            <span class="n">_render_method_section</span><span class="p">(</span><span class="s2">"svrun"</span><span class="p">,</span> <span class="n">spec</span><span class="p">[</span><span class="s2">"method_infos"</span><span class="p">][</span><span class="s2">"svrun"</span><span class="p">]),</span>
+            <span class="s2">""</span><span class="p">,</span>
+            <span class="s2">"## 処理結果"</span><span class="p">,</span>
+            <span class="s2">""</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"- 終了コード候補: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'statuses'</span><span class="p">])</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">spec</span><span class="p">[</span><span class="s1">'statuses'</span><span class="p">]</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'抽出なし'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"- 結果キー候補: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s1">'result_keys'</span><span class="p">])</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">spec</span><span class="p">[</span><span class="s1">'result_keys'</span><span class="p">]</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'抽出なし'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="s2">"- 戻り値の基本形: Tuple[int, Dict[str, Any], Any]"</span><span class="p">,</span>
+            <span class="s2">""</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">output_schema</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"output_schema"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output_schema</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">"## 出力スキーマ (output_schema)"</span><span class="p">,</span> <span class="s2">""</span><span class="p">])</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"このコマンドは `Validator` を継承しており、`output_schema()` が返す "</span>
+            <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">output_schema</span><span class="p">[</span><span class="s1">'class_name'</span><span class="p">]</span><span class="si">}</span><span class="s2">` モデルで出力を検証します。"</span>
+        <span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"### JSON 属性構造"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"```json"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">output_schema</span><span class="p">[</span><span class="s2">"json_example"</span><span class="p">],</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">_json_default</span><span class="p">))</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"```"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output_schema</span><span class="p">[</span><span class="s2">"fields"</span><span class="p">]:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">"### フィールド一覧"</span><span class="p">,</span> <span class="s2">""</span><span class="p">])</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"| フィールド | 型 | 必須 | デフォルト | 説明 |"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"| --- | --- | --- | --- | --- |"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">output_schema</span><span class="p">[</span><span class="s2">"fields"</span><span class="p">]:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">"| </span><span class="si">{name}</span><span class="s2"> | </span><span class="si">{type}</span><span class="s2"> | </span><span class="si">{required}</span><span class="s2"> | </span><span class="si">{default}</span><span class="s2"> | </span><span class="si">{description}</span><span class="s2"> |"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]),</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]),</span>
+                        <span class="n">required</span><span class="o">=</span><span class="s2">"はい"</span> <span class="k">if</span> <span class="n">field</span><span class="p">[</span><span class="s2">"required"</span><span class="p">]</span> <span class="k">else</span> <span class="s2">"いいえ"</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]),</span>
+                        <span class="n">description</span><span class="o">=</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="s2">"description"</span><span class="p">])</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"-"</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">spec</span><span class="p">[</span><span class="s2">"helper_methods"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">"## 主な補助メソッド"</span><span class="p">,</span> <span class="s2">""</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">helper</span> <span class="ow">in</span> <span class="n">spec</span><span class="p">[</span><span class="s2">"helper_methods"</span><span class="p">]:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"### </span><span class="si">{</span><span class="n">helper</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- 実装元: </span><span class="si">{</span><span class="n">helper</span><span class="p">[</span><span class="s1">'defining_class'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">helper</span><span class="p">[</span><span class="s2">"docstring"</span><span class="p">]:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- 役割: </span><span class="si">{</span><span class="n">helper</span><span class="p">[</span><span class="s1">'docstring'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">helper</span><span class="p">[</span><span class="s2">"steps"</span><span class="p">]:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"- 処理概要:"</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">helper</span><span class="p">[</span><span class="s2">"steps"</span><span class="p">]:</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  - </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">spec</span><span class="p">[</span><span class="s2">"test_viewpoints"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">"## 単体テスト観点"</span><span class="p">,</span> <span class="s2">""</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">viewpoint</span> <span class="ow">in</span> <span class="n">spec</span><span class="p">[</span><span class="s2">"test_viewpoints"</span><span class="p">]:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- </span><span class="si">{</span><span class="n">viewpoint</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+    <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">"## ソース参照"</span><span class="p">,</span>
+            <span class="s2">""</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"- 実装ファイル: </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">'source_file'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"- apprun 実装元: </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">'method_infos'</span><span class="p">][</span><span class="s1">'apprun'</span><span class="p">][</span><span class="s1">'defining_class'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"- svrun 実装元: </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">'method_infos'</span><span class="p">][</span><span class="s1">'svrun'</span><span class="p">][</span><span class="s1">'defining_class'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"- 生成日時: </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">'generated_at'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="s2">""</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_render_method_section</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">method_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"### </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"- 実装元: </span><span class="si">{</span><span class="n">method_info</span><span class="p">[</span><span class="s1">'defining_class'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method_info</span><span class="p">[</span><span class="s2">"docstring"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- 役割: </span><span class="si">{</span><span class="n">method_info</span><span class="p">[</span><span class="s1">'docstring'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method_info</span><span class="p">[</span><span class="s2">"statuses"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- 終了コード候補: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">method_info</span><span class="p">[</span><span class="s1">'statuses'</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method_info</span><span class="p">[</span><span class="s2">"result_keys"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- 結果キー候補: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">method_info</span><span class="p">[</span><span class="s1">'result_keys'</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"- 処理フロー:"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">method_info</span><span class="p">[</span><span class="s2">"steps"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  - </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_index</span><span class="p">(</span>
+    <span class="n">documents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">index_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">json_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">:</span>
+        <span class="n">grouped</span><span class="p">[</span><span class="n">document</span><span class="p">[</span><span class="s2">"mode"</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"# CLI Specifications"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"フィーチャーパッケージのコマンド実装から生成した詳細設計書です。"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"- 生成対象コマンド数: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"- 生成日時: </span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s1">'seconds'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"- JSON メタデータ: </span><span class="si">{</span><span class="n">json_file</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"## 共通仕様"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"- すべての CLI コマンドは mode と cmd の組で識別されます。"</span><span class="p">,</span>
+        <span class="s2">"- get_option() の choice 配列が、受け付けるパラメータ定義の原本です。"</span><span class="p">,</span>
+        <span class="s2">"- apprun() はクライアント側処理、svrun() はサーバー側処理を表します。"</span><span class="p">,</span>
+        <span class="s2">"- 終了コードは Feature.RESP_SUCCESS, Feature.RESP_WARN, Feature.RESP_ERROR を中心に返します。"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"## 一覧"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grouped</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"### </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">grouped</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"| cmd | 概要 | ファイル |"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"| --- | --- | --- |"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grouped</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s2">"cmd"</span><span class="p">]):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">document</span><span class="p">[</span><span class="s2">"output_file"</span><span class="p">])</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="n">document</span><span class="p">[</span><span class="s2">"output_file"</span><span class="p">])</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">document</span><span class="p">[</span><span class="s2">"output_file"</span><span class="p">]</span>
+            <span class="c1"># output_file は "Specifications/cli/mode/cmd.md" 形式</span>
+            <span class="c1"># index は output_dir/README.md なので cli/mode/cmd.md の相対パスにする</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">rel</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">document</span><span class="p">[</span><span class="s2">"output_file"</span><span class="p">])</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span>
+                    <span class="n">index_file</span><span class="o">.</span><span class="n">parent</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">rel</span> <span class="o">=</span> <span class="n">document</span><span class="p">[</span><span class="s2">"output_file"</span><span class="p">]</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"| </span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">document</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">])</span><span class="si">}</span><span class="s2"> | "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_escape_table</span><span class="p">(</span><span class="n">document</span><span class="p">[</span><span class="s1">'description_ja'</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">document</span><span class="p">[</span><span class="s1">'description_en'</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'-'</span><span class="p">)</span><span class="si">}</span><span class="s2"> | "</span>
+                <span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">document</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">]</span><span class="si">}</span><span class="s2">](</span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">) |"</span>
+            <span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+    <span class="n">index_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ordered_unique</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="kc">None</span><span class="p">,</span> <span class="s2">""</span><span class="p">}</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_clean_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_shorten</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">limit</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">text</span>
+    <span class="k">return</span> <span class="n">text</span><span class="p">[:</span> <span class="n">limit</span> <span class="o">-</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"..."</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_escape_table</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"|"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\\</span><span class="s2">|"</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"&lt;br&gt;"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_format_default</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"None"</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">_json_default</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_json_default</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># output_schema (Validator) ヘルパー</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_annotation_to_str</span><span class="p">(</span><span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""型アノテーションを人間が読みやすい文字列に変換します。"""</span>
+    <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"null"</span>
+    <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"any"</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_origin</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_args</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">_annotation_to_str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s2">" | "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">typing</span><span class="p">,</span> <span class="s2">"List"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">origin</span> <span class="ow">is</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">typing</span><span class="p">,</span> <span class="s2">"List"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"list[</span><span class="si">{</span><span class="n">_annotation_to_str</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">]"</span>
+        <span class="k">return</span> <span class="s2">"list"</span>
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">typing</span><span class="p">,</span> <span class="s2">"Dict"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">origin</span> <span class="ow">is</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">typing</span><span class="p">,</span> <span class="s2">"Dict"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"dict[</span><span class="si">{</span><span class="n">_annotation_to_str</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">_annotation_to_str</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2">]"</span>
+        <span class="k">return</span> <span class="s2">"dict"</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_annotation_to_example</span><span class="p">(</span><span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">visited</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""型アノテーションからJSON例の値を生成します。"""</span>
+    <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_origin</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_args</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+    <span class="c1"># Union型: Noneでない最初の型を使用</span>
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">:</span>
+        <span class="n">non_none</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">non_none</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_annotation_to_example</span><span class="p">(</span><span class="n">non_none</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">visited</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="c1"># List型</span>
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">_annotation_to_example</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">visited</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="c1"># Dict型</span>
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_pydantic_to_example</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">type_map</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nb">str</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="nb">float</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="nb">bool</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">type_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span> <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_pydantic_to_example</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">visited</span><span class="p">:</span> <span class="nb">frozenset</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""pydanticモデルクラスからJSON構造例を生成します（型名を値として使用）。"""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_annotation_to_example</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> (循環参照)&gt;"</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="n">visited</span> <span class="o">|</span> <span class="p">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">}</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model_fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_annotation_to_example</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_pydantic_to_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">visited</span><span class="p">:</span> <span class="nb">frozenset</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""pydanticモデルのフィールド情報をフラットなリストで返します。"""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PydanticUndefined</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="n">visited</span> <span class="o">|</span> <span class="p">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">}</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model_fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">full_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">prefix</span> <span class="k">else</span> <span class="n">name</span>
+        <span class="n">raw_default</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span>
+        <span class="k">if</span> <span class="n">raw_default</span> <span class="ow">is</span> <span class="n">PydanticUndefined</span><span class="p">:</span>
+            <span class="n">default_str</span> <span class="o">=</span> <span class="s2">"(必須)"</span>
+        <span class="k">elif</span> <span class="n">raw_default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">default_str</span> <span class="o">=</span> <span class="s2">"null"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">default_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">raw_default</span><span class="p">)</span>
+        <span class="n">fields</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="n">full_name</span><span class="p">,</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="n">_annotation_to_str</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">annotation</span><span class="p">),</span>
+            <span class="s2">"required"</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">is_required</span><span class="p">(),</span>
+            <span class="s2">"default"</span><span class="p">:</span> <span class="n">default_str</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">description</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="c1"># ネストされたpydanticモデルを再帰的に展開</span>
+        <span class="n">ann</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">annotation</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_origin</span><span class="p">(</span><span class="n">ann</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_args</span><span class="p">(</span><span class="n">ann</span><span class="p">)</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">:</span>
+            <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ann</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ann</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+            <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">ann</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">origin</span> <span class="ow">is</span> <span class="nb">list</span> <span class="ow">and</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+                <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">nested_cls</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nested_cls</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">nested_cls</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">nested_cls</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                    <span class="n">fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_pydantic_to_fields</span><span class="p">(</span><span class="n">nested_cls</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">full_name</span><span class="p">,</span> <span class="n">visited</span><span class="o">=</span><span class="n">visited</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">fields</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_output_schema</span><span class="p">(</span><span class="n">feature_obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Validatorを継承したフィーチャーオブジェクトの出力スキーマ情報を抽出します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        feature_obj: フィーチャーオブジェクトのインスタンス</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        スキーマ情報の辞書。Validatorでない場合はNone。</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">validator</span> <span class="k">as</span> <span class="n">_validator</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature_obj</span><span class="p">,</span> <span class="n">_validator</span><span class="o">.</span><span class="n">Validator</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">schema_cls</span> <span class="o">=</span> <span class="n">feature_obj</span><span class="o">.</span><span class="n">output_schema</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">schema_cls</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">schema_cls</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">example</span> <span class="o">=</span> <span class="n">_pydantic_to_example</span><span class="p">(</span><span class="n">schema_cls</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">_pydantic_to_fields</span><span class="p">(</span><span class="n">schema_cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"class_name"</span><span class="p">:</span> <span class="n">schema_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="s2">"fields"</span><span class="p">:</span> <span class="n">fields</span><span class="p">,</span>
+            <span class="s2">"json_example"</span><span class="p">:</span> <span class="n">example</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># CLI エントリポイント</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.test.html#cmdbox.app.features.cli.test.gen_cli_spec.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""コマンドラインから詳細設計書を生成します。</span>
+
+<span class="sd">    デフォルトでは cmdbox.app.features.cli を対象にします。</span>
+<span class="sd">    --feature-package オプションで任意のフィーチャーパッケージを指定できます。</span>
+<span class="sd">    """</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"CLIコマンド詳細設計書を生成します"</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--feature-package"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"cmdbox.app.features.cli"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"フィーチャーを含むPythonパッケージ名 (デフォルト: cmdbox.app.features.cli)"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--output-dir"</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"仕様書の出力先ディレクトリ (デフォルト: &lt;root-dir&gt;/Specifications)"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--root-dir"</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"プロジェクトルートディレクトリ (デフォルト: このファイルから4階層上)"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--prefix"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"cmdbox_"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"フィーチャーモジュールのファイル名プレフィックス (デフォルト: cmdbox_)"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--app-module"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"アプリケーションクラスのモジュールパス (例: myapp.app.MyApp)。省略時はCmdBoxApp"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--ver-module"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"バージョンモジュールのパス (例: myapp.version)。省略時はcmdbox.version"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">root_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">root_dir</span> <span class="ow">or</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">output_dir</span> <span class="ow">or</span> <span class="p">(</span><span class="n">root_dir</span> <span class="o">/</span> <span class="s2">"Specifications"</span><span class="p">)</span>
+
+    <span class="n">appcls</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">app_module</span><span class="p">:</span>
+        <span class="n">module_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">app_module</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
+        <span class="n">appcls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+
+    <span class="n">ver</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">ver_module</span><span class="p">:</span>
+        <span class="n">ver</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">ver_module</span><span class="p">)</span>
+
+    <span class="n">generate</span><span class="p">(</span>
+        <span class="n">feature_package</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">feature_package</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span>
+        <span class="n">root_dir</span><span class="o">=</span><span class="n">root_dir</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span>
+        <span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span>
+        <span class="n">ver</span><span class="o">=</span><span class="n">ver</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

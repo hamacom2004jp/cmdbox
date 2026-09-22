@@ -385,7 +385,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
           }
         ],
         "wav_b64": "string",
-        "ressize": 0
+        "ressize": 0,
+        "token_usage": {}
       },
       "warn": {},
       "error": {},
@@ -426,6 +427,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.artifacts","list[Artifact] | null","no","null","アーティファクト内容"
     "success.wav_b64","str | null","no","null","Base64エンコードされたWAVデータ"
     "success.ressize","int | null","no","null","Agentが返したレスポンスのサイズ"
+    "success.token_usage","dict[str, int] | null","no","null","トークン使用量"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"

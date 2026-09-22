@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox_cmdbox_server_install &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox_cmdbox_server_install</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.cmdbox_cmdbox_server_install</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli.cmdbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdbox_base</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">getpass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="CmdboxServerInstall">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_cmdbox_server_install.CmdboxServerInstall">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CmdboxServerInstall</span><span class="p">(</span><span class="n">cmdbox_base</span><span class="o">.</span><span class="n">CmdboxBase</span><span class="p">,</span> <span class="n">validator</span><span class="o">.</span><span class="n">Validator</span><span class="p">):</span>
+<div class="viewcode-block" id="CmdboxServerInstall.get_mode">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_cmdbox_server_install.CmdboxServerInstall.get_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のモードを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[str, List[str]]: モード</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'cmdbox'</span></div>
+
+
+<div class="viewcode-block" id="CmdboxServerInstall.get_cmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_cmdbox_server_install.CmdboxServerInstall.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のコマンドを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: コマンド</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'server_install'</span></div>
+
+
+<div class="viewcode-block" id="CmdboxServerInstall.get_option">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_cmdbox_server_install.CmdboxServerInstall.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のオプションを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: オプション</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">description_ja</span><span class="o">=</span><span class="s2">"cmdboxのコンテナをインストールします。"</span><span class="p">,</span>
+            <span class="n">description_en</span><span class="o">=</span><span class="s2">"Install the cmdbox container."</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"data"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DIR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_data</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="sa">f</span><span class="s2">"省略した時は `$HOME/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="sa">f</span><span class="s2">"When omitted, `$HOME/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"install_cmdbox"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sa">f</span><span class="s1">'cmdbox==</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="sa">f</span><span class="s2">"省略した時は `cmdbox==</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="sa">f</span><span class="s2">"When omitted, `cmdbox==</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"install_from"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"作成するdockerイメージの元となるFROMイメージを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the FROM image that will be the source of the docker image to be created."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"install_no_python"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"pythonのインストールを行わないようにします。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Do not install python."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"install_compile_python"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"python3をコンパイルしてインストールします。install_no_pythonが指定されるとそちらを優先します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Compile and install python3; if install_no_python is specified, it is preferred."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"install_tag"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"指定すると作成するdockerイメージのタグ名に追記出来ます。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"If specified, you can add to the tag name of the docker image to create."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"install_use_gpu"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"GPUを使用するモジュール構成でインストールします。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Install with a module configuration that uses the GPU."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"tts_engine"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"voicevox"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s2">""</span><span class="p">,</span> <span class="s2">"voicevox"</span><span class="p">],</span>
+                     <span class="n">choice_show</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">voicevox</span><span class="o">=</span><span class="p">[</span><span class="s2">"voicevox_ver"</span><span class="p">,</span> <span class="s2">"voicevox_whl"</span><span class="p">]),</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するTTSエンジンを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the TTS engine to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"voicevox_ver"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'0.16.3'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'0.16.3'</span><span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するVOICEVOXのバージョンを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the version of VOICEVOX to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"voicevox_whl"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_x86_64.whl'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-win32.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-win_amd64.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-macosx_10_12_x86_64.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-macosx_11_0_arm64.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_aarch64.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_x86_64.whl'</span><span class="p">,</span>
+                             <span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するVOICEVOXのホイールファイルを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the VOICEVOX wheel file to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"init_extra"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"from直後に実行するコマンドを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the command to be executed immediately after “from”."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"run_extra_pre"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"install_extraの実行前に実行するコマンドを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify additional commands to run before install_extra execution."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"run_extra_post"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"install_extraの実行後に実行するコマンドを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify additional commands to run after install_extra execution."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"install_extra"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"追加でインストールするパッケージを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify additional packages to install."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"compose_path"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FILE</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fileio</span><span class="o">=</span><span class="s2">"in"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"`docker-compose.yml` ファイルを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the `docker-compose.yml` file."</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxServerInstall.apprun">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_cmdbox_server_install.CmdboxServerInstall.apprun">[docs]</a>
+    <span class="nd">@validator</span><span class="o">.</span><span class="n">apprun_check</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能の実行を行います</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+<span class="sd">            tm (float): 実行開始時間</span>
+<span class="sd">            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト</span>
+<span class="sd">        """</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_install</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">),</span>
+                                  <span class="n">install_cmdbox_tgt</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">install_cmdbox</span><span class="p">,</span>
+                                  <span class="n">install_from</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">install_from</span><span class="p">,</span>
+                                  <span class="n">install_no_python</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">install_no_python</span><span class="p">,</span>
+                                  <span class="n">install_compile_python</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">install_compile_python</span><span class="p">,</span>
+                                  <span class="n">install_tag</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">install_tag</span><span class="p">,</span>
+                                  <span class="n">install_use_gpu</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">install_use_gpu</span><span class="p">,</span>
+                                  <span class="n">tts_engine</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">tts_engine</span><span class="p">,</span>
+                                  <span class="n">voicevox_ver</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">voicevox_ver</span><span class="p">,</span>
+                                  <span class="n">voicevox_whl</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">voicevox_whl</span><span class="p">,</span>
+                                  <span class="n">init_extra</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">init_extra</span><span class="p">,</span>
+                                  <span class="n">run_extra_pre</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">run_extra_pre</span><span class="p">,</span>
+                                  <span class="n">run_extra_post</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">run_extra_post</span><span class="p">,</span>
+                                  <span class="n">install_extra</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">install_extra</span><span class="p">,</span>
+                                  <span class="n">compose_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">compose_path</span><span class="p">,</span>
+                                  <span class="n">language</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="CmdboxServerInstall.server_install">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_cmdbox_server_install.CmdboxServerInstall.server_install">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">server_install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span>
+                       <span class="n">data</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">install_cmdbox_tgt</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_from</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">install_no_python</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">install_compile_python</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">install_tag</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_use_gpu</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">tts_engine</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voicevox_ver</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voicevox_whl</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">init_extra</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">run_extra_pre</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">run_extra_post</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_extra</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        cmdboxが含まれるdockerイメージをインストールします。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+<span class="sd">            data (Path): cmdbox-serverのデータディレクトリ</span>
+<span class="sd">            install_cmdbox_tgt (str): cmdboxのインストール元</span>
+<span class="sd">            install_from (str): インストール元dockerイメージ</span>
+<span class="sd">            install_no_python (bool): pythonをインストールしない</span>
+<span class="sd">            install_compile_python (bool): pythonをコンパイルしてインストール</span>
+<span class="sd">            install_tag (str): インストールタグ</span>
+<span class="sd">            install_use_gpu (bool): GPUを使用するモジュール構成でインストールします。</span>
+<span class="sd">            tts_engine (str): TTSエンジンの指定</span>
+<span class="sd">            voicevox_ver (str): VoiceVoxのバージョン</span>
+<span class="sd">            voicevox_whl (str): VoiceVoxのwhlファイルの名前</span>
+<span class="sd">            init_extra (List[str]): from直後に実行するコマンド</span>
+<span class="sd">            run_extra_pre (List[str]): install_extraの実行前に実行するコマンド</span>
+<span class="sd">            run_extra_post (List[str]): install_extraの実行後に実行するコマンド</span>
+<span class="sd">            install_extra (List[str]): 追加でインストールするパッケージ</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            language (str): 言語コード</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'Windows'</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Build server command is Unsupported in windows platform."</span><span class="p">}</span>
+            <span class="n">container</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">container</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'container'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">container</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^[0-9]'</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'_</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">'</span> <span class="c1"># ユーザー名が数字始まりの場合、先頭にアンダースコアを付与</span>
+            <span class="n">install_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">install_tag</span> <span class="k">else</span> <span class="s1">''</span>
+            <span class="n">imgname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_imgname</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+            <span class="n">dockerfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Dockerfile.</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dockerfile</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_dockerfile</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+                <span class="c1"># cmdboxのインストール設定</span>
+                <span class="k">if</span> <span class="n">install_cmdbox_tgt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">install_cmdbox_tgt</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'cmdbox==</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">'</span>
+                <span class="n">wheel_cmdbox</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">install_cmdbox_tgt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">wheel_cmdbox</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">wheel_cmdbox</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s1">'.whl'</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">wheel_cmdbox</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="n">wheel_cmdbox</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">shutil</span><span class="o">.</span><span class="n">SameFileError</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="n">install_cmdbox_tgt</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">wheel_cmdbox</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{COPY_CMDBOX}</span><span class="s1">'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'COPY </span><span class="si">{</span><span class="n">wheel_cmdbox</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">install_cmdbox_tgt</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{COPY_CMDBOX}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+
+                <span class="n">start_sh_hst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_scripts</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+                <span class="n">start_sh_tgt</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'/opt/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">/scripts'</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{COPY_CMDBOX_START}</span><span class="s1">'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'RUN mkdir -p </span><span class="si">{</span><span class="n">start_sh_tgt</span><span class="si">}</span><span class="se">\n</span><span class="s1">COPY </span><span class="si">{</span><span class="n">start_sh_hst</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">start_sh_tgt</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+                <span class="n">base_image</span> <span class="o">=</span> <span class="s1">'python:3.12.12-slim'</span> <span class="c1">#'python:3.11.9-slim' #'python:3.8.18-slim'</span>
+                <span class="k">if</span> <span class="n">install_use_gpu</span><span class="p">:</span>
+                    <span class="c1">#base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'</span>
+                    <span class="c1">#base_image = 'pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime'</span>
+                    <span class="c1">#base_image = 'pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime'</span>
+                    <span class="n">base_image</span> <span class="o">=</span> <span class="s1">'pytorch/pytorch:2.4.0-cuda12.1-cudnn9-devel'</span>
+                <span class="k">if</span> <span class="n">install_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">install_from</span> <span class="o">!=</span> <span class="s1">''</span><span class="p">:</span>
+                    <span class="n">base_image</span> <span class="o">=</span> <span class="n">install_from</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{FROM}</span><span class="s1">'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'FROM </span><span class="si">{</span><span class="n">base_image</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'$</span><span class="si">{MKUSER}</span><span class="s1">'</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">install_compile_python</span><span class="p">:</span>
+                    <span class="n">install_python</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'RUN apt-get update &amp;&amp; apt-get install -y build-essential libbz2-dev libdb-dev libreadline-dev libffi-dev libgdbm-dev liblzma-dev '</span> <span class="o">+</span> \
+                                    <span class="sa">f</span><span class="s1">'libncursesw5-dev libsqlite3-dev libssl-dev zlib1g-dev uuid-dev tk-dev wget</span><span class="se">\n</span><span class="s1">'</span> <span class="o">+</span> \
+                                    <span class="sa">f</span><span class="s1">'RUN wget https://www.python.org/ftp/python/3.11.11/Python-3.11.11.tar.xz</span><span class="se">\n</span><span class="s1">'</span> <span class="o">+</span> \
+                                    <span class="sa">f</span><span class="s1">'RUN tar xJf Python-3.11.11.tar.xz &amp;&amp; cd Python-3.11.11 &amp;&amp; ./configure &amp;&amp; make &amp;&amp; make install</span><span class="se">\n</span><span class="s1">'</span> <span class="o">+</span> \
+                                    <span class="sa">f</span><span class="s1">'RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.11 1'</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{INSTALL_PYTHON}</span><span class="s1">'</span><span class="p">,</span> <span class="n">install_python</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">install_no_python</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{INSTALL_PYTHON}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{INSTALL_PYTHON}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+                <span class="n">install_voicevox</span> <span class="o">=</span> <span class="s1">''</span>
+                <span class="k">if</span> <span class="n">tts_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">tts_engine</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'voicevox'</span><span class="p">:</span>
+                    <span class="n">install_voicevox</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'RUN pip install https://github.com/VOICEVOX/voicevox_core/releases/download/</span><span class="si">{</span><span class="n">voicevox_ver</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">voicevox_whl</span><span class="si">}</span><span class="s1">'</span>
+                <span class="k">if</span> <span class="n">install_extra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">install_extra</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="n">install_extra</span> <span class="o">!=</span> <span class="p">[]:</span>
+                    <span class="n">whls</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">install_extra</span><span class="p">:</span>
+                        <span class="n">tp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'.whl'</span><span class="p">):</span> <span class="k">continue</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">tp</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">tp</span><span class="p">):</span>
+                            <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">tp</span><span class="p">)</span>
+                        <span class="n">whls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
+                    <span class="n">ie</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">'COPY </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">whls</span><span class="p">])</span>
+                    <span class="n">install_extra</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ie</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">'RUN pip install </span><span class="si">{</span><span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">whls</span><span class="p">])</span><span class="si">}</span><span class="s1">'</span>
+                    <span class="c1">#whls = [r for r in install_extra if r.endswith('.whl')]</span>
+                    <span class="c1">#ie = "\n".join([f'COPY {r} {Path(r).name}' for r in whls])</span>
+                    <span class="c1">#install_extra = f"{ie}\n" + f'RUN pip install {" ".join([Path(r).name for r in whls])}'</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">install_extra</span> <span class="o">=</span> <span class="s1">''</span>
+                <span class="k">if</span> <span class="n">init_extra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">init_extra</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="n">init_extra</span> <span class="o">!=</span> <span class="p">[]:</span>
+                    <span class="n">init_extra</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">init_extra</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">init_extra</span> <span class="o">=</span> <span class="s1">''</span>
+                <span class="k">if</span> <span class="n">run_extra_pre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">run_extra_pre</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="n">run_extra_pre</span> <span class="o">!=</span> <span class="p">[]:</span>
+                    <span class="n">run_extra_pre</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'RUN </span><span class="si">{</span><span class="s2">" &amp;&amp; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">run_extra_pre</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">run_extra_pre</span> <span class="o">=</span> <span class="s1">''</span>
+                <span class="k">if</span> <span class="n">run_extra_post</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">run_extra_post</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="n">run_extra_post</span> <span class="o">!=</span> <span class="p">[]:</span>
+                    <span class="n">run_extra_post</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'RUN </span><span class="si">{</span><span class="s2">" &amp;&amp; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">run_extra_post</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">run_extra_post</span> <span class="o">=</span> <span class="s1">''</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{INSTALL_TAG}</span><span class="s1">'</span><span class="p">,</span> <span class="n">install_tag</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{INSTALL_CMDBOX}</span><span class="s1">'</span><span class="p">,</span> <span class="n">install_cmdbox_tgt</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{INSTALL_VOICEVOX}</span><span class="s1">'</span><span class="p">,</span> <span class="n">install_voicevox</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{INSTALL_EXTRA}</span><span class="s1">'</span><span class="p">,</span> <span class="n">install_extra</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{RUN_EXTRA_PRE}</span><span class="s1">'</span><span class="p">,</span> <span class="n">run_extra_pre</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{RUN_EXTRA_POST}</span><span class="s1">'</span><span class="p">,</span> <span class="n">run_extra_post</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{INIT_EXTRA}</span><span class="s1">'</span><span class="p">,</span> <span class="n">init_extra</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{ENV_EXTRA}</span><span class="s1">'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'ENV APPID=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#</span><span class="si">{MK_DATA_DIR}</span><span class="s1">'</span><span class="p">,</span>
+                                    <span class="s1">'RUN mkdir -p /home/$</span><span class="si">{MKUSER}</span><span class="s1">/.'</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span> <span class="o">+</span> \
+                                    <span class="s1">' &amp;&amp; chown -R $</span><span class="si">{MKUSER}</span><span class="s1">:$</span><span class="si">{MKUSER}</span><span class="s1"> /home/$</span><span class="si">{MKUSER}</span><span class="s1">/.'</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="p">)</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+            <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"docker build ./ --rm -t </span><span class="si">{</span><span class="n">imgname</span><span class="si">}</span><span class="s2"> -f </span><span class="si">{</span><span class="n">dockerfile</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to install </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">-server. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to install </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">-server. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="n">dockerfile</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">comp</span><span class="p">,</span> <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_compose_server</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">imgname</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                                                                 <span class="n">start_sh_tgt</span><span class="p">,</span> <span class="n">install_use_gpu</span><span class="p">,</span> <span class="n">install_tag</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to install </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2"> server. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to install </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2"> server. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to install </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2"> server. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxServerInstall.output_schema">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_cmdbox_server_install.CmdboxServerInstall.output_schema">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Data</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Data</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"処理結果のデータ"</span><span class="p">)</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Result</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Result</span><span class="p">):</span>
+            <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Data</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"成功した場合の結果"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Result</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

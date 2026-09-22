@@ -1,0 +1,578 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.web.cmdbox_web_exec_cmd &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.web.cmdbox_web_exec_cmd</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.web.cmdbox_web_exec_cmd</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">server</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">signin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdbox_audit_search</span><span class="p">,</span> <span class="n">cmdbox_audit_write</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdbox_web_load_cmd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">Web</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlainTextResponse</span><span class="p">,</span> <span class="n">StreamingResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.datastructures</span><span class="w"> </span><span class="kn">import</span> <span class="n">UploadFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">concurrent.futures</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">html</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">queue</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+
+<span class="c1"># CmdboxAppはプロセス内シングルトンで、main()内でlogging・言語設定を更新する。</span>
+<span class="c1"># sys.stdout/sys.stdin差し替えもプロセス全体に効くため、コマンド実行は必ず直列化する。</span>
+<span class="c1"># 待ち行列は専用executorに持たせ、既定スレッドプールの枯渇を防ぐ。</span>
+<span class="n">_CMD_EXECUTOR</span> <span class="o">=</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">thread_name_prefix</span><span class="o">=</span><span class="s2">"cmdbox_cmd"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ExecCmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_cmd.ExecCmd">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExecCmd</span><span class="p">(</span><span class="n">cmdbox_web_load_cmd</span><span class="o">.</span><span class="n">LoadCmd</span><span class="p">):</span>
+<div class="viewcode-block" id="ExecCmd.route">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_cmd.ExecCmd.route">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        webモードのルーティングを設定します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            app (FastAPI): FastAPIオブジェクト</span>
+<span class="sd">        """</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/exec_cmd'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/exec_cmd/</span><span class="si">{title}</span><span class="s1">'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/exec_cmd/</span><span class="si">{title}</span><span class="s1">'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">exec_cmd</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">signin</span><span class="o">.</span><span class="n">create_request_scope</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">opt</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="s2">"nouse_webmode"</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">" failed. This command is not available in web mode.'</span><span class="p">)</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">HTTPException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command execution failed. </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">" failed. </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'Command execution failed. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command execution failed. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">" failed. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/exec_sse_cmd'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/exec_sse_cmd/</span><span class="si">{title}</span><span class="s1">'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">exec_sse_cmd</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">signin</span><span class="o">.</span><span class="n">create_request_scope</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">opt</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="s2">"nouse_webmode"</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">" failed. This command is not available in web mode.'</span><span class="p">)</span>
+                <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sse_event_generator</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                    <span class="n">resqueue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+                    <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">resqueue</span><span class="p">)),</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="n">resqueue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="k">break</span>
+                            <span class="n">res_val</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                            <span class="k">yield</span> <span class="sa">f</span><span class="s2">"data: </span><span class="si">{</span><span class="n">res_val</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span>
+                    <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="sa">f</span><span class="s2">"data: </span><span class="si">{</span><span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">'Command execution timed out.'</span><span class="p">))</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span>
+                <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span><span class="n">sse_event_generator</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="s1">'text/event-stream'</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">HTTPException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"HTTPException: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command execution failed. </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Exception: </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">" failed. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コマンド実行前の前処理を行います。リクエストからオプションを抽出し、コマンドのオプション定義とマージします。</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            app (FastAPI): FastAPIオブジェクト</span>
+<span class="sd">            req (Request): リクエスト</span>
+<span class="sd">            res (Response): レスポンス</span>
+<span class="sd">            title (str): コマンドタイトル</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: コマンドオプション</span>
+<span class="sd">        """</span>
+        <span class="n">signin</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_signin</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">signin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_401_MESSAGE</span><span class="p">)</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'content-type'</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_marge_opt</span><span class="p">(</span><span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">param</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">opt</span>
+        <span class="n">opt_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">content_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">_marge_opt</span><span class="p">(</span><span class="n">opt_def</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">query_params</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'multipart/form-data'</span><span class="p">):</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">_marge_opt</span><span class="p">(</span><span class="n">opt_def</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">query_params</span><span class="p">)</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">form</span><span class="p">()</span>
+            <span class="c1">#files = {key: value for key, value in form.multi_items() if isinstance(value, UploadFile)}</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">fv</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">multi_items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fv</span><span class="p">,</span> <span class="n">UploadFile</span><span class="p">):</span> <span class="k">continue</span>
+                <span class="n">opt</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">fv</span><span class="o">.</span><span class="n">file</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">'input_file'</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'stdin'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'application/json'</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">body</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s1">'Request body is empty.'</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">opt</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Invalid JSON: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">_marge_opt</span><span class="p">(</span><span class="n">opt_def</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'application/octet-stream'</span><span class="p">):</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">_marge_opt</span><span class="p">(</span><span class="n">opt_def</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">query_params</span><span class="p">)</span>
+            <span class="n">opt</span><span class="p">[</span><span class="s1">'_stdin_body'</span><span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">body</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">_marge_opt</span><span class="p">(</span><span class="n">opt_def</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">query_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'mode'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">or</span> <span class="s1">'cmd'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s1">'mode or cmd is not found.'</span><span class="p">)</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'capture_stdout'</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'capture_stdout'</span><span class="p">]</span> <span class="k">if</span> <span class="s1">'capture_stdout'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">opt</span>
+
+<div class="viewcode-block" id="ExecCmd.chk_client_only">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_cmd.ExecCmd.chk_client_only">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chk_client_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        クライアントのみのサービスかどうかをチェックする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            opt (dict): オプション</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (クライアントのみ場合はTrue, メッセージ)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">use_redis</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="s2">"use_redis"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_redis</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Commands that require a connection to the cmdbox server are not available.'</span>
+                        <span class="o">+</span><span class="sa">f</span><span class="s1">' (mode=</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s2">"mode"</span><span class="p">]</span><span class="si">}</span><span class="s1">, cmd=</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s2">"cmd"</span><span class="p">]</span><span class="si">}</span><span class="s1">) '</span>
+                        <span class="o">+</span><span class="sa">f</span><span class="s1">'The cause is that the client_only option is specified when starting web mode.'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_redis</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_TRUE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="s2">"choice"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s1">'opt'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'client_data'</span> <span class="ow">and</span> <span class="s1">'client_data'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'client_data'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ExecCmd.exec_cmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_cmd.ExecCmd.exec_cmd">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">exec_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                       <span class="n">nothread</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resqueue</span><span class="p">:</span><span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コマンドを実行する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエスト</span>
+<span class="sd">            res (Response): レスポンス</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            opt (dict): オプション</span>
+<span class="sd">            nothread (bool, optional): スレッドを使わないかどうか. Defaults to False.</span>
+<span class="sd">            resqueue (queue.Queue, optional): 結果を格納するキュー. Defaults to None.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: コマンド実行結果</span>
+<span class="sd">        """</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s1">'tag'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'tag'</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'tag'</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">t</span> <span class="o">!=</span> <span class="s1">''</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">'mode'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="s1">'cmd'</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
+            <span class="n">tags</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+        <span class="n">audit_write_opt</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">tags</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">opt</span><span class="p">)</span>
+        <span class="n">appcls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span> <span class="k">if</span> <span class="n">appcls</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">appcls</span>
+        <span class="n">appcls</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">CmdBoxApp</span> <span class="k">if</span> <span class="n">appcls</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">appcls</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">'cmdbox_app'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ap</span> <span class="o">=</span> <span class="n">appcls</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'mode'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="s1">'cmd'</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_cmd</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="n">opt</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Execute command denyed. mode=</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s2">"mode"</span><span class="p">]</span><span class="si">}</span><span class="s1">, cmd=</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s2">"cmd"</span><span class="p">]</span><span class="si">}</span><span class="s1">, title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="n">_options</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">_options</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">opt_path</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">cmds_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"cmd-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json"</span>
+                <span class="n">feat</span> <span class="o">=</span> <span class="n">_options</span><span class="o">.</span><span class="n">get_cmd_feature</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">])</span>
+                <span class="n">loaded</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">opt_path</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opt</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="s1">'fwpath'</span> <span class="ow">in</span> <span class="n">o</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="n">o</span><span class="p">]:</span> <span class="k">continue</span> <span class="c1"># fwpathはアクセスコントロールで使用するため、コマンドファイルから読み込まない</span>
+                    <span class="k">if</span> <span class="s1">'rjpath'</span> <span class="ow">in</span> <span class="n">o</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="n">o</span><span class="p">]:</span> <span class="k">continue</span> <span class="c1"># rjpathはアクセスコントロールで使用するため、コマンドファイルから読み込まない</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s1">'opt'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="n">s</span><span class="p">[</span><span class="s1">'opt'</span><span class="p">]</span> <span class="o">!=</span> <span class="n">o</span><span class="p">:</span> <span class="k">continue</span>
+                        <span class="k">if</span> <span class="s1">'web'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="n">s</span><span class="p">[</span><span class="s1">'web'</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">'mask'</span><span class="p">:</span> <span class="k">continue</span>
+                        <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span> <span class="ow">or</span> <span class="n">o</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loaded</span><span class="p">:</span> <span class="k">continue</span>
+                    <span class="n">opt</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="n">loaded</span><span class="p">[</span><span class="n">o</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">cmdbox_audit_write</span><span class="o">.</span><span class="n">AuditWrite</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">_options</span><span class="p">,</span> <span class="s1">'audit_write_args'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">_options</span><span class="o">.</span><span class="n">audit_write_args</span><span class="p">:</span>
+                        <span class="n">opt</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="n">_options</span><span class="o">.</span><span class="n">audit_write_args</span><span class="p">[</span><span class="n">o</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">cmdbox_audit_search</span><span class="o">.</span><span class="n">AuditSearch</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">_options</span><span class="p">,</span> <span class="s1">'audit_search_args'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">_options</span><span class="o">.</span><span class="n">audit_search_args</span><span class="p">:</span>
+                        <span class="n">opt</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="n">_options</span><span class="o">.</span><span class="n">audit_search_args</span><span class="p">[</span><span class="n">o</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="c1"># webモードで特定のオプションを自動的にセットする</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'host'</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">redis_host</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'port'</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">redis_port</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">redis_password</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'svname'</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">svname</span>
+        <span class="k">if</span> <span class="s1">'timeout'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'timeout'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'timeout'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">'retry_count'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'retry_count'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'retry_count'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">'retry_interval'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'retry_interval'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'retry_interval'</span><span class="p">]</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'pg_enabled'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'pg_enabled'</span><span class="p">]</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'pg_host'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'pg_host'</span><span class="p">]</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'pg_port'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'pg_port'</span><span class="p">]</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'pg_user'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'pg_user'</span><span class="p">]</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'pg_password'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'pg_password'</span><span class="p">]</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'pg_dbname'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'pg_dbname'</span><span class="p">]</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'retention_period_days'</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_write_opt</span><span class="p">[</span><span class="s1">'retention_period_days'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">'clmsg_id'</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>  <span class="c1"># optに含まれる場合は処理しない</span>
+            <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">'signin'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">'clmsg_id'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'clmsg_id'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">opt</span><span class="p">[</span><span class="s1">'clmsg_id'</span><span class="p">]</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'clmsg_id'</span><span class="p">]</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'data'</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'client_data'</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'signin_file'</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'cache_clear'</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cache_clear'</span><span class="p">]</span> <span class="k">if</span> <span class="s1">'cache_clear'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">else</span> <span class="n">web</span><span class="o">.</span><span class="n">cache_clear</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'cache_timeout'</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">cache_timeout</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'meta'</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'meta'</span><span class="p">]</span> <span class="k">if</span> <span class="s1">'meta'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">'signin'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">'groups'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'groups'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'groups'</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">'name'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'name'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">'meta'</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">last_access_user</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'name'</span><span class="p">]))</span> <span class="c1"># ファイル操作のmeta情報として最後にアクセスしたユーザーを記録</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">'clmsg_user'</span><span class="p">]</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'name'</span><span class="p">]</span> <span class="c1"># 監査ログ用のユーザー名を強制上書き</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">'meta'</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">last_access_date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()))</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coercion_param</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">opt</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">ap</span><span class="o">.</span><span class="n">sv</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ap</span><span class="o">.</span><span class="n">cl</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ap</span><span class="o">.</span><span class="n">web</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_exec_cmd</span><span class="p">(</span><span class="n">cmdbox_app</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">CmdBoxApp</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span>
+                            <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resqueue</span><span class="p">:</span><span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">signin</span><span class="o">.</span><span class="n">set_request_scope</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">req</span><span class="o">=</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">websocket</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="n">web</span><span class="p">))</span>
+                <span class="n">_stdin_body</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s1">'_stdin_body'</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
+                    <span class="n">_stdin_body</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'_stdin_body'</span><span class="p">]</span>
+                    <span class="k">del</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'_stdin_body'</span><span class="p">]</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"exec_cmd: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chk_client_only</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">put_queue</span><span class="p">(</span><span class="n">resqueue</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span> <span class="k">return</span> <span class="n">output</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">output</span>
+
+                <span class="n">output_raw</span> <span class="o">=</span> <span class="s1">'output_raw'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'output_raw'</span><span class="p">]</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">'output_raw'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">opt_list</span><span class="p">,</span> <span class="n">file_dict</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">mk_opt_list</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">'output_raw'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="s2">"--data"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt_list</span> <span class="ow">and</span> <span class="n">opt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># コマンドオプションで"data"オプションが指定されていない場合がある。</span>
+                    <span class="c1"># "--data"オプションが指定されていない場合、opt['data']の内容を追加する。</span>
+                    <span class="c1"># このオプションはログファイルの出力先で使用されるため補完する。</span>
+                    <span class="n">opt_list</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">"--data"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'data'</span><span class="p">])])</span>
+                <span class="n">old_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+                <span class="n">old_stdin</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span>
+                <span class="k">if</span> <span class="s1">'capture_stdout'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'capture_stdout'</span><span class="p">]</span> <span class="ow">and</span> <span class="s1">'stdin'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'stdin'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">_stdin_body</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'The "stdin" and "capture_stdout" options cannot be enabled at the same time. This is because it may cause a memory squeeze.'</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">put_queue</span><span class="p">(</span><span class="n">resqueue</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span> <span class="k">return</span> <span class="n">output</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">output</span>
+                <span class="n">should_capture_stdout</span> <span class="o">=</span> <span class="s1">'capture_stdout'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'capture_stdout'</span><span class="p">]</span>
+                <span class="n">ret_main</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">logsize</span> <span class="o">=</span> <span class="mi">1024</span>
+                <span class="n">console</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">create_console</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">old_stdout</span><span class="p">)</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">capture_maxsize</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'capture_maxsize'</span><span class="p">]</span> <span class="k">if</span> <span class="s1">'capture_maxsize'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_CAPTURE_MAXSIZE</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+                        <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="s1">'output_image'</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s1">'output_image_shape'</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+                            <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">"output_image"</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">"output_image_shape"</span><span class="p">])</span>
+                            <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">'png'</span><span class="p">)</span>
+                            <span class="n">res_json</span><span class="p">[</span><span class="s2">"output_image"</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                            <span class="n">res_json</span><span class="p">[</span><span class="s1">'output_image_name'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">res_json</span><span class="p">[</span><span class="s1">'output_image_name'</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">.png"</span>
+                        <span class="k">return</span> <span class="n">res_json</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">run_main_serialized</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+                        <span class="c1"># stdio差し替えとmain実行を同一スレッドで完結させる。</span>
+                        <span class="n">stdin_bkup</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span>
+                        <span class="n">stdout_bkup</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+                        <span class="n">captured</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span> <span class="k">if</span> <span class="n">should_capture_stdout</span> <span class="k">else</span> <span class="kc">None</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">_stdin_body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">_stdin_body</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">captured</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">captured</span>
+                            <span class="n">st</span><span class="p">,</span> <span class="n">rm</span><span class="p">,</span> <span class="n">ob</span> <span class="o">=</span> <span class="n">cmdbox_app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span>
+                                <span class="n">args_list</span><span class="o">=</span><span class="p">[</span><span class="n">common</span><span class="o">.</span><span class="n">chopdq</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opt_list</span><span class="p">],</span>
+                                <span class="n">file_dict</span><span class="o">=</span><span class="n">file_dict</span><span class="p">,</span>
+                                <span class="n">webcall</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">resqueue</span><span class="o">=</span><span class="n">resqueue</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="n">cap</span> <span class="o">=</span> <span class="s1">''</span> <span class="k">if</span> <span class="n">captured</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">captured</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                            <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">rm</span><span class="p">,</span> <span class="n">ob</span><span class="p">,</span> <span class="n">cap</span>
+                        <span class="k">finally</span><span class="p">:</span>
+                            <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span> <span class="o">=</span> <span class="n">stdin_bkup</span>
+                            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout_bkup</span>
+
+                    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+                    <span class="n">status</span><span class="p">,</span> <span class="n">ret_main</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">captured_output</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="n">_CMD_EXECUTOR</span><span class="p">,</span> <span class="n">run_main_serialized</span><span class="p">)</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># ログ出力を有効にする</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">server</span><span class="o">.</span><span class="n">Server</span><span class="p">):</span>
+                        <span class="n">cmdbox_app</span><span class="o">.</span><span class="n">sv</span> <span class="o">=</span> <span class="n">obj</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">client</span><span class="o">.</span><span class="n">Client</span><span class="p">):</span>
+                        <span class="n">cmdbox_app</span><span class="o">.</span><span class="n">cl</span> <span class="o">=</span> <span class="n">obj</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Web</span><span class="p">):</span>
+                        <span class="n">cmdbox_app</span><span class="o">.</span><span class="n">web</span> <span class="o">=</span> <span class="n">obj</span>
+
+                    <span class="k">if</span> <span class="n">should_capture_stdout</span><span class="p">:</span>
+                        <span class="n">output</span> <span class="o">=</span> <span class="n">captured_output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                        <span class="n">output_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">output_size</span> <span class="o">&gt;</span> <span class="n">capture_maxsize</span><span class="p">:</span>
+                            <span class="n">o</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">osize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                                <span class="n">oidx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_maxsize</span> <span class="o">/</span> <span class="n">osize</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="n">oidx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">output</span> <span class="o">=</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="o">-</span><span class="n">oidx</span><span class="p">:])</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="n">capture_maxsize</span><span class="si">}</span><span class="s1"> bytes.'</span><span class="p">)]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="n">capture_maxsize</span><span class="si">}</span><span class="s1"> bytes.'</span><span class="p">)]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">output</span> <span class="o">=</span> <span class="n">ret_main</span>
+                    <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">old_stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">'EXEC OUTPUT =&gt; </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s1">'</span><span class="p">[:</span><span class="n">logsize</span><span class="p">]</span><span class="o">+</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span> <span class="c1"># コマンド実行時のアウトプットはカラーリングしない</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'exec_cmd error. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">console_log</span><span class="p">(</span><span class="n">console</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s1">'EXEC  - </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1">'</span><span class="p">[:</span><span class="n">logsize</span><span class="p">],</span> <span class="n">highlight</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span><span class="o">&lt;</span><span class="n">logsize</span><span class="o">-</span><span class="mi">10</span><span class="p">))</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span><span class="si">}</span><span class="s1">&lt;/pre&gt;'</span><span class="p">)]</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># ログ出力を有効にする</span>
+                <span class="k">if</span> <span class="n">should_capture_stdout</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_console_modal_log_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">''</span><span class="p">]</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">ret</span> <span class="o">=</span> <span class="n">to_json</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret_main</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">put_queue</span><span class="p">(</span><span class="n">resqueue</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                            <span class="k">return</span> <span class="n">PlainTextResponse</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="s1">'text/plain'</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                            <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">ret</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="s1">'application/octet-stream'</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">output_raw</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">'No output.'</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                                <span class="k">return</span> <span class="n">ret</span>
+                            <span class="n">success</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="p">{})</span>
+                            <span class="n">filename</span> <span class="o">=</span> <span class="n">success</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                    <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"output_</span><span class="si">{</span><span class="n">title</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span><span class="w"> </span><span class="s1">'_'</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">filename</span> <span class="o">=</span> <span class="s2">"output"</span>
+                            <span class="n">mimetype</span> <span class="o">=</span> <span class="n">success</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'mime_type'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                            <span class="n">content_b64</span> <span class="o">=</span> <span class="n">success</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                            <span class="c1"># content_b64がNoneの場合はsuccess全体を出力する</span>
+                            <span class="k">if</span> <span class="n">content_b64</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">content_b64</span> <span class="o">=</span> <span class="n">success</span>
+                            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">content_b64</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+                                <span class="c1"># content_b64が辞書型又はリスト型の場合はJSON文字列に変換する</span>
+                                <span class="n">content_b64</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">content_b64</span><span class="p">)</span>
+                                <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">'application/json'</span>
+                                <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.json"</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="c1"># content_b64をbase64デコードしてbytesに変換する。</span>
+                                <span class="c1"># content_b64がbase64エンコードされていない場合はそのままcontent_b64をcontentとして扱う。</span>
+                                <span class="n">content</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">b64str2bytes</span><span class="p">(</span><span class="n">content_b64</span><span class="p">))</span>
+                            <span class="k">except</span><span class="p">:</span>
+                                <span class="n">content</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">content_b64</span><span class="p">)</span>
+                            <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+                            <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+                                <span class="n">headers</span><span class="p">[</span><span class="s1">'Content-Disposition'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'attachment; filename="</span><span class="si">{</span><span class="n">convert</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s1">"'</span>
+                            <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span><span class="n">content</span><span class="p">,</span>
+                                                     <span class="n">media_type</span><span class="o">=</span><span class="p">(</span><span class="n">mimetype</span> <span class="k">if</span> <span class="n">mimetype</span> <span class="k">else</span> <span class="s1">'application/octet-stream'</span><span class="p">),</span>
+                                                     <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">ret</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_cmd_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'exec_cmd error.'</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">put_queue</span><span class="p">(</span><span class="n">resqueue</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">output</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_cmd_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">put_queue</span><span class="p">(</span><span class="n">resqueue</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">_exec_cmd</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">resqueue</span><span class="o">=</span><span class="n">resqueue</span><span class="p">)</span>
+        <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">_exec_cmd</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">resqueue</span><span class="o">=</span><span class="n">resqueue</span><span class="p">))</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">'start_cmd'</span><span class="p">)]</span></div>
+
+    
+<div class="viewcode-block" id="ExecCmd.coercion_param">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_cmd.ExecCmd.coercion_param">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">coercion_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コマンドオプションを強制的に値を設定する拡張ポイントです。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_session (Dict[str, Any]): ユーザーセッション</span>
+<span class="sd">            opt (Dict[str, Any]): 実行時のコマンドオプション</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: 強制的に値を設定したコマンドオプション</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">opt</span></div>
+
+
+<div class="viewcode-block" id="ExecCmd.put_queue">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_cmd.ExecCmd.put_queue">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span><span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        キューにデータを格納する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q (queue.Queue): キュー</span>
+<span class="sd">            data: 格納するデータ</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Full</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

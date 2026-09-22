@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox_client_http &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox_client_http</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.cmdbox_client_http</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">limiter</span><span class="p">,</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+
+
+<div class="viewcode-block" id="ClientHttp">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_client_http.ClientHttp">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClientHttp</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">ResultEdgeFeature</span><span class="p">,</span> <span class="n">validator</span><span class="o">.</span><span class="n">Validator</span><span class="p">,</span> <span class="n">limiter</span><span class="o">.</span><span class="n">LimitedFeature</span><span class="p">):</span>
+<div class="viewcode-block" id="ClientHttp.get_mode">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_client_http.ClientHttp.get_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のモードを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[str, List[str]]: モード</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'client'</span></div>
+
+
+<div class="viewcode-block" id="ClientHttp.get_cmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_client_http.ClientHttp.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のコマンドを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: コマンド</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'http'</span></div>
+
+    
+<div class="viewcode-block" id="ClientHttp.get_option">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_client_http.ClientHttp.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のオプションを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: オプション</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_MEIGHT</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">description_ja</span><span class="o">=</span><span class="s2">"HTTPサーバーに対してリクエストを送信し、レスポンスを取得します。"</span><span class="p">,</span>
+            <span class="n">description_en</span><span class="o">=</span><span class="s2">"Sends a request to the HTTP server and gets a response."</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"リクエスト先URLを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the URL to request."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"proxy"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"no"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">'no'</span><span class="p">,</span> <span class="s1">'yes'</span><span class="p">],</span>
+                     <span class="n">choice_show</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">no</span><span class="o">=</span><span class="p">[</span><span class="s2">"send_method"</span><span class="p">,</span> <span class="s2">"send_content_type"</span><span class="p">,</span> <span class="s2">"send_apikey"</span><span class="p">,</span> <span class="s2">"send_header"</span><span class="p">,],</span>
+                                      <span class="n">yes</span><span class="o">=</span><span class="p">[]),</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"webモードで呼び出された場合、受信したリクエストパラメータをリクエスト先URLに送信するかどうかを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies whether or not to send the received request parameters to the destination URL when invoked in web mode."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"send_method"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"GET"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span> <span class="s1">'POST'</span><span class="p">,</span> <span class="s1">'PUT'</span><span class="p">,</span> <span class="s1">'DELETE'</span><span class="p">,</span> <span class="s1">'PATCH'</span><span class="p">,</span> <span class="s1">'HEAD'</span><span class="p">,</span> <span class="s1">'OPTIONS'</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"リクエストメソッドを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the request method."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"send_content_type"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'application/octet-stream'</span><span class="p">,</span> <span class="s1">'application/json'</span><span class="p">,</span> <span class="s1">'multipart/form-data'</span><span class="p">],</span>
+                     <span class="n">choice_show</span><span class="o">=</span><span class="p">{</span><span class="s1">'application/octet-stream'</span><span class="p">:[</span><span class="s2">"send_param"</span><span class="p">,</span> <span class="s2">"send_data"</span><span class="p">,],</span>
+                                  <span class="s1">'application/json'</span><span class="p">:[</span><span class="s2">"send_data"</span><span class="p">,],</span>
+                                  <span class="s1">'multipart/form-data'</span><span class="p">:[</span><span class="s2">"send_param"</span><span class="p">,],},</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"送信するデータのContent-Typeを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the Content-Type of the data to be sent."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"send_apikey"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_PASSWD</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"リクエスト先の認証で使用するAPIキーを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the API key to be used for authentication of the request destination."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"send_header"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DICT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"リクエストヘッダーを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the request header."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"send_param"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DICT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"送信するパラメータを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies parameters to be sent."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"send_data"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_TEXT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"送信するデータを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the data to be sent."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"send_verify"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"レスポンスを受け取るまでのタイムアウトを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the timeout before a response is received."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"send_timeout"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"レスポンスを受け取るまでのタイムアウトを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the timeout before a response is received."</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@limiter</span><span class="o">.</span><span class="n">apprun_check_limit</span>
+    <span class="nd">@validator</span><span class="o">.</span><span class="n">async_apprun_check</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能の実行を行います</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+<span class="sd">            tm (float): 実行開始時間</span>
+<span class="sd">            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト</span>
+<span class="sd">        """</span>
+        <span class="n">query_param</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">proxy</span> <span class="o">==</span> <span class="s1">'yes'</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">signin</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
+            <span class="n">scope</span> <span class="o">=</span> <span class="n">signin</span><span class="o">.</span><span class="n">get_request_scope</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Request scope is not set. Please set the request scope."</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="n">req</span><span class="p">:</span><span class="n">Request</span> <span class="o">=</span> <span class="n">scope</span><span class="p">[</span><span class="s1">'req'</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">send_method</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">method</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">send_content_type</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'Content-Type'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">send_apikey</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'Authorization'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'Bearer '</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">send_header</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> \
+                                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'connection'</span><span class="p">,</span> <span class="s1">'proxy-authorization'</span><span class="p">,</span> <span class="s1">'proxy-connection'</span><span class="p">,</span> <span class="s1">'keep-alive'</span><span class="p">,</span>
+                                                     <span class="s1">'transfer-encoding'</span><span class="p">,</span> <span class="s1">'te'</span><span class="p">,</span> <span class="s1">'trailer'</span><span class="p">,</span> <span class="s1">'upgrade'</span><span class="p">,</span> <span class="s1">'content-length'</span><span class="p">]}</span>
+            <span class="n">query_param</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">send_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">body</span><span class="p">()</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">parse_qs</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">query_param</span><span class="p">}</span> <span class="k">if</span> <span class="n">query</span> <span class="k">else</span> <span class="n">query_param</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlunparse</span><span class="p">((</span><span class="n">url</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">),</span> <span class="n">url</span><span class="o">.</span><span class="n">fragment</span><span class="p">))</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">send_header</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">send_header</span><span class="p">,</span> <span class="s1">'Authorization'</span><span class="p">:</span><span class="sa">f</span><span class="s1">'Bearer </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">send_apikey</span><span class="si">}</span><span class="s1">'</span><span class="p">}</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">send_apikey</span> <span class="k">else</span> <span class="n">args</span><span class="o">.</span><span class="n">send_header</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">send_method</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">send_header</span><span class="p">,</span>
+                                   <span class="n">verify</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">send_verify</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">send_timeout</span><span class="p">,</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">data</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">send_data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">send_param</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Request failed with status code </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'Content-Type'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'application/json'</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">text</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'text/'</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">text</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ClientHttp.output_schema">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_client_http.ClientHttp.output_schema">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Result</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Result</span><span class="p">):</span>
+            <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"成功した場合の結果"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Result</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

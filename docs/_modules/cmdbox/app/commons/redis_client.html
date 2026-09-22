@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.commons.redis_client &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.commons.redis_client</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.commons.redis_client</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">redis</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+
+
+<div class="viewcode-block" id="RedisClient">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RedisClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">host</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span><span class="p">,</span>
+                 <span class="n">password</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">svname</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">"server"</span><span class="p">,</span> <span class="n">org_svname</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Redisクライアントを初期化します。</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            logger (Logger): ロガー</span>
+<span class="sd">            host (str): Redisのホスト名</span>
+<span class="sd">            port (int): Redisのポート番号</span>
+<span class="sd">            password (str): Redisのパスワード</span>
+<span class="sd">            svname (str): サーバー名</span>
+<span class="sd">            org_svname (str): 元のサーバー名（suffixが含まれていないsvname）省略した時はsvnameからsuffixを除いたsvnameを使用する</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"sv-</span><span class="si">{</span><span class="n">svname</span><span class="si">}</span><span class="s2">"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">org_svname</span> <span class="o">=</span> <span class="n">org_svname</span> <span class="k">if</span> <span class="n">org_svname</span> <span class="k">else</span> <span class="n">svname</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">'-'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hbname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"hb-</span><span class="si">{</span><span class="n">svname</span><span class="si">}</span><span class="s2">"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">siname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"showimg-</span><span class="si">{</span><span class="n">svname</span><span class="si">}</span><span class="s2">"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"mem-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">org_svname</span><span class="si">}</span><span class="s2">"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmtname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"lmt-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">org_svname</span><span class="si">}</span><span class="s2">"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RedisClient.connect">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.connect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Redisに接続します。</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">redis</span><span class="o">.</span><span class="n">Redis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="RedisClient.close">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.close">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    
+<div class="viewcode-block" id="RedisClient.rpush">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.rpush">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rpush</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">pfkey</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">'svrun'</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pfkey</span> <span class="ow">and</span> <span class="n">tm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">update_performance</span><span class="p">(</span><span class="n">pfkey</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="n">res_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">res_str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_ressize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_resval</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_ressize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_resval</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported type. </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported type. </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.exists">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.exists">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.pipeline">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.pipeline">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shard_hint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="n">transaction</span><span class="o">=</span><span class="n">transaction</span><span class="p">,</span> <span class="n">shard_hint</span><span class="o">=</span><span class="n">shard_hint</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.blpop">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.blpop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">blpop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">blpop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.lpop">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.lpop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lpop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">lpop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.hset">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.hset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.hdel">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.hdel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hdel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hdel</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.delete">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.delete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="RedisClient.hexists">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.hexists">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hexists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hexists</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="RedisClient.hget">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.hget">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.hgetall">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.hgetall">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hgetall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hgetall</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.keys">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.keys">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.get">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.check_server">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.check_server">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">find_svname</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">retry_count</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">retry_interval</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">outstatus</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Redisサーバーにpingを送信し、応答があるか確認する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            find_svname (bool, optional): サーバー名が存在するか確認する. Defaults to False.</span>
+<span class="sd">            retry_count (int, optional): リトライ回数. Defaults to 20.</span>
+<span class="sd">            retry_interval (int, optional): リトライ間隔. Defaults to 5.</span>
+<span class="sd">            outstatus (bool, optional): ステータスを出力する. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 接続成功時はTrue、失敗時はFalse</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">retry_interval</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"retry_interval must be greater than 0. retry_interval=</span><span class="si">{</span><span class="n">retry_interval</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">retry_count</span> <span class="ow">or</span> <span class="n">retry_count</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">outstatus</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">retry_count</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">retry_count</span><span class="o">&gt;</span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'-'</span><span class="si">}</span><span class="s2">) connecting to the redis server. </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">find_svname</span><span class="p">:</span>
+                    <span class="n">_hbname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">hbname</span><span class="si">}</span><span class="s2">-*"</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hbname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'-'</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">hbname</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="n">_hbname</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Server not found. svname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'-'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"fail to ping server. </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">, error=</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">retry_count</span> <span class="ow">and</span> <span class="n">retry_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">retry_interval</span> <span class="k">if</span> <span class="n">retry_interval</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">5</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.send_cmd">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.send_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">retry_count</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">retry_interval</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                 <span class="n">outstatus</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">nowait</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コマンドをRedisサーバーに送信し、応答を取得します。</span>
+<span class="sd">        nowait=Trueの場合は、応答を待たずにスレッドで実行します。</span>
+<span class="sd">        その場合、応答は受信できません。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cmd (str): コマンド</span>
+<span class="sd">            params (List[str]): コマンドのパラメータ</span>
+<span class="sd">            retry_count (int, optional): リトライ回数. Defaults to 20.</span>
+<span class="sd">            retry_interval (int, optional): リトライ間隔. Defaults to 5.</span>
+<span class="sd">            outstatus (bool, optional): ステータスを出力する. Defaults to False.</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+<span class="sd">            nowait (bool, optional): 応答を待たない. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_cmd_sse</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="p">,</span>
+                                      <span class="n">outstatus</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">nowait</span><span class="p">,</span> <span class="n">sse</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.send_cmd_sse">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.send_cmd_sse">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_cmd_sse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">retry_count</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">retry_interval</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                 <span class="n">outstatus</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">nowait</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sse</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コマンドをRedisサーバーに送信し、応答を取得します。</span>
+<span class="sd">        nowait=Trueの場合は、応答を待たずにスレッドで実行します。</span>
+<span class="sd">        その場合、応答は受信できません。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cmd (str): コマンド</span>
+<span class="sd">            params (List[str]): コマンドのパラメータ</span>
+<span class="sd">            retry_count (int, optional): リトライ回数. Defaults to 20.</span>
+<span class="sd">            retry_interval (int, optional): リトライ間隔. Defaults to 5.</span>
+<span class="sd">            outstatus (bool, optional): ステータスを出力する. Defaults to False.</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+<span class="sd">            nowait (bool, optional): 応答を待たない. Defaults to False.</span>
+<span class="sd">            sse (bool, optional): サーバーサイドからの終了メッセージを受けるまで連続してレスポンスを受け取る. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        """</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="n">nowait</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">timeout</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">timeout</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"timeout must be greater than 0. timeout=</span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_server</span><span class="p">(</span><span class="n">find_svname</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">outstatus</span><span class="o">=</span><span class="n">outstatus</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Connected server failed or server not found. svname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'-'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="n">reskey</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">()</span>
+                <span class="n">reskey</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"cl-</span><span class="si">{</span><span class="n">reskey</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">reskey</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">params</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nowait</span><span class="p">:</span> <span class="k">return</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">stime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+                    <span class="n">ctime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">ctime</span> <span class="o">-</span> <span class="n">stime</span> <span class="o">&gt;</span> <span class="n">timeout</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Response timed out."</span><span class="p">)</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">lpop</span><span class="p">(</span><span class="n">reskey</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="n">stime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">sse</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_res_cmd</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                        <span class="k">yield</span> <span class="n">msg</span>
+                        <span class="k">if</span> <span class="s1">'end'</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span> <span class="k">return</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_res_cmd</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+                        <span class="k">return</span>
+                <span class="k">raise</span> <span class="ne">KeyboardInterrupt</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Stop command."</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Stop command. cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Stop command. cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"fail to execute command. cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">, msg=</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"fail to execute command. cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">, msg=</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nowait</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">send</span><span class="p">(</span><span class="n">nowait</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">msg</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">run_send</span><span class="p">(</span><span class="n">nowait</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">send</span><span class="p">(</span><span class="n">nowait</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
+                    <span class="k">pass</span>
+            <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_send</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">nowait</span><span class="p">,</span> <span class="n">timeout</span><span class="p">))</span>
+            <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Command sent. cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">, nowait=</span><span class="si">{</span><span class="n">nowait</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_res_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">res_msg</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">sse</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Redisサーバーからの応答を解析する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): Redisサーバーからの応答のキー</span>
+<span class="sd">            res_msg (bytes): Redisサーバーからの応答</span>
+<span class="sd">            sse (bool, optional): サーバーサイドからの終了メッセージを受けるまで連続してレスポンスを受け取る. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 解析された応答</span>
+<span class="sd">        """</span>
+        <span class="n">reskbyte</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_msg</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1024</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">res_msg</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">'utf-8'</span><span class="p">)</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sse</span> <span class="ow">or</span> <span class="p">(</span><span class="n">sse</span> <span class="ow">and</span> <span class="s1">'end'</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">reskey</span><span class="p">)</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">result_format</span><span class="p">(</span><span class="n">res_json</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="p">[</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">"receive"</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">reskbyte</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">KB"</span><span class="p">),</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="n">res_json</span>
+
+<div class="viewcode-block" id="RedisClient.receive_showimg">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.receive_showimg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">receive_showimg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_server</span><span class="p">(</span><span class="n">find_svname</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lpop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">msg_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"redis_client.receive_showimg: self.siname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="si">}</span><span class="s2">, msg=</span><span class="si">{</span><span class="n">msg_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">"text"</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">"outputs"</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">"output_image"</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">capture_data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">capture_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">capture_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">capture_data</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+            <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span>
+            <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cmd</span><span class="p">,</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">img_bytes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported cmd. cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.send_showimg">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.send_showimg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_showimg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxrecsize</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        後処理結果をRedisサーバーに送信する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cmd (str): コマンド</span>
+<span class="sd">            outputs (Dict[str, Any]): 後処理結果</span>
+<span class="sd">            output_image (Image.Image, optional): 画像データ. Defaults to None.</span>
+<span class="sd">            maxrecsize (int, optional): 最大レコードサイズ. Defaults to 200.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">cmd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">"outputs"</span><span class="p">,</span> <span class="s2">"output_image"</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported cmd. cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Unsupported cmd. cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_server</span><span class="p">(</span><span class="n">find_svname</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Server chack failed. svname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'-'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">llen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">llen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">llen</span> <span class="o">&gt;</span> <span class="n">maxrecsize</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cancelled execution of showimg. '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="si">}</span><span class="s2">' list is full. llen=</span><span class="si">{</span><span class="n">llen</span><span class="si">}</span><span class="s2"> maxrecsize=</span><span class="si">{</span><span class="n">maxrecsize</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Cancelled execution of showimg. '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="si">}</span><span class="s2">' list is full. llen=</span><span class="si">{</span><span class="n">llen</span><span class="si">}</span><span class="s2"> maxrecsize=</span><span class="si">{</span><span class="n">maxrecsize</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">"outputs"</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                    <span class="n">outputs_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"redis_client.send_showimg: self.siname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="si">}</span><span class="s2">, cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">, outputs=</span><span class="si">{</span><span class="n">outputs_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">"output_image"</span><span class="p">:</span>
+                <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">output_image</span><span class="p">)</span>
+                <span class="n">img_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+                <span class="n">output_image_name</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">'output_image_name'</span><span class="p">]</span> <span class="k">if</span> <span class="s1">'output_image_name'</span> <span class="ow">in</span> <span class="n">outputs</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S"</span><span class="p">)</span><span class="si">}</span><span class="s1">.capture'</span>
+                <span class="n">img_line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"capture,</span><span class="si">{</span><span class="n">img_b64</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">output_image_name</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">img_line</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">"text"</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">siname</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"outputs are not supported type. </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span><span class="si">}</span><span class="s2"> cmd='</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">' llen=</span><span class="si">{</span><span class="n">llen</span><span class="si">}</span><span class="s2">. outputs=</span><span class="si">{</span><span class="n">outputs</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"outputs are not supported type. </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span><span class="si">}</span><span class="s2"> cmd='</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">' llen=</span><span class="si">{</span><span class="n">llen</span><span class="si">}</span><span class="s2">. outputs=</span><span class="si">{</span><span class="n">outputs</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to publish to Redis server. cmd='</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">' llen=</span><span class="si">{</span><span class="n">llen</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Failed to publish to Redis server. cmd='</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">' llen=</span><span class="si">{</span><span class="n">llen</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Success execution of showimg. cmd='</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">' llen=</span><span class="si">{</span><span class="n">llen</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisClient.list_server">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.redis_client.RedisClient.list_server">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_server</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        起動しているサーバーリストを取得する</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Dict[str, Any]]: サーバーのリスト</span>
+<span class="sd">        """</span>
+        <span class="n">hblist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="s2">"hb-*"</span><span class="p">)</span>
+        <span class="n">svlist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">hb</span> <span class="ow">in</span> <span class="n">hblist</span><span class="p">:</span>
+            <span class="n">hb</span> <span class="o">=</span> <span class="n">hb</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="n">svname</span> <span class="o">=</span> <span class="n">hb</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"hb-"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">hb</span><span class="p">,</span> <span class="s1">'receive_cnt'</span><span class="p">)</span>
+                <span class="n">receive_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">hb</span><span class="p">,</span> <span class="s1">'success_cnt'</span><span class="p">)</span>
+                <span class="n">success_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">hb</span><span class="p">,</span> <span class="s1">'warn_cnt'</span><span class="p">)</span>
+                <span class="n">warn_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">hb</span><span class="p">,</span> <span class="s1">'error_cnt'</span><span class="p">)</span>
+                <span class="n">error_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">hb</span><span class="p">,</span> <span class="s1">'active_cnt'</span><span class="p">)</span>
+                <span class="n">active_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">hb</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">)</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"unknown"</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">hb</span><span class="p">,</span> <span class="s1">'ctime'</span><span class="p">)</span>
+                <span class="n">ctime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y/%m/</span><span class="si">%d</span><span class="s1"> %H:%M:%S'</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">())))</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"-"</span>
+                <span class="c1"># アクティブタスク情報を取得（hbname ハッシュ内で active_tasks_ で始まるフィールド）</span>
+                <span class="n">hb_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hgetall</span><span class="p">(</span><span class="n">hb</span><span class="p">)</span>
+                <span class="n">active_tasks</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">hb_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">key_str</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">key</span>
+                    <span class="k">if</span> <span class="n">key_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'active_tasks_'</span><span class="p">):</span>
+                        <span class="n">thread_id</span> <span class="o">=</span> <span class="n">key_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'active_tasks_'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+                        <span class="n">task</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">start_tm</span><span class="p">,</span> <span class="n">proc_cnt</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'&amp;&amp;'</span><span class="p">)</span>
+                        <span class="n">start_tm_str</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y/%m/</span><span class="si">%d</span><span class="s1"> %H:%M:%S'</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">start_tm</span><span class="p">)))</span> <span class="k">if</span> <span class="n">start_tm</span> <span class="k">else</span> <span class="s2">"-"</span>
+                        <span class="n">proc_cnt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">proc_cnt</span><span class="p">)</span> <span class="k">if</span> <span class="n">proc_cnt</span> <span class="k">else</span> <span class="mf">0.0</span>
+                        <span class="n">active_tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span> <span class="n">start_tm</span><span class="o">=</span><span class="n">start_tm_str</span><span class="p">,</span> <span class="n">proc_cnt</span><span class="o">=</span><span class="n">proc_cnt</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">))</span>
+                <span class="c1"># start_tmで昇順にソート</span>
+                <span class="n">active_tasks</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">'start_tm'</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ResponseError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ResponseError. </span><span class="si">{</span><span class="n">hb</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">active_tasks</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">svlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">svname</span><span class="o">=</span><span class="n">svname</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span> <span class="n">ctime</span><span class="o">=</span><span class="n">ctime</span><span class="p">,</span>
+                               <span class="n">receive_cnt</span><span class="o">=</span><span class="n">receive_cnt</span><span class="p">,</span> <span class="n">success_cnt</span><span class="o">=</span><span class="n">success_cnt</span><span class="p">,</span> <span class="n">warn_cnt</span><span class="o">=</span><span class="n">warn_cnt</span><span class="p">,</span> <span class="n">error_cnt</span><span class="o">=</span><span class="n">error_cnt</span><span class="p">,</span> <span class="n">active_cnt</span><span class="o">=</span><span class="n">active_cnt</span><span class="p">,</span> <span class="n">active_tasks</span><span class="o">=</span><span class="n">active_tasks</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">svlist</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -242,7 +242,7 @@ statusPage.loadLogTail = async (isinit=false) => {
 };
 
 // 表示済みログに対してのみ grep 相当の絞り込みを適用して描画する
-statusPage.renderLogTail = (isinit=false) => {
+statusPage.renderLogTail = async (isinit=false) => {
     const scope = $('#svlog_scope').val() || 'server';
     const svpath = $('#svlog_file').val() || '';
     const key = statusPage.tailKey(scope, svpath);
@@ -251,44 +251,56 @@ statusPage.renderLogTail = (isinit=false) => {
     const q = String(statusPage.logGrepQuery || '').trim();
     const lines = raw.split(/\r?\n/);
     let view = lines.map((line, idx) => ({ line, idx }));
-    if (q.length > 0) {
-        const qLower = q.toLowerCase();
-        view = view.filter((v) => v.line.toLowerCase().includes(qLower));
-    }
-
-    const appendLine = (parent, line, keyword) => {
-        if (!keyword) {
-            parent.append(document.createTextNode(line));
-            return;
-        }
-        const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const re = new RegExp(`(${escaped})`, 'ig');
-        const parts = line.split(re);
-        parts.forEach((part) => {
-            if (part.length === 0) return;
-            if (part.toLowerCase() === keyword.toLowerCase()) {
-                $('<span class="tail-log-kwd"></span>').text(part).appendTo(parent);
-            } else {
-                parent.append(document.createTextNode(part));
-            }
-        });
-    };
-
+    // 追加分のログを描画する
     const tail = $('#svlog_tail');
-    //tail.empty();
-    view.forEach((v, i) => {
-        const isNew = newStart >= 0 && v.idx >= newStart;
+    view.forEach((rec, i) => {
+        const isNew = newStart >= 0 && rec.idx >= newStart;
         if (isNew || isinit) {
             const lineWrap = $('<span class="tail-log-new"></span>').appendTo(tail);
-            appendLine(lineWrap, v.line, q);
-        } else {
-            return;
-            appendLine(tail, v.line, q);
-        }
-        if (i < view.length - 1) {
-            tail.append(document.createTextNode('\n'));
+            lineWrap.append(document.createTextNode(rec.line));
         }
     });
+    // grep 相当のフィルタ及びハイライトを適用する
+    if (q.length > 0) {
+        const qLower = q.toLowerCase();
+        tail.find('.tail-log-new').each((_, elem) => {
+            const $elem = $(elem);
+            const text = $elem.text();
+            if (text.length === 0 || !text.toLowerCase().includes(q.toLowerCase())) {
+                $elem.hide();
+                return;
+            }
+            $elem.show();
+            $elem.find('.tail-log-kwd').each((_, kwdElem) => {
+                const $kwdElem = $(kwdElem);
+                $kwdElem.after(document.createTextNode($kwdElem.text()));
+                $kwdElem.remove();
+            });
+            const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const re = new RegExp(`(${escaped})`, 'ig');
+            const parts = text.split(re);
+            let content = '';
+            parts.forEach((part) => {
+                if (part.length === 0) return;
+                if (part.toLowerCase() === q.toLowerCase()) {
+                    content += `<span class="tail-log-kwd">${part}</span>`;
+                } else {
+                    content += part;
+                }
+            });
+            $elem.html(content);
+        });
+    } else {
+        tail.find('.tail-log-new').each((_, elem) => {
+            const $elem = $(elem);
+            $elem.show();
+            $elem.find('.tail-log-kwd').each((_, kwdElem) => {
+                const $kwdElem = $(kwdElem);
+                $kwdElem.after(document.createTextNode($kwdElem.text()));
+                $kwdElem.remove();
+            });
+        });
+    }
     if (tail.length > 0) {
         tail.scrollTop(tail.prop('scrollHeight'));
     }

@@ -119,6 +119,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
     def output_schema(self) -> type:
         class Data(resdata.Data):
             data: Union[Dict[str, str], None] = pydantic.Field(default=None, description="翻訳結果。{元の単語: 翻訳後の文字列} の辞書形式。")
+            token_usage: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="トークン使用量")
         class Result(resdata.Result):
             success: Union[Data, str, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -233,7 +234,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
         # 重複を排除しつつ順序を保持
         unique_words = list(dict.fromkeys(words))
         missing = [w for w in unique_words if w not in lang_cache]
-
+        token_usage = dict(prompt_tokens=0, completion_tokens=0, total_tokens=0)
         if missing:
             if not llmname:
                 # 利用可能なLLM設定が見つからない場合は翻訳できないため、キャッシュがあるものをマージして返す
@@ -258,6 +259,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             content = ''
             try:
                 data = chat_result.get('success', {}).get('data', [])
+                token_usage = chat_result.get('success', {}).get('token_usage', {})
                 if data:
                     content = data[0].get('content', '')
                     content = content.strip()
@@ -275,10 +277,10 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
                 # キャッシュ保存は失敗しても既キャッシュ分は返す
 
         result = {w: lang_cache.get(w, w) for w in words}
-        return self.RESP_SUCCESS, dict(success=dict(data=result))
+        return self.RESP_SUCCESS, dict(success=dict(data=result, token_usage=token_usage))
 
     def svrun_credit(self, data_dir, logger, opt, msg):
-        data = msg.get('success', {}).get('data', [])
+        data = msg.get('success', {}).get('token_usage', {})
         if not data:
             return 0
-        return len(data)
+        return data.get('total_tokens', 0)

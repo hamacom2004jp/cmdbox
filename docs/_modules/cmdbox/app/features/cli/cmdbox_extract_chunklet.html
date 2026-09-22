@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox_extract_chunklet &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox_extract_chunklet</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.cmdbox_extract_chunklet</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">filer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">limiter</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">,</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+
+
+<div class="viewcode-block" id="ExtractChunklet">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExtractChunklet</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">OneshotResultEdgeFeature</span><span class="p">,</span> <span class="n">validator</span><span class="o">.</span><span class="n">Validator</span><span class="p">,</span> <span class="n">limiter</span><span class="o">.</span><span class="n">LimitedFeature</span><span class="p">):</span>
+<div class="viewcode-block" id="ExtractChunklet.get_mode">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.get_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のモードを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[str, List[str]]: モード</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s2">"extract"</span></div>
+
+
+<div class="viewcode-block" id="ExtractChunklet.get_cmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のコマンドを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: コマンド</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'chunklet'</span></div>
+
+
+<div class="viewcode-block" id="ExtractChunklet.get_option">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のオプションを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: オプション</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_TRUE</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">description_ja</span><span class="o">=</span><span class="s2">"指定されたドキュメントファイルからテキストを抽出します。"</span><span class="p">,</span>
+            <span class="n">description_en</span><span class="o">=</span><span class="s2">"Extracts text from the specified document file."</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"host"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_host</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーのサービスホストを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service host of the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"port"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_port</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーのサービスポートを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service port of the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"password"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_PASSWD</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="si">}</span><span class="s2">` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Specify the access password of the Redis server (optional). If omitted, `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="si">}</span><span class="s2">` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"svname"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_svname</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"readonly"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"サーバーのサービス名を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service name of the inference server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"scope"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"client"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s2">"client"</span><span class="p">,</span> <span class="s2">"current"</span><span class="p">,</span> <span class="s2">"server"</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."</span><span class="p">,),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"fwpath"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FILE</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."</span><span class="p">,),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"rjpath"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FILE</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"loadpath"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FILE</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fileio</span><span class="o">=</span><span class="s2">"in"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"読み込みファイルパスを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the source file path."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"chunk_lang"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">'auto'</span><span class="p">,</span> <span class="s1">'ja'</span><span class="p">,</span> <span class="s1">'en'</span><span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"チャンキングするテキストの言語を指定します。`auto` を指定した場合は自動で言語を判定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the language of the text to be chunked. If `auto` is specified, the language will be automatically detected."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"chunk_max_token_counter"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"gpt-4o"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">choice_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">choice_chunk_max_token_counter</span><span class="p">,</span> <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"チャンキングするテキストの最大トークン数を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the maximum number of tokens for chunking text."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"chunk_max_tokens"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"チャンキングするテキストの最大トークン数を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the maximum number of tokens for chunking text."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"chunk_max_sentences"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"チャンキングするテキストの最大文数(文字数ではない)を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the maximum number of sentences (not characters) for chunking text."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"chunk_overlap_percent"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"チャンクのオーバーラップ割合を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the overlap percentage of the chunk."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"retry_count"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーへの再接続回数を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the number of reconnections to the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"retry_interval"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーに再接続までの秒数を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the number of seconds before reconnecting to the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"timeout"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"サーバーの応答が返ってくるまでの最大待ち時間を指定。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the maximum waiting time until the server responds."</span><span class="p">),</span>
+            <span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ExtractChunklet.choice_chunk_max_token_counter">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.choice_chunk_max_token_counter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">choice_chunk_max_token_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        オプションのchoiceを動的に生成する関数</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            o (Dict[str, Any]): choice_fn関数が呼ばれたコマンドオプションのchoice定義</span>
+<span class="sd">            webmode (bool): Webモードかどうか</span>
+<span class="sd">            opt (Dict[str, Any]): このコマンドのすべてのコマンドオプションのchoice定義</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Any: choice情報</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">tiktoken</span><span class="w"> </span><span class="kn">import</span> <span class="n">model</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">""</span><span class="p">]</span> <span class="o">+</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">MODEL_TO_ENCODING</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span></div>
+
+
+    <span class="nd">@limiter</span><span class="o">.</span><span class="n">apprun_check_limit</span>
+    <span class="nd">@validator</span><span class="o">.</span><span class="n">apprun_check</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能の実行を行います</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+<span class="sd">            tm (float): 実行開始時間</span>
+<span class="sd">            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">client_data</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">client_data</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'"'</span><span class="p">,</span><span class="s1">''</span><span class="p">))</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">client_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="s2">"client"</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">client_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">filer</span><span class="o">.</span><span class="n">Filer</span><span class="p">(</span><span class="n">client_data</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+                    <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">loadpath</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
+                        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+                    <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">loadpath</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">fwpath</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">rjpath</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
+                        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">abspath</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">None</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"client_data is empty."</span><span class="p">)</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="s2">"current"</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">filer</span><span class="o">.</span><span class="n">Filer</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="n">logger</span><span class="p">)</span>
+                <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">loadpath</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+                <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">loadpath</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">fwpath</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">rjpath</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">abspath</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">None</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="s2">"server"</span><span class="p">:</span>
+                <span class="n">cl</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">redis_port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">redis_password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">loadpath</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">loadpath</span><span class="p">,</span>
+                    <span class="n">fwpath</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">fwpath</span><span class="p">,</span>
+                    <span class="n">rjpath</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">rjpath</span><span class="p">,</span>
+                    <span class="n">client_data</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">client_data</span><span class="p">,</span>
+                    <span class="n">chunk_lang</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_lang</span><span class="p">,</span>
+                    <span class="n">chunk_max_tokens</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_max_tokens</span><span class="p">,</span>
+                    <span class="n">chunk_max_sentences</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_max_sentences</span><span class="p">,</span>
+                    <span class="n">chunk_overlap_percent</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_overlap_percent</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">payload_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">(),</span> <span class="p">[</span><span class="n">payload_b64</span><span class="p">],</span>
+                                            <span class="n">retry_count</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">None</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"scope is invalid. </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"scope is invalid. </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Exception occurred. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Exception occurred. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">),</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ExtractChunklet.output_schema">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.output_schema">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">ContentRecord</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Base</span><span class="p">):</span>
+            <span class="n">content</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"コンテンツ"</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"メタデータ"</span><span class="p">)</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Data</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Data</span><span class="p">):</span>
+            <span class="n">file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"ファイルパス"</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ContentRecord</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"処理結果のデータ"</span><span class="p">)</span>
+            <span class="n">chunk_count</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"チャンク数"</span><span class="p">)</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Result</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Result</span><span class="p">):</span>
+            <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Data</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"成功した場合の結果"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Result</span></div>
+
+
+<div class="viewcode-block" id="ExtractChunklet.is_cluster_redirect">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.is_cluster_redirect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="nd">@limiter</span><span class="o">.</span><span class="n">svrun_check_limit</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+              <span class="n">sessions</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のサーバー側の実行を行います</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data_dir (Path): データディレクトリ</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            redis_cli (redis_client.RedisClient): Redisクライアント</span>
+<span class="sd">            msg (List[str]): 受信メッセージ</span>
+<span class="sd">            sessions (Dict[str, Dict[str, Any]]): セッション情報</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            int: 終了コード</span>
+<span class="sd">        """</span>
+        <span class="n">reskey</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">filer</span><span class="o">.</span><span class="n">Filer</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+            <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'loadpath'</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File not found. </span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'loadpath'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+            <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'loadpath'</span><span class="p">),</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'fwpath'</span><span class="p">),</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'rjpath'</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"F</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'loadpath'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">abspath</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Failed to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span>
+
+<div class="viewcode-block" id="ExtractChunklet.extract">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.extract">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abspath</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        指定されたファイルからテキストを抽出します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            abspath (Path): 抽出対象ファイルの絶対パス</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            tm (float): 実行開始時間</span>
+<span class="sd">            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: 抽出結果</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">abspath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">abspath</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File not found. </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">tiktoken</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">chunklet.document_chunker</span><span class="w"> </span><span class="kn">import</span> <span class="n">DocumentChunker</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">chunk_max_token_counter</span><span class="p">:</span>
+                <span class="n">model</span> <span class="o">=</span> <span class="n">tiktoken</span><span class="o">.</span><span class="n">encoding_for_model</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_max_token_counter</span><span class="p">)</span>
+                <span class="n">counter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">chunk_max_tokens</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"chunk_max_token_counter is required when chunk_max_tokens is specified."</span><span class="p">)</span>
+            <span class="n">chunker</span> <span class="o">=</span> <span class="n">DocumentChunker</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"Windows"</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"In a Windows environment, only text file formats are supported."</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">chunks</span> <span class="o">=</span> <span class="n">chunker</span><span class="o">.</span><span class="n">chunk_file</span><span class="p">(</span>
+                    <span class="n">path</span><span class="o">=</span><span class="n">abspath</span><span class="p">,</span>
+                    <span class="n">lang</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_lang</span><span class="p">,</span>
+                    <span class="n">token_counter</span><span class="o">=</span><span class="n">counter</span><span class="p">,</span>
+                    <span class="n">max_tokens</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_max_tokens</span><span class="p">,</span>
+                    <span class="n">max_sentences</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_max_sentences</span><span class="p">,</span>
+                    <span class="n">overlap_percent</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_overlap_percent</span><span class="p">,</span>
+                    <span class="n">offset</span><span class="o">=</span><span class="mi">0</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">chunks</span> <span class="o">=</span> <span class="n">chunker</span><span class="o">.</span><span class="n">chunk_files</span><span class="p">(</span>
+                    <span class="n">paths</span><span class="o">=</span><span class="p">[</span><span class="n">abspath</span><span class="p">],</span>
+                    <span class="n">lang</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_lang</span><span class="p">,</span>
+                    <span class="n">token_counter</span><span class="o">=</span><span class="n">counter</span><span class="p">,</span>
+                    <span class="n">max_tokens</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_max_tokens</span><span class="p">,</span>
+                    <span class="n">max_sentences</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_max_sentences</span><span class="p">,</span>
+                    <span class="n">overlap_percent</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">chunk_overlap_percent</span><span class="p">,</span>
+                    <span class="n">offset</span><span class="o">=</span><span class="mi">0</span>
+                <span class="p">)</span>
+            <span class="n">res_data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunks</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">chunk</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">chunk</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+                <span class="n">res_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">res_data</span><span class="p">,</span> <span class="n">chunk_count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">res_data</span><span class="p">)))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"extract success. abspath=</span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"extract error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"extract error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="ExtractChunklet.apprun_credit">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.apprun_credit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun_credit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="n">chunk_count</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'chunk_count'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chunk_count</span></div>
+
+
+<div class="viewcode-block" id="ExtractChunklet.svrun_credit">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_extract_chunklet.ExtractChunklet.svrun_credit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">svrun_credit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">):</span>
+        <span class="n">chunk_count</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'chunk_count'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chunk_count</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

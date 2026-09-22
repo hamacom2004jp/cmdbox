@@ -47,36 +47,52 @@ groups:                        # A list of groups, each of which is a map that c
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.
   home: /.groups/admin         # The home directory of the group, used for file operations.
+  startpage: /agent            # The group's start page.
+                               # This is the page to which users belonging to the group are redirected when they access the “/” path.
+  readonly: true               # Whether the group is read-only. If True, the settings for this group cannot be changed.
+  hidden: false                # Whether the group is hidden. If True, it will not be returned in the group list.
 - gid: 2
   name: develop
   home: /.groups/develop
   startpage: /gui
   buildin: true                # Whether the group is a built-in group. Built-in groups cannot be deleted.
+  readonly: true
+  hidden: true
 - gid: 3
   name: master
   home: /.groups/master
   startpage: /gui
   buildin: true
+  readonly: true
+  hidden: true
 - gid: 4
   name: guest
   home: /.groups/guest
   startpage: /agent
+  readonly: true
+  hidden: false
 - gid: 101
   name: user
   home: /.groups/user
   startpage: /agent
+  readonly: true
+  hidden: false
 - gid: 102
   name: readonly
   parent: user                 # The parent group of the group. If the parent group is not specified, the group is a top-level group.
   home: /.groups/readonly
+  readonly: true
+  hidden: false
 - gid: 103
   name: editor
   parent: user
   home: /.groups/editor
+  readonly: true
+  hidden: false
 cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
-  - groups: [develop, master]
+  - groups: [develop, master]  # Specify the groups to which the rule applies.
     coercion:                  # Specify a coercion value for each item to be set when a rule is matched.
                                # e.g. wpath: f"/users/{user_name}"
       fwpath: "['/']"
@@ -85,90 +101,111 @@ cmdrule:                       # A list of command rules, Specify a rule that de
       to_fwpath: "['/']"
       from_rjpath: '[]'
       to_rjpath: '[]'
-    rule: allow
+    rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
   - groups: [admin]
     coercion:
-      fwpath: "['/.users','/.groups']"
-      rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
-      from_fwpath: "['/.users','/.groups']"
-      to_fwpath: "['/.users','/.groups']"
-      from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
-      to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
-    rule: allow
-  - groups: [guest, user, readonly, editor]
-    coercion:
-      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-      rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
-      from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-      to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-      from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
-      to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
+      fwpath: "['/.users/','/.groups/']"
+      rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
+      from_fwpath: "['/.users/','/.groups/']"
+      to_fwpath: "['/.users/','/.groups/']"
+      from_rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
+      to_rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
     rule: deny
-  - groups: [master, admin]
+  - groups: [guest, user]
+    coercion:
+      fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
+      rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
+      from_fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
+      to_fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
+      from_rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
+      to_rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
+    rule: deny
+  - groups: [admin]
+    mode: limiter              # Specify the "mode" as the condition for applying the rule.
+    cmds: [counter, evidences, # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+           list, load, targets, plan_list, plan_load]
+    rule: allow
+  - groups: [admin]
+    mode: web
+    cmds: [user_add, user_del, user_edit, user_list, group_add, group_del, group_edit, group_list]
+    rule: allow
+  - groups: [master]
     mode: test
     rule: deny
-  - groups: [admin]
+  - groups: [admin, guest, user]
     mode: tts
-    cmds: [install, uninstall]
-    rule: deny
-  - groups: [admin]
-    mode: datasource
-    cmds: [save, load, del, tbl_create, tbl_drop, idx_create, idx_drop]
-    rule: deny
-  - groups: [guest, user, readonly, editor]
-    mode: llm
-    cmds: [list, chat, translation]
+    cmds: [list, say] 
     rule: allow
-  - groups: [user]             # Specify the groups to which the rule applies.
-    mode: client               # Specify the "mode" as the condition for applying the rule.
-    cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
-    rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
-  - groups: [user]
+  - groups: [admin, guest, user]
+    mode: datasource
+    cmds: [list]
+    rule: allow
+  - groups: [admin, guest, user]
+    mode: llm
+    cmds: [list, chat, embed, translation]
+    rule: allow
+  - groups: [admin, user]
+    mode: client
+    cmds: [file_download, file_is, file_list, server_info, time]
+    rule: allow
+  - groups: [admin, user]
     mode: agent
     cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list, runner_load,
            session_list, session_del, start, stop]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: cmd
     cmds: [list, load, check]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: extract
     cmds: [list, pdfplumber, chunklet]
     coercion:
-      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: rag
     cmds: [list]
     rule: allow
-  - groups: [user]
+  - groups: [admin, guest, user]
+    mode: datasource
+    cmds: [list]
+    rule: allow
+  - groups: [admin, user]
     mode: server
     cmds: [list]
     rule: allow
-  - groups: [user, guest]
+  - groups: [admin, user]
+    mode: skill
+    cmds: [list]
+    rule: allow
+  - groups: [admin, user, guest]
     mode: audit
     cmds: [write]
     rule: allow
-  - groups: [user, guest]
+  - groups: [admin, user, guest]
     mode: web
     cmds: [genpass]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user, guest]
+    mode: url
+    cmds: [add, del, load]
+    rule: allow
+  - groups: [admin, editor]
     mode: client
     cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
     rule: allow
-  - groups: [editor]
+  - groups: [admin, editor]
     mode: agent
     cmds: [agent_del, mcpsv_del, runner_del,
            agent_load, mcpsv_load, runner_load,
            agent_save, mcpsv_save, runner_save,]
     rule: allow
-  - groups: [editor]
+  - groups: [admin, editor]
     mode: extract
     cmds: [del, load, save]
     rule: allow
-  - groups: [editor]
+  - groups: [admin, editor]
     mode: llm
     cmds: [del, load, save]
     rule: allow

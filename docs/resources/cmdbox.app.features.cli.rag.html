@@ -1,0 +1,682 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.rag package &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.rag package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/resources/cmdbox.app.features.cli.rag.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmdbox-app-features-cli-rag-package">
+<h1>cmdbox.app.features.cli.rag package<a class="headerlink" href="#cmdbox-app-features-cli-rag-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-cmdbox.app.features.cli.rag.rag_base">
+<span id="cmdbox-app-features-cli-rag-rag-base-module"></span><h2>cmdbox.app.features.cli.rag.rag_base module<a class="headerlink" href="#module-cmdbox.app.features.cli.rag.rag_base" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.rag.rag_base.</span></span><span class="sig-name descname"><span class="pre">RAGBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.ResultEdgeFeature" title="cmdbox.app.feature.ResultEdgeFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultEdgeFeature</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.check_cmd_permission">
+<span class="sig-name descname"><span class="pre">check_cmd_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signin_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.check_cmd_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.check_cmd_permission" title="Link to this definition"></a></dt>
+<dd><p>Extractコマンドの実行権限チェックを行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signin_data</strong> (<em>Dict</em>) -- サインイン情報</p></li>
+<li><p><strong>user_name</strong> (<em>str</em>) -- ユーザー名</p></li>
+<li><p><strong>extract_opt</strong> (<em>dict</em>) -- Extractコマンドのオプション</p></li>
+<li><p><strong>extract_args</strong> (<em>argparse.Namespace</em>) -- Extractコマンドの引数</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, チェック</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.check_signin">
+<span class="sig-name descname"><span class="pre">check_signin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.check_signin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.check_signin" title="Link to this definition"></a></dt>
+<dd><p>サインイン情報の確認を行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, サインイン情報, None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.embedding">
+<span class="sig-name descname"><span class="pre">embedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rag_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.embedding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.embedding" title="Link to this definition"></a></dt>
+<dd><p>LLM embedを利用したEmbedding処理を行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rag_config</strong> (<em>Dict</em>) -- RAG設定</p></li>
+<li><p><strong>original_data</strong> (<em>List</em><em>[</em><em>Any</em><em>]</em>) -- 埋め込み対象の元データ</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>cl</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><em>client.Client</em></a>) -- クライアント</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, 結果, クライアント</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], <a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client">client.Client</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.exec_extract_cmd">
+<span class="sig-name descname"><span class="pre">exec_extract_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extract_feat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature" title="cmdbox.app.feature.Feature"><span class="pre">Feature</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options" title="cmdbox.app.options.Options"><span class="pre">Options</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.exec_extract_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.exec_extract_cmd" title="Link to this definition"></a></dt>
+<dd><p>Extractコマンドの実行を行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extract_feat</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature" title="cmdbox.app.feature.Feature"><em>feature.Feature</em></a>) -- Extractコマンドの機能</p></li>
+<li><p><strong>extract_args</strong> (<em>argparse.Namespace</em>) -- Extractコマンドの引数</p></li>
+<li><p><strong>options</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options" title="cmdbox.app.options.Options"><em>Options</em></a>) -- オプション</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, 実行結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.list_file">
+<span class="sig-name descname"><span class="pre">list_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_list_opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options" title="cmdbox.app.options.Options"><span class="pre">Options</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.list_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.list_file" title="Link to this definition"></a></dt>
+<dd><p>Extract対象ファイル一覧の取得を行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_list_opt</strong> (<em>Dict</em>) -- ClientFileListコマンドのオプション</p></li>
+<li><p><strong>options</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options" title="cmdbox.app.options.Options"><em>Options</em></a>) -- オプション</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, Extract対象ファイル一覧, None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.load_datasource_config">
+<span class="sig-name descname"><span class="pre">load_datasource_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.load_datasource_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.load_datasource_config" title="Link to this definition"></a></dt>
+<dd><p>データソース接続設定の読込みを行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>cl</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><em>client.Client</em></a>) -- クライアント</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, データソース接続設定, クライアント</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], <a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client">client.Client</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.load_extract_cmd">
+<span class="sig-name descname"><span class="pre">load_extract_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extract_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options" title="cmdbox.app.options.Options"><span class="pre">Options</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.load_extract_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.load_extract_cmd" title="Link to this definition"></a></dt>
+<dd><p>Extractコマンドの読込みを行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extract_conf</strong> (<em>Dict</em>) -- Extract設定</p></li>
+<li><p><strong>options</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options" title="cmdbox.app.options.Options"><em>Options</em></a>) -- オプション</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>cl</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><em>client.Client</em></a>) -- クライアント</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, Extractコマンド情報, クライアント</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], <a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client">client.Client</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.load_extract_config">
+<span class="sig-name descname"><span class="pre">load_extract_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extract_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.load_extract_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.load_extract_config" title="Link to this definition"></a></dt>
+<dd><p>Extract設定の読込みを行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extract_name</strong> (<em>str</em>) -- Extract設定の名前</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>cl</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><em>client.Client</em></a>) -- クライアント</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, Extract設定, クライアント</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], <a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client">client.Client</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_base.RAGBase.load_rag_config">
+<span class="sig-name descname"><span class="pre">load_rag_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><span class="pre">Client</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_base.html#RAGBase.load_rag_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_base.RAGBase.load_rag_config" title="Link to this definition"></a></dt>
+<dd><p>RAG設定の読込みを行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) -- 引数</p></li>
+<li><p><strong>cl</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client"><em>client.Client</em></a>) -- クライアント</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 実行開始時間</p></li>
+<li><p><strong>pf</strong> -- パフォーマンス情報</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>終了コード, RAG設定, クライアント</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, Dict[str, Any], <a class="reference internal" href="cmdbox.app.html#cmdbox.app.client.Client" title="cmdbox.app.client.Client">client.Client</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.rag.rag_postgresql">
+<span id="cmdbox-app-features-cli-rag-rag-postgresql-module"></span><h2>cmdbox.app.features.cli.rag.rag_postgresql module<a class="headerlink" href="#module-cmdbox.app.features.cli.rag.rag_postgresql" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.rag.rag_postgresql.</span></span><span class="sig-name descname"><span class="pre">RagPostgresql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbhost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbport</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbuser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbpass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbtimeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_postgresql.html#RagPostgresql"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cmdbox.app.features.cli.rag.rag_store.RagStore" title="cmdbox.app.features.cli.rag.rag_store.RagStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">RagStore</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.create_tables">
+<span class="sig-name descname"><span class="pre">create_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embed_vector_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_postgresql.html#RagPostgresql.create_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.create_tables" title="Link to this definition"></a></dt>
+<dd><p>テーブルを作成します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>embed_vector_dim</strong> (<em>int</em>) -- 埋め込みベクトルの次元数</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.delete_doc">
+<span class="sig-name descname"><span class="pre">delete_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Connection</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_postgresql.html#RagPostgresql.delete_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.delete_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを削除します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>vec_id</strong> (<em>str</em>) -- ベクトルID</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.insert_doc">
+<span class="sig-name descname"><span class="pre">insert_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Connection</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_blob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_postgresql.html#RagPostgresql.insert_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.insert_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを挿入します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>content_blob</strong> (<em>bytes</em>) -- ドキュメントのバイナリデータ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+<li><p><strong>vec_data</strong> (<em>Any</em>) -- ベクトルデータ</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.install">
+<span class="sig-name descname"><span class="pre">install</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_postgresql.html#RagPostgresql.install"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.install" title="Link to this definition"></a></dt>
+<dd><p>pgvector拡張機能とAGE拡張機能をインストールします</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.select_doc">
+<span class="sig-name descname"><span class="pre">select_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kcount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_postgresql.html#RagPostgresql.select_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_postgresql.RagPostgresql.select_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを選択します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>select</strong> (<em>str</em>) -- 取得する項目をカンマ区切りで指定します。未指定の場合はすべての項目を返します。</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>vec_id</strong> (<em>str</em>) -- ベクトルID</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+<li><p><strong>vec_data</strong> (<em>str</em>) -- ドキュメントのベクトル表現</p></li>
+<li><p><strong>sort_dict</strong> (<em>dict</em>) -- ソート条件を指定します。キーに項目名、値にソート順（ <cite>ASC</cite> (昇順) 又は <cite>DESC</cite> (降順)）を指定します。</p></li>
+<li><p><strong>kcount</strong> (<em>int</em>) -- 検索結果件数</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>record</em> -- ドキュメントレコード</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.rag.rag_sqlite">
+<span id="cmdbox-app-features-cli-rag-rag-sqlite-module"></span><h2>cmdbox.app.features.cli.rag.rag_sqlite module<a class="headerlink" href="#module-cmdbox.app.features.cli.rag.rag_sqlite" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.rag.rag_sqlite.</span></span><span class="sig-name descname"><span class="pre">RagSqlite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbtimeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_sqlite.html#RagSqlite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cmdbox.app.features.cli.rag.rag_store.RagStore" title="cmdbox.app.features.cli.rag.rag_store.RagStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">RagStore</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.create_tables">
+<span class="sig-name descname"><span class="pre">create_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embed_vector_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_sqlite.html#RagSqlite.create_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.create_tables" title="Link to this definition"></a></dt>
+<dd><p>テーブルを作成します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>embed_vector_dim</strong> (<em>int</em>) -- 埋め込みベクトルの次元数（SQLiteでは参照のみ）</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.delete_doc">
+<span class="sig-name descname"><span class="pre">delete_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_sqlite.html#RagSqlite.delete_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.delete_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを削除します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>vec_id</strong> (<em>str</em>) -- ベクトルID</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.insert_doc">
+<span class="sig-name descname"><span class="pre">insert_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_blob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_sqlite.html#RagSqlite.insert_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.insert_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを挿入します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>vec_id</strong> (<em>str</em>) -- ベクトルID</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>content_blob</strong> (<em>bytes</em>) -- ドキュメントのバイナリデータ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+<li><p><strong>vec_data</strong> (<em>Any</em>) -- ベクトルデータ</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.install">
+<span class="sig-name descname"><span class="pre">install</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_sqlite.html#RagSqlite.install"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.install" title="Link to this definition"></a></dt>
+<dd><p>SQLiteは特別なインストールは不要です</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.select_doc">
+<span class="sig-name descname"><span class="pre">select_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kcount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_sqlite.html#RagSqlite.select_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_sqlite.RagSqlite.select_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを選択します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>select</strong> (<em>str</em>) -- 取得する項目をカンマ区切りで指定します。未指定の場合はすべての項目を返します。</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>vec_id</strong> (<em>str</em>) -- ベクトルID</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+<li><p><strong>vec_data</strong> (<em>str</em>) -- ドキュメントのベクトル表現</p></li>
+<li><p><strong>sort_dict</strong> (<em>dict</em>) -- ソート条件を指定します。キーに項目名、値にソート順（ <cite>ASC</cite> (昇順) 又は <cite>DESC</cite> (降順)）を指定します。</p></li>
+<li><p><strong>kcount</strong> (<em>int</em>) -- 検索結果件数</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>record</em> -- ドキュメントレコード</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.rag.rag_store">
+<span id="cmdbox-app-features-cli-rag-rag-store-module"></span><h2>cmdbox.app.features.cli.rag.rag_store module<a class="headerlink" href="#module-cmdbox.app.features.cli.rag.rag_store" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_store.RagStore">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.rag.rag_store.</span></span><span class="sig-name descname"><span class="pre">RagStore</span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_store.html#RagStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_store.RagStore" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_store.RagStore.connect">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_store.html#RagStore.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_store.RagStore.connect" title="Link to this definition"></a></dt>
+<dd><p>データベースに接続します</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_store.RagStore.create">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#cmdbox.app.features.cli.rag.rag_store.RagStore" title="cmdbox.app.features.cli.rag.rag_store.RagStore"><span class="pre">RagStore</span></a></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_store.html#RagStore.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_store.RagStore.create" title="Link to this definition"></a></dt>
+<dd><p>RagStoreのインスタンスを作成します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds_conf</strong> (<em>dict</em>) -- データソース設定</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>RagStoreのインスタンス</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cmdbox.app.features.cli.rag.rag_store.RagStore" title="cmdbox.app.features.cli.rag.rag_store.RagStore">RagStore</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_store.RagStore.create_tables">
+<span class="sig-name descname"><span class="pre">create_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embed_vector_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_store.html#RagStore.create_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_store.RagStore.create_tables" title="Link to this definition"></a></dt>
+<dd><p>テーブルを作成します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>embed_vector_dim</strong> (<em>int</em>) -- 埋め込みベクトルの次元数</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_store.RagStore.delete_doc">
+<span class="sig-name descname"><span class="pre">delete_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_store.html#RagStore.delete_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_store.RagStore.delete_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを削除します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>vec_id</strong> (<em>str</em>) -- ベクトルID</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_store.RagStore.insert_doc">
+<span class="sig-name descname"><span class="pre">insert_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_blob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_store.html#RagStore.insert_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_store.RagStore.insert_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを挿入します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>content_blob</strong> (<em>bytes</em>) -- ドキュメントのバイナリデータ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+<li><p><strong>vec_data</strong> (<em>Any</em>) -- ベクトルデータ</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_store.RagStore.install">
+<span class="sig-name descname"><span class="pre">install</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_store.html#RagStore.install"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_store.RagStore.install" title="Link to this definition"></a></dt>
+<dd><p>必要なモジュールのインストールを行います</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.rag.rag_store.RagStore.select_doc">
+<span class="sig-name descname"><span class="pre">select_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servicename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kcount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/rag/rag_store.html#RagStore.select_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.rag.rag_store.RagStore.select_doc" title="Link to this definition"></a></dt>
+<dd><p>ドキュメントを選択します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> -- データベース接続オブジェクト</p></li>
+<li><p><strong>select</strong> (<em>str</em>) -- 取得する項目をカンマ区切りで指定します。未指定の場合はすべての項目を返します。</p></li>
+<li><p><strong>servicename</strong> (<em>str</em>) -- サービス名</p></li>
+<li><p><strong>vec_id</strong> (<em>str</em>) -- ベクトルID</p></li>
+<li><p><strong>content_text</strong> (<em>str</em>) -- ドキュメントの内容</p></li>
+<li><p><strong>content_type</strong> (<em>str</em>) -- ドキュメントのタイプ</p></li>
+<li><p><strong>origin_name</strong> (<em>str</em>) -- ドキュメントの元の名前</p></li>
+<li><p><strong>origin_type</strong> (<em>str</em>) -- ドキュメントの元のタイプ</p></li>
+<li><p><strong>origin_url</strong> (<em>str</em>) -- ドキュメントの元のURL</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) -- ドキュメントのメタデータ</p></li>
+<li><p><strong>vec_model</strong> (<em>str</em>) -- ベクトルモデルの名前</p></li>
+<li><p><strong>vec_data</strong> (<em>str</em>) -- ドキュメントのベクトル表現</p></li>
+<li><p><strong>sort_dict</strong> (<em>dict</em>) -- ソート条件を指定します。キーに項目名、値にソート順（ <cite>ASC</cite> (昇順) 又は <cite>DESC</cite> (降順)）を指定します。</p></li>
+<li><p><strong>kcount</strong> (<em>int</em>) -- 検索結果件数</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>record</em> -- ドキュメントレコード</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.rag">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cmdbox.app.features.cli.rag" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

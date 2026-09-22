@@ -59,7 +59,7 @@ class Limiter(feature.WebFeature):
                     'html': 'Filer',
                     'href': 'filer',
                     'target': '_blank',
-                    'css_class': 'dropdown-item'
+                    'css_class': 'dropdown-item',
                     'onclick': 'alert("filer")'
                 }
             }

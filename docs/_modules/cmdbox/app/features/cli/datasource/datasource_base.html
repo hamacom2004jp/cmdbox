@@ -1,0 +1,505 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.datasource.datasource_base &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.datasource.datasource_base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.datasource.datasource_base</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span> <span class="k">as</span> <span class="n">_cli_client</span><span class="p">,</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span> <span class="k">as</span> <span class="n">_convert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg_pool</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectionPool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlite_vec</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Sqlite3CursorCM</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""sqlite3.Cursor をコンテキストマネージャーとして使えるようにするラッパー。"""</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span> <span class="o">=</span> <span class="n">cursor</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Sqlite3ConnectionWrapper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""sqlite3.Connection の cursor() が CM をサポートするようにするラッパー。"""</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span> <span class="o">=</span> <span class="n">conn</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cursor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_Sqlite3CursorCM</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DatasourceBase">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DatasourceBase</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">ResultEdgeFeature</span><span class="p">):</span>
+    <span class="n">DBTYPE_PG</span> <span class="o">=</span> <span class="s1">'postgresql'</span>
+    <span class="n">DBTYPE_SQLITE</span> <span class="o">=</span> <span class="s1">'sqlite'</span>
+    <span class="n">DBTYPES</span> <span class="o">=</span> <span class="p">[</span><span class="n">DBTYPE_PG</span><span class="p">,</span> <span class="n">DBTYPE_SQLITE</span><span class="p">]</span>
+
+    <span class="n">_IDENTIFIER_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^[a-zA-Z_][a-zA-Z0-9_]*$'</span><span class="p">)</span>
+    <span class="n">_COL_TYPE_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^[A-Za-z][A-Za-z0-9_ ]*(?:\([0-9, ]+\))?$'</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DatasourceBase.load_datasource">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.load_datasource">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_datasource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">dsname</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        データソース設定をファイルから読み込みます。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            data_dir: データディレクトリのパス</span>
+<span class="sd">            dsname: データソース名</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            データソース設定の辞書</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            FileNotFoundError: 指定されたデータソース設定ファイルが存在しない場合</span>
+<span class="sd">            json.JSONDecodeError: データソース設定ファイルの内容が有効なJSONでない場合</span>
+<span class="sd">        """</span>
+        <span class="n">ds_path</span> <span class="o">=</span> <span class="n">data_dir</span> <span class="o">/</span> <span class="s2">".datasource"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"datasource-</span><span class="si">{</span><span class="n">dsname</span><span class="si">}</span><span class="s2">.json"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ds_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Datasource configuration '</span><span class="si">{</span><span class="n">dsname</span><span class="si">}</span><span class="s2">' not found at '</span><span class="si">{</span><span class="n">ds_path</span><span class="si">}</span><span class="s2">'."</span>
+            <span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="n">ds_path</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.save_datasource">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.save_datasource">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_datasource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dsname</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">dbtype</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">'client'</span><span class="p">,</span> <span class="n">client_data</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">db_host</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">db_port</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">db_user</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">db_password</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">db_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">db_timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        データソース設定をファイルに保存します。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            data_dir: データディレクトリのパス</span>
+<span class="sd">            dsname: データソース名</span>
+<span class="sd">            dbtype: データベース種別（'postgresql' または 'sqlite'）</span>
+<span class="sd">            scope: 参照スコープ（'client' または 'server'）</span>
+<span class="sd">            client_data: ローカルを参照させる場合のデータフォルダのパス（scope='client' の場合に必要）</span>
+<span class="sd">            db_host: データベースホスト（PostgreSQLの場合）</span>
+<span class="sd">            db_port: データベースポート（PostgreSQLの場合）</span>
+<span class="sd">            db_user: データベースユーザー（PostgreSQLの場合）</span>
+<span class="sd">            db_password: データベースパスワード（PostgreSQLの場合）</span>
+<span class="sd">            db_name: データベース名（PostgreSQLの場合）</span>
+<span class="sd">            db_timeout: データベース接続のタイムアウト（秒）（PostgreSQLの場合）</span>
+<span class="sd">            db_path: SQLiteのデータベースファイルパス（SQLiteの場合）</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: dbtype がサポートされていない場合</span>
+<span class="sd">            IOError: データソース設定ファイルの書き込みに失敗した場合</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">dbtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Unsupported dbtype: '</span><span class="si">{</span><span class="n">dbtype</span><span class="si">}</span><span class="s2">'. Supported types: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DBTYPES</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+        <span class="n">ds_path</span> <span class="o">=</span> <span class="n">data_dir</span> <span class="o">/</span> <span class="s2">".datasource"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"datasource-</span><span class="si">{</span><span class="n">dsname</span><span class="si">}</span><span class="s2">.json"</span>
+        <span class="n">ds_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">current_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">"</span><span class="p">,</span><span class="s2">"/"</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"//"</span><span class="p">,</span><span class="s2">"/"</span><span class="p">)</span> <span class="k">if</span> <span class="n">db_path</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">current_path</span> <span class="o">=</span> <span class="n">current_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">current_path</span> <span class="ow">and</span> <span class="n">current_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span> <span class="k">else</span> <span class="n">current_path</span>
+        <span class="n">db_fullpath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">((</span><span class="n">data_dir</span> <span class="o">/</span> <span class="n">current_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span> <span class="k">if</span> <span class="n">current_path</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">dsconfig</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">dsname</span><span class="o">=</span><span class="n">dsname</span><span class="p">,</span>
+            <span class="n">dbtype</span><span class="o">=</span><span class="n">dbtype</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">,</span>
+            <span class="n">client_data</span><span class="o">=</span><span class="n">client_data</span><span class="p">,</span>
+            <span class="n">db_host</span><span class="o">=</span><span class="n">db_host</span><span class="p">,</span>
+            <span class="n">db_port</span><span class="o">=</span><span class="n">db_port</span><span class="p">,</span>
+            <span class="n">db_user</span><span class="o">=</span><span class="n">db_user</span><span class="p">,</span>
+            <span class="n">db_password</span><span class="o">=</span><span class="n">db_password</span><span class="p">,</span>
+            <span class="n">db_name</span><span class="o">=</span><span class="n">db_name</span><span class="p">,</span>
+            <span class="n">db_timeout</span><span class="o">=</span><span class="n">db_timeout</span><span class="p">,</span>
+            <span class="n">db_path</span><span class="o">=</span><span class="n">db_path</span><span class="p">,</span>
+            <span class="n">db_fullpath</span><span class="o">=</span><span class="n">db_fullpath</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="n">ds_path</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dsconfig</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.get_context">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.get_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dsconfig</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        データソース設定に基づいてデータベース接続を取得し、コンテキストマネージャーとして使用できるようにします。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dsconfig: データソース設定の辞書</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            コンテキストマネージャーとして使用できるデータベース接続オブジェクトとデータベース種別のタプル (conn, dbtype)</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: dbtype がサポートされていない場合</span>
+<span class="sd">        """</span>
+        <span class="n">dbtype</span> <span class="o">=</span> <span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dbtype'</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_SQLITE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dbtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_PG</span><span class="p">:</span>
+            <span class="n">pg_host</span><span class="o">=</span><span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'db_host'</span><span class="p">,</span> <span class="s1">'localhost'</span><span class="p">)</span>
+            <span class="n">pg_port</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'db_port'</span><span class="p">,</span> <span class="mi">5432</span><span class="p">))</span>
+            <span class="n">pg_user</span><span class="o">=</span><span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'db_user'</span><span class="p">,</span> <span class="s1">'postgres'</span><span class="p">)</span>
+            <span class="n">pg_password</span><span class="o">=</span><span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'db_password'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+            <span class="n">pg_dbname</span><span class="o">=</span><span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'db_name'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+            <span class="n">pg_connect_timeout</span><span class="o">=</span><span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'db_timeout'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">constr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"host=</span><span class="si">{</span><span class="n">pg_host</span><span class="si">}</span><span class="s2"> port=</span><span class="si">{</span><span class="n">pg_port</span><span class="si">}</span><span class="s2"> user=</span><span class="si">{</span><span class="n">pg_user</span><span class="si">}</span><span class="s2"> password=</span><span class="si">{</span><span class="n">pg_password</span><span class="si">}</span><span class="s2"> dbname=</span><span class="si">{</span><span class="n">pg_dbname</span><span class="si">}</span><span class="s2"> connect_timeout=</span><span class="si">{</span><span class="n">pg_connect_timeout</span><span class="si">}</span><span class="s2">"</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">DatasourceBase</span><span class="p">,</span> <span class="s1">'_pg_pool'</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DatasourceBase</span><span class="o">.</span><span class="n">_pg_pool</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">DatasourceBase</span><span class="o">.</span><span class="n">_pg_pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">constr</span><span class="p">,</span> <span class="n">min_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">DatasourceBase</span><span class="o">.</span><span class="n">_pg_pool</span><span class="o">.</span><span class="n">connection</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_PG</span>
+        <span class="k">elif</span> <span class="n">dbtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_SQLITE</span><span class="p">:</span>
+            <span class="n">db_path</span> <span class="o">=</span> <span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'db_fullpath'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">db_path</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"db_path is required for SQLite dbtype."</span><span class="p">)</span>
+            <span class="n">db_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
+            <span class="n">db_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">enable_load_extension</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">sqlite_vec</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">enable_load_extension</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">conn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_SQLITE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported dbtype: </span><span class="si">{</span><span class="n">dbtype</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.is_dbtype_postgresql">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.is_dbtype_postgresql">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_dbtype_postgresql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dsconfig</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        dsconfig の dbtype が PostgreSQL かどうかを判定します。</span>
+<span class="sd">         - dsconfig に dbtype がない場合は SQLite とみなします。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dsconfig: データソース設定の辞書</span>
+<span class="sd">            dbtype: 判定したいデータベース種別（'postgresql' または 'sqlite'）</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: dsconfig の dbtype が PostgreSQL の場合 True</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: dbtype がサポートされていない場合</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dbtype'</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_SQLITE</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_PG</span></div>
+
+    
+<div class="viewcode-block" id="DatasourceBase.is_dbtype_sqlite">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.is_dbtype_sqlite">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_dbtype_sqlite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dsconfig</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        dsconfig の dbtype が SQLite かどうかを判定します。</span>
+<span class="sd">         - dsconfig に dbtype がない場合は SQLite とみなします。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dsconfig: データソース設定の辞書</span>
+<span class="sd">            dbtype: 判定したいデータベース種別（'postgresql' または 'sqlite'）</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: dsconfig の dbtype が SQLite の場合 True</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dbtype'</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_SQLITE</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_SQLITE</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.validate_identifier">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_identifier">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        SQLの識別子（テーブル名、カラム名、スキーマ名など）として有効かどうかを検査します。</span>
+<span class="sd">        有効な識別子は、英字またはアンダースコアで始まり、その後に英数字またはアンダースコアが続く文字列です。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: 検査する識別子の文字列</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            name: 入力された識別子が有効な場合はそのまま返します。</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: name が有効なSQL識別子でない場合に発生します。</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_IDENTIFIER_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Invalid SQL identifier: '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">'. "</span>
+                <span class="s2">"Only letters, digits, and underscores are allowed, starting with a letter or underscore."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.validate_col_type">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_col_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_col_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        カラムのデータ型として有効かどうかを検査します。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            col_type: 検査するカラムのデータ型の文字列</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            col_type: 入力されたカラムのデータ型が有効な場合はそのまま返します。</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: col_type が有効なカラムのデータ型でない場合に発生します。</span>
+<span class="sd">        """</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">col_type</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_COL_TYPE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid column type: '</span><span class="si">{</span><span class="n">col_type</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.validate_columns">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_columns">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        カラムリストの文字列を検査し、SQLクエリで使用できる形式に変換します。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            columns_str: カラムリストの文字列。カラム名をカンマ区切りで指定します。空文字列や '*' の場合は全カラムを意味します。</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: SQLクエリで使用できるカラムリストの文字列。</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: columns_str に無効なカラム名が含まれている場合</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">columns_str</span> <span class="ow">or</span> <span class="n">columns_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'*'</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">'*'</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_identifier</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">c</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.validate_order_by">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_order_by">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_order_by</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order_by_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ORDER BY句の文字列を検査し、SQLクエリで使用できる形式に変換します。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            order_by_str: ORDER BY句の文字列。カラム名とオプションのASC/DESCをカンマ区切りで指定します。例: "name ASC, age DESC"</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: SQLクエリで使用できるORDER BY句の文字列。空文字列の場合は空文字列を返します。</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: order_by_str に無効な形式が含まれている場合</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">order_by_str</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">order_by_str</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">return</span> <span class="s1">''</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order_by_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">):</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_identifier</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'ASC'</span><span class="p">,</span> <span class="s1">'DESC'</span><span class="p">):</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_identifier</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Invalid ORDER BY item: '</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">'. "</span>
+                    <span class="s2">"Expected '&lt;column&gt;' or '&lt;column&gt; ASC|DESC'."</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">items</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.build_where">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.build_where">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_where</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">where_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">dbtype</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        WHERE句の文字列を構築します。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            where_data: WHERE句に使用する条件の辞書。キーがカラム名、値が条件値です。</span>
+<span class="sd">            dbtype: データベースの種類（'postgresql' または 'sqlite'）</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[str, list]: WHERE句の文字列と対応する値のリスト</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">where_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">''</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="n">placeholder</span> <span class="o">=</span> <span class="s1">'</span><span class="si">%s</span><span class="s1">'</span> <span class="k">if</span> <span class="n">dbtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_PG</span> <span class="k">else</span> <span class="s1">'?'</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_identifier</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">placeholder</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">where_data</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="s1">'WHERE '</span> <span class="o">+</span> <span class="s1">' AND '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">where_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.fetch_as_dicts">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.fetch_as_dicts">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch_as_dicts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        カーソルから取得した結果を辞書のリストとして返します。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            cursor: データベースカーソル</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Dict[str, Any]]: カーソルから取得した結果のリスト。各行は辞書として表されます。</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.qualified_name">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.qualified_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qualified_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dbtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        スキーマ名とオブジェクト名を結合して完全修飾名を作成します。</span>
+<span class="sd">        SQLiteの場合はスキーマをサポートしないため、nameをそのまま返します。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            schema: スキーマ名</span>
+<span class="sd">            name: オブジェクト名</span>
+<span class="sd">            dbtype: データベース種別。DBTYPE_SQLITE の場合はスキーマを無視します。</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: 完全修飾名</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">schema</span> <span class="ow">and</span> <span class="n">dbtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBTYPE_SQLITE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_identifier</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">return</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="DatasourceBase.route_apprun">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.datasource.html#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.route_apprun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">route_apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                     <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        データソース設定の scope に基づいて apprun 処理をルーティングします。</span>
+<span class="sd">        client_data から dsconfig を読み込み、scope=='server' なら Redis 経由で svrun を呼び出し、</span>
+<span class="sd">        それ以外ならローカルで _do_run を実行します。</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdbox_datasource_load</span>
+        <span class="n">ds_load</span> <span class="o">=</span> <span class="n">cmdbox_datasource_load</span><span class="o">.</span><span class="n">DatasourceLoad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">st</span><span class="p">,</span> <span class="n">_ds_conf</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ds_load</span><span class="o">.</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">st</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">_ds_conf</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">dsconfig</span> <span class="o">=</span> <span class="n">_ds_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">dsconfig</span><span class="p">,</span> <span class="o">**</span><span class="n">payload</span><span class="p">}</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">dsconfig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'scope'</span><span class="p">,</span> <span class="s1">'client'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="s1">'server'</span><span class="p">:</span>
+            <span class="n">payload_b64</span> <span class="o">=</span> <span class="n">_convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+            <span class="n">cl</span> <span class="o">=</span> <span class="n">_cli_client</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">redis_port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                                    <span class="n">redis_password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">(),</span> <span class="p">[</span><span class="n">payload_b64</span><span class="p">],</span>
+                                        <span class="n">retry_count</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">,</span>
+                                        <span class="n">timeout</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">nowait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cl</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cl</span>
+        <span class="k">elif</span> <span class="n">scope</span> <span class="o">==</span> <span class="s1">'client'</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'client_data'</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s2">"client_data is required for client scope."</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"client_data is required for client scope."</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_run</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="s1">'client_data'</span><span class="p">]),</span> <span class="n">payload</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Unsupported scope: '</span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported scope: '</span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_do_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Subclasses must implement _do_run method."</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

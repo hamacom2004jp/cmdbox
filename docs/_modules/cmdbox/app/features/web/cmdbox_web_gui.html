@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.web.cmdbox_web_gui &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.web.cmdbox_web_gui</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.web.cmdbox_web_gui</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">Web</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">PlainTextResponse</span><span class="p">,</span> <span class="n">RedirectResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="Gui">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_gui.Gui">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Gui</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_info</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">tabid</span><span class="o">=</span><span class="s1">'versions_cmdbox'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">version</span><span class="o">.</span><span class="n">__title__</span><span class="p">,</span>
+                                  <span class="n">thisapp</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">__appid__</span> <span class="o">==</span> <span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+                                  <span class="n">icon</span><span class="o">=</span><span class="sa">f</span><span class="s1">'assets/cmdbox/icon.png'</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">'versions_cmdbox'</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="Gui.route">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_gui.Gui.route">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        webモードのルーティングを設定します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            app (FastAPI): FastAPIオブジェクト</span>
+<span class="sd">        """</span>
+        <span class="n">ondemand_load</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ondemand_load</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">gui_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">gui_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'gui_html is not found. (</span><span class="si">{</span><span class="n">web</span><span class="o">.</span><span class="n">gui_html</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">gui_html</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">gui_html_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="n">signin</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_signin</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">signin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">signin</span>
+            <span class="k">if</span> <span class="s1">'signin'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">'/signin/'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'group_sps'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'group_sps'</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">'/</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s2">"signin"</span><span class="p">][</span><span class="s2">"group_sps"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">'/gui'</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/gui'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">gui</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="n">signin</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_signin</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">signin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">signin</span>
+            <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">gui_html</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime_ns</span><span class="p">))</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'Access-Control-Allow-Origin'</span><span class="p">:</span> <span class="s1">'*'</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">em</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">304</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ondemand_load</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">gui_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'gui_html is not found. (</span><span class="si">{</span><span class="n">web</span><span class="o">.</span><span class="n">gui_html</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">gui_html</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">gui_html_data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/signin/gui/appid'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">PlainTextResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui/appid'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">PlainTextResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">appid</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="p">))</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'Access-Control-Allow-Origin'</span><span class="p">:</span> <span class="s1">'*'</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">em</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">304</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/signin/gui/title'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">PlainTextResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui/title'</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">PlainTextResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__title__</span><span class="p">))</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'Access-Control-Allow-Origin'</span><span class="p">:</span> <span class="s1">'*'</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">em</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">304</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__title__</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui/version_info'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">version_info</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version_info</span><span class="p">))</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'Access-Control-Allow-Origin'</span><span class="p">:</span> <span class="s1">'*'</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">em</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">304</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_info</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui/user_info'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">user_info</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">'signin'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_401_MESSAGE</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'name'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_401_MESSAGE</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'name'</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">users</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">user_list</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="c1"># oauth2やsamlの場合、user_listに登録されていない可能性があるため、セッションのユーザー情報を返す</span>
+                <span class="k">if</span> <span class="n">users</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">users</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'hash'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'oauth2'</span> <span class="ow">or</span> <span class="n">users</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'hash'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'saml'</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> 
+                    <span class="k">del</span> <span class="n">ret</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="n">ret</span>
+                    <span class="c1">#return dict(warn='User information is not found.')</span>
+                <span class="k">return</span> <span class="n">users</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui/filemenu'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">filemenu</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">filemenu</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui/toolmenu'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">toolmenu</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">'signin'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_401_MESSAGE</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">web</span><span class="o">.</span><span class="n">toolmenu</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">path_jadge</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">_check_path</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="s1">'href'</span><span class="p">],</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">],</span>
+                                                    <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">path_jadge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">ret</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui/viewmenu'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">viewmenu</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">viewmenu</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/gui/aboutmenu'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">aboutmenu</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">aboutmenu</span></div>
+
+
+<div class="viewcode-block" id="Gui.callback_console_modal_log_func">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_gui.Gui.callback_console_modal_log_func">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callback_console_modal_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コンソールモーダルにログを出力する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            output (Dict[str, Any]): 出力</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">output_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"web.callback_console_modal_log_func: output=</span><span class="si">{</span><span class="n">output_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">cb_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s1">'js_console_modal_log_func'</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Gui.callback_return_cmd_exec_func">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_gui.Gui.callback_return_cmd_exec_func">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callback_return_cmd_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コマンド実行結果を返す</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            output (Dict[str, Any]): 出力</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">output_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"web.callback_return_cmd_exec_func: output=</span><span class="si">{</span><span class="n">output_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">cb_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s1">'js_return_cmd_exec_func'</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Gui.callback_return_pipe_exec_func">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_gui.Gui.callback_return_pipe_exec_func">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callback_return_pipe_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        パイプライン実行結果を返す</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            output (Dict[str, Any]): 出力</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">output_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"web.callback_return_pipe_exec_func: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, output=</span><span class="si">{</span><span class="n">output_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">cb_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s1">'js_return_pipe_exec_func'</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Gui.callback_return_stream_log_func">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_gui.Gui.callback_return_stream_log_func">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callback_return_stream_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ストリームログを返す</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            output (Dict[str, Any]): 出力</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">output_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"web.callback_return_stream_log_func: output=</span><span class="si">{</span><span class="n">output_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">cb_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s1">'js_return_stream_log_func'</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Gui.mk_curl_fileup">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_gui.Gui.mk_curl_fileup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mk_curl_fileup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">cmd_opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        curlコマンド文字列を作成する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            cmd_opt (dict): コマンドのオプション</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: curlコマンド文字列</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="s1">'mode'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">or</span> <span class="s1">'cmd'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">""</span>
+        <span class="n">curl_fileup</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">'fileio'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ref</span> <span class="ow">or</span> <span class="n">ref</span><span class="p">[</span><span class="s1">'fileio'</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">'in'</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">ref</span><span class="p">[</span><span class="s1">'opt'</span><span class="p">]</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s1">'opt'</span><span class="p">]]</span> <span class="o">!=</span> <span class="s1">''</span><span class="p">:</span>
+                <span class="n">curl_fileup</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">'-F "</span><span class="si">{</span><span class="n">ref</span><span class="p">[</span><span class="s2">"opt"</span><span class="p">]</span><span class="si">}</span><span class="s1">=@&amp;lt;</span><span class="si">{</span><span class="n">ref</span><span class="p">[</span><span class="s2">"opt"</span><span class="p">]</span><span class="si">}</span><span class="s1">&amp;gt;"'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'stdin'</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'stdin'</span><span class="p">]:</span>
+            <span class="n">curl_fileup</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">'-F "input_file=@&amp;lt;input_file&amp;gt;"'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curl_fileup</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Gui.toolmenu">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_gui.Gui.toolmenu">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toolmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ツールメニューの情報を返します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: ツールメニュー情報</span>
+<span class="sd">        </span>
+<span class="sd">        Sample:</span>
+<span class="sd">            {</span>
+<span class="sd">                'filer': {</span>
+<span class="sd">                    'html': 'Filer',</span>
+<span class="sd">                    'href': 'filer',</span>
+<span class="sd">                    'target': '_blank',</span>
+<span class="sd">                    'css_class': 'dropdown-item',</span>
+<span class="sd">                    'onclick': 'alert("filer")'</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">html</span><span class="o">=</span><span class="s1">'Command'</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s1">'gui'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">'_blank'</span><span class="p">,</span> <span class="n">css_class</span><span class="o">=</span><span class="s1">'dropdown-item'</span><span class="p">))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

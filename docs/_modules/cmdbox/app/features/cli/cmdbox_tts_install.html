@@ -1,0 +1,551 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox_tts_install &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox_tts_install</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.cmdbox_tts_install</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">,</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pip</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tarfile</span>
+
+
+<div class="viewcode-block" id="TtsInstall">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TtsInstall</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">UnsupportEdgeFeature</span><span class="p">,</span> <span class="n">validator</span><span class="o">.</span><span class="n">Validator</span><span class="p">):</span>
+<div class="viewcode-block" id="TtsInstall.get_mode">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall.get_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のモードを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[str, List[str]]: モード</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'tts'</span></div>
+
+
+<div class="viewcode-block" id="TtsInstall.get_cmd">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のコマンドを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: コマンド</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'install'</span></div>
+
+    
+<div class="viewcode-block" id="TtsInstall.get_option">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のオプションを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: オプション</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_MEIGHT</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Text-to-Speech(TTS)エンジンをインストールします。"</span><span class="p">,</span>
+            <span class="n">description_en</span><span class="o">=</span><span class="s2">"Installs the Text-to-Speech (TTS) engine."</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"host"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_host</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーのサービスホストを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service host of the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"port"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_port</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーのサービスポートを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service port of the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"password"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_PASSWD</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="si">}</span><span class="s2">` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Specify the access password of the Redis server (optional). If omitted, `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="si">}</span><span class="s2">` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"svname"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_svname</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"readonly"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"サーバーのサービス名を指定します。省略時は `server` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service name of the inference server. If omitted, `server` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"data"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DIR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_data</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="sa">f</span><span class="s2">"省略した時は `$HOME/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">` を使用します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="sa">f</span><span class="s2">"When omitted, `$HOME/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">` is used."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"retry_count"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"retry_interval"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーに再接続までの秒数を指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specifies the number of seconds before reconnecting to the Redis server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"timeout"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"300"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"サーバーの応答が返ってくるまでの最大待ち時間を指定。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the maximum waiting time until the server responds."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"client_only"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"サーバーへの接続を行わないようにします。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Do not make connections to the server."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"force_install"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"既にインストール済みであっても上書きインストールを行います。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Overwrite the installation even if it is already installed."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"tts_engine"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"voicevox"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s2">""</span><span class="p">,</span> <span class="s2">"voicevox"</span><span class="p">],</span>
+                     <span class="n">choice_show</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">voicevox</span><span class="o">=</span><span class="p">[</span><span class="s2">"voicevox_ver"</span><span class="p">,</span> <span class="s2">"voicevox_whl"</span><span class="p">,</span>
+                                                <span class="s2">"openjtalk_ver"</span><span class="p">,</span> <span class="s2">"openjtalk_dic"</span><span class="p">,</span>
+                                                <span class="s2">"onnxruntime_ver"</span><span class="p">,</span> <span class="s2">"onnxruntime_lib"</span><span class="p">]),</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するTTSエンジンを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the TTS engine to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"voicevox_ver"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'0.16.3'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'0.16.3'</span><span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するVOICEVOXのバージョンを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the version of VOICEVOX to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"voicevox_whl"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_x86_64.whl'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-win32.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-win_amd64.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-macosx_10_12_x86_64.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-macosx_11_0_arm64.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_aarch64.whl'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_x86_64.whl'</span><span class="p">,</span>
+                             <span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するVOICEVOXのホイールファイルを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the VOICEVOX wheel file to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"openjtalk_ver"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'v1.11.1'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'v1.11.1'</span><span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するopenjtalkのバージョンを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the version of openjtalk to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"openjtalk_dic"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'open_jtalk_dic_utf_8-1.11.tar.gz'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'open_jtalk_dic_utf_8-1.11.tar.gz'</span><span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するopenjtalkの辞書ファイルを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the openjtalk dictionary file to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"onnxruntime_ver"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'voicevox_onnxruntime-1.17.3'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'voicevox_onnxruntime-1.17.3'</span><span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するONNX Runtimeのバージョンを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the version of ONNX Runtime to use."</span><span class="p">),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"onnxruntime_lib"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'voicevox_onnxruntime-linux-x64-1.17.3.tgz'</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s1">''</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-linux-arm64-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-linux-armhf-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-linux-x64-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-linux-x64-cuda-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-osx-arm64-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-osx-x86_64-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-win-x64-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-win-x64-cuda-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-win-x64-dml-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="s1">'voicevox_onnxruntime-win-x86-1.17.3.tgz'</span><span class="p">,</span>
+                             <span class="p">],</span>
+                     <span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">description_ja</span><span class="o">=</span><span class="s2">"使用するONNX Runtimeのライブラリファイルを指定します。"</span><span class="p">,</span>
+                     <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the ONNX Runtime library file to use."</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TtsInstall.apprun">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall.apprun">[docs]</a>
+    <span class="nd">@validator</span><span class="o">.</span><span class="n">apprun_check</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能の実行を行います</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+<span class="sd">            tm (float): 実行開始時間</span>
+<span class="sd">            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify the --data option."</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">tts_engine</span> <span class="o">==</span> <span class="s1">'voicevox'</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">voicevox_ver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify the --voicevox_ver option."</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">voicevox_whl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify the --voicevox_whl option."</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">openjtalk_ver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify the --openjtalk_ver option."</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">openjtalk_dic</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify the --openjtalk_dic option."</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">onnxruntime_ver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify the --onnxruntime_ver option."</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">onnxruntime_lib</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify the --onnxruntime_lib option."</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">tts_engine</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">tts_engine</span>
+        <span class="n">voicevox_ver</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">voicevox_ver</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">voicevox_ver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">'-'</span>
+        <span class="n">voicevox_whl</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">voicevox_whl</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">voicevox_whl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">'-'</span>
+        <span class="n">openjtalk_ver</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">openjtalk_ver</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">openjtalk_ver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">'-'</span>
+        <span class="n">openjtalk_dic</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">openjtalk_dic</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">openjtalk_dic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">'-'</span>
+        <span class="n">onnxruntime_ver</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">onnxruntime_ver</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">onnxruntime_ver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">'-'</span>
+        <span class="n">onnxruntime_lib</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">onnxruntime_lib</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">onnxruntime_lib</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">'-'</span>
+        <span class="n">force_install</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">force_install</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">force_install</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
+            <span class="c1"># クライアントのみの場合は、サーバーに接続せずに実行</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">(),</span> <span class="n">data</span><span class="p">,</span> <span class="n">tts_engine</span><span class="p">,</span> <span class="n">voicevox_ver</span><span class="p">,</span> <span class="n">voicevox_whl</span><span class="p">,</span>
+                               <span class="n">openjtalk_ver</span><span class="p">,</span> <span class="n">openjtalk_dic</span><span class="p">,</span>
+                               <span class="n">onnxruntime_ver</span><span class="p">,</span> <span class="n">onnxruntime_lib</span><span class="p">,</span> <span class="n">force_install</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tts_engine_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">tts_engine</span><span class="p">)</span>
+            <span class="n">voicevox_ver_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">voicevox_ver</span><span class="p">)</span>
+            <span class="n">voicevox_whl_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">voicevox_whl</span><span class="p">)</span>
+            <span class="n">openjtalk_ver_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">openjtalk_ver</span><span class="p">)</span>
+            <span class="n">openjtalk_dic_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">openjtalk_dic</span><span class="p">)</span>
+            <span class="n">onnxruntime_ver_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">onnxruntime_ver</span><span class="p">)</span>
+            <span class="n">onnxruntime_lib_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">onnxruntime_lib</span><span class="p">)</span>
+            <span class="n">force_install_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">force_install</span><span class="p">))</span>
+            <span class="n">cl</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">redis_port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">redis_password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">(),</span>
+                                        <span class="p">[</span><span class="n">tts_engine_b64</span><span class="p">,</span> <span class="n">voicevox_ver_b64</span><span class="p">,</span> <span class="n">voicevox_whl_b64</span><span class="p">,</span> <span class="n">openjtalk_ver_b64</span><span class="p">,</span> <span class="n">openjtalk_dic_b64</span><span class="p">,</span> <span class="n">onnxruntime_ver_b64</span><span class="p">,</span> <span class="n">onnxruntime_lib_b64</span><span class="p">,</span> <span class="n">force_install_b64</span><span class="p">],</span>
+                                        <span class="n">retry_count</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">nowait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="TtsInstall.output_schema">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall.output_schema">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Data</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Data</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"処理結果のデータ"</span><span class="p">)</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Result</span><span class="p">(</span><span class="n">resdata</span><span class="o">.</span><span class="n">Result</span><span class="p">):</span>
+            <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Data</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"成功した場合の結果"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Result</span></div>
+
+
+<div class="viewcode-block" id="TtsInstall.is_cluster_redirect">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall.is_cluster_redirect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: メッセージを転送する場合はTrue</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="TtsInstall.svrun">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall.svrun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+              <span class="n">sessions</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のサーバー側の実行を行います</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data_dir (Path): データディレクトリ</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            redis_cli (redis_client.RedisClient): Redisクライアント</span>
+<span class="sd">            msg (List[str]): 受信メッセージ</span>
+<span class="sd">            sessions (Dict[str, Dict[str, Any]]): セッション情報</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            int: 終了コード</span>
+<span class="sd">        """</span>
+        <span class="n">tts_engine</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">voicevox_ver</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">voicevox_whl</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">openjtalk_ver</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">openjtalk_dic</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+        <span class="n">onnxruntime_ver</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+        <span class="n">onnxruntime_lib</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span>
+        <span class="n">force_install</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'true'</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">tts_engine</span><span class="p">,</span> <span class="n">voicevox_ver</span><span class="p">,</span> <span class="n">voicevox_whl</span><span class="p">,</span>
+                           <span class="n">openjtalk_ver</span><span class="p">,</span> <span class="n">openjtalk_dic</span><span class="p">,</span> <span class="n">onnxruntime_ver</span><span class="p">,</span> <span class="n">onnxruntime_lib</span><span class="p">,</span>
+                           <span class="n">force_install</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+
+        <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ret</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span></div>
+
+
+<div class="viewcode-block" id="TtsInstall.install">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.cli.html#cmdbox.app.features.cli.cmdbox_tts_install.TtsInstall.install">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">tts_engine</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">voicevox_ver</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">voicevox_whl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                <span class="n">openjtalk_ver</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">openjtalk_dic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                <span class="n">onnxruntime_ver</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">onnxruntime_lib</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                <span class="n">force_install</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        TTSエンジンをインストールします</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            data_dir (Path): データディレクトリ</span>
+<span class="sd">            tts_engine (str): TTSエンジン</span>
+<span class="sd">            voicevox_ver (str): VoiceVoxバージョン</span>
+<span class="sd">            voicevox_whl (str): VoiceVox ホイールファイル</span>
+<span class="sd">            openjtalk_ver (str): Open JTalk バージョン</span>
+<span class="sd">            openjtalk_dic (str): Open JTalk 辞書</span>
+<span class="sd">            onnxruntime_ver (str): ONNX Runtime バージョン</span>
+<span class="sd">            onnxruntime_lib (str): ONNX Runtime ライブラリ</span>
+<span class="sd">            force_install (bool): 強制インストールフラグ</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: 結果</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tts_engine</span> <span class="o">==</span> <span class="s1">'voicevox'</span><span class="p">:</span>
+                <span class="n">voicevox_dir</span> <span class="o">=</span> <span class="n">data_dir</span> <span class="o">/</span> <span class="s1">'.voicevox'</span> <span class="o">/</span> <span class="s1">'voicevox_core'</span>
+                <span class="k">if</span> <span class="n">voicevox_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">force_install</span><span class="p">:</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">voicevox_dir</span><span class="p">)</span>
+                <span class="n">voicevox_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="c1">#===============================================================</span>
+                <span class="c1"># Open JTalk辞書のダウンロード (SourceForgeが不安定なためGitHubから)</span>
+                <span class="n">dic_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://github.com/r9y9/open_jtalk/releases/download/</span><span class="si">{</span><span class="n">openjtalk_ver</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">openjtalk_dic</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">dic_file</span> <span class="o">=</span> <span class="n">voicevox_dir</span> <span class="o">/</span> <span class="s1">'dict'</span> <span class="o">/</span> <span class="n">openjtalk_dic</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">dic_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">dic_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Downloading dictionary.. : </span><span class="si">{</span><span class="n">dic_url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="n">responce</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dic_url</span><span class="p">,</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">responce</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                        <span class="n">_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Failed to download Open JTalk dictionary: </span><span class="si">{</span><span class="n">responce</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">responce</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">dic_url</span><span class="si">}</span><span class="s2">"</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">_msg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">_msg</span><span class="p">)</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">_wd_dic</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">responce</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="n">dic_file</span><span class="p">,</span> <span class="n">_wd_dic</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'wb'</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="c1"># 辞書の展開</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Extracting dictionary.. : </span><span class="si">{</span><span class="n">dic_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">dic_file</span><span class="p">,</span> <span class="s1">'r:gz'</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
+                        <span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">dic_file</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                    <span class="n">src_dir</span> <span class="o">=</span> <span class="n">dic_file</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">openjtalk_dic</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.tar.gz'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">src_file</span> <span class="ow">in</span> <span class="n">src_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">'*'</span><span class="p">):</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">src_file</span><span class="p">,</span> <span class="n">dic_file</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">src_dir</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Extracted dictionary. : </span><span class="si">{</span><span class="n">dic_file</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Since it already existed, I skipped downloading Open JTalk dictionary. : </span><span class="si">{</span><span class="n">dic_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+                <span class="c1">#===============================================================</span>
+                <span class="c1"># モデルファイルをダウンロード</span>
+                <span class="n">model_url</span> <span class="o">=</span> <span class="s2">"https://raw.githubusercontent.com/VOICEVOX/voicevox_vvm/main/vvms/"</span>
+                <span class="n">model_dir</span> <span class="o">=</span> <span class="n">voicevox_dir</span> <span class="o">/</span> <span class="s1">'models'</span> <span class="o">/</span> <span class="s1">'vvms'</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">model_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">model_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">22</span><span class="p">):</span>
+                        <span class="c1"># モデルダウンロード</span>
+                        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Downloading model. : </span><span class="si">{</span><span class="n">model_url</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s2">.vvm"</span><span class="p">)</span>
+                        <span class="n">responce</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">model_url</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s2">.vvm"</span><span class="p">,</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">responce</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                            <span class="n">_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Failed to download vvm: </span><span class="si">{</span><span class="n">responce</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">responce</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">model_url</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s2">.vvm"</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">_msg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">_msg</span><span class="p">)</span>
+                        <span class="k">def</span><span class="w"> </span><span class="nf">_wd_model</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">responce</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                        <span class="n">save_file</span> <span class="o">=</span> <span class="n">model_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">.vvm'</span>
+                        <span class="n">common</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="n">_wd_model</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'wb'</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Saved model. : </span><span class="si">{</span><span class="n">save_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Downloading models Completed."</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Since it already existed, I skipped downloading VOICEVOX models. : </span><span class="si">{</span><span class="n">model_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+                <span class="c1">#===============================================================</span>
+                <span class="c1"># ONNX Runtimeをダウンロード</span>
+                <span class="n">onnx_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://github.com/VOICEVOX/onnxruntime-builder/releases/download/</span><span class="si">{</span><span class="n">onnxruntime_ver</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">onnxruntime_lib</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">onnx_dir</span> <span class="o">=</span> <span class="n">voicevox_dir</span> <span class="o">/</span> <span class="s1">'onnxruntime'</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">onnx_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">onnx_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="c1"># onnxruntimeダウンロード</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Downloading onnxruntime. : </span><span class="si">{</span><span class="n">onnx_url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="n">responce</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">onnx_url</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">responce</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                        <span class="n">_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Failed to download onnxruntime: </span><span class="si">{</span><span class="n">responce</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">responce</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">onnx_url</span><span class="si">}</span><span class="s2">"</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">_msg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">_msg</span><span class="p">)</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">_wd_model</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">responce</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                    <span class="n">save_file</span> <span class="o">=</span> <span class="n">onnx_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">onnxruntime_lib</span><span class="si">}</span><span class="s1">'</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="n">_wd_model</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'wb'</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Downloading onnxruntime Completed."</span><span class="p">)</span>
+                    <span class="c1"># libの展開</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Extracting dictionary.. : </span><span class="si">{</span><span class="n">save_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="s1">'r:gz'</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
+                        <span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">save_file</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                    <span class="n">src_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">save_file</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.tgz'</span><span class="p">,</span> <span class="s1">''</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">src_file</span> <span class="ow">in</span> <span class="n">src_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">'*'</span><span class="p">):</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">src_file</span><span class="p">,</span> <span class="n">onnx_dir</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">src_dir</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Extracted dictionary. : </span><span class="si">{</span><span class="n">onnx_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Since it already existed, I skipped downloading ONNX Runtime. : </span><span class="si">{</span><span class="n">onnx_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+                <span class="c1">#===============================================================</span>
+                <span class="c1"># voicevoxのpythonライブラリのインストール</span>
+                <span class="n">whl_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'https://github.com/VOICEVOX/voicevox_core/releases/download/</span><span class="si">{</span><span class="n">voicevox_ver</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">voicevox_whl</span><span class="si">}</span><span class="s1">'</span>
+                <span class="n">voicevox_whl</span> <span class="o">=</span> <span class="n">voicevox_dir</span> <span class="o">/</span> <span class="n">voicevox_whl</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">voicevox_whl</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="c1"># whlファイルをダウンロード</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Downloading.. : </span><span class="si">{</span><span class="n">whl_url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="n">responce</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">whl_url</span><span class="p">,</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">responce</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                        <span class="n">_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Failed to download VoiceVox whl: </span><span class="si">{</span><span class="n">responce</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">responce</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">whl_url</span><span class="si">}</span><span class="s2">"</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">_msg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">_msg</span><span class="p">)</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">_ww</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">responce</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="n">voicevox_whl</span><span class="p">,</span> <span class="n">_ww</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'wb'</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Since it already existed, I skipped downloading VOICEVOX whl. : </span><span class="si">{</span><span class="n">voicevox_whl</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="c1"># whlファイルをpipでインストール</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"pip install </span><span class="si">{</span><span class="n">voicevox_whl</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">rescode</span> <span class="o">=</span> <span class="n">pip</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="s1">'install'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">voicevox_whl</span><span class="p">)])</span>  <span class="c1"># pipのインストール</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Install wheel: </span><span class="si">{</span><span class="n">voicevox_whl</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">rescode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Failed to install VoiceVox python library: Possible whl not in the environment. </span><span class="si">{</span><span class="n">voicevox_whl</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">whl_url</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">_msg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">_msg</span><span class="p">)</span>
+                <span class="c1">#===============================================================</span>
+                <span class="c1"># 成功時の処理</span>
+                <span class="n">rescode</span><span class="p">,</span> <span class="n">_msg</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'Success to install VoiceVox. </span><span class="si">{</span><span class="n">whl_url</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">_msg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Failed to install VoiceVox: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_msg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">_msg</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

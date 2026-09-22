@@ -236,7 +236,7 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                     'html': 'Filer',
                     'href': 'filer',
                     'target': '_blank',
-                    'css_class': 'dropdown-item'
+                    'css_class': 'dropdown-item',
                     'onclick': 'alert("filer")'
                 }
             }

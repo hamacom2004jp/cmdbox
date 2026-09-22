@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.datasource package &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.datasource package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/resources/cmdbox.app.features.cli.datasource.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmdbox-app-features-cli-datasource-package">
+<h1>cmdbox.app.features.cli.datasource package<a class="headerlink" href="#cmdbox-app-features-cli-datasource-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-cmdbox.app.features.cli.datasource.datasource_base">
+<span id="cmdbox-app-features-cli-datasource-datasource-base-module"></span><h2>cmdbox.app.features.cli.datasource.datasource_base module<a class="headerlink" href="#module-cmdbox.app.features.cli.datasource.datasource_base" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.datasource.datasource_base.</span></span><span class="sig-name descname"><span class="pre">DatasourceBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.ResultEdgeFeature" title="cmdbox.app.feature.ResultEdgeFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultEdgeFeature</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.DBTYPES">
+<span class="sig-name descname"><span class="pre">DBTYPES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['postgresql',</span> <span class="pre">'sqlite']</span></span><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.DBTYPES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.DBTYPE_PG">
+<span class="sig-name descname"><span class="pre">DBTYPE_PG</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'postgresql'</span></span><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.DBTYPE_PG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.DBTYPE_SQLITE">
+<span class="sig-name descname"><span class="pre">DBTYPE_SQLITE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sqlite'</span></span><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.DBTYPE_SQLITE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.build_where">
+<span class="sig-name descname"><span class="pre">build_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.build_where"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.build_where" title="Link to this definition"></a></dt>
+<dd><p>WHERE句の文字列を構築します。
+:param where_data: WHERE句に使用する条件の辞書。キーがカラム名、値が条件値です。
+:param dbtype: データベースの種類（'postgresql' または 'sqlite'）</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>WHERE句の文字列と対応する値のリスト</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[str, list]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.fetch_as_dicts">
+<span class="sig-name descname"><span class="pre">fetch_as_dicts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.fetch_as_dicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.fetch_as_dicts" title="Link to this definition"></a></dt>
+<dd><p>カーソルから取得した結果を辞書のリストとして返します。
+:param cursor: データベースカーソル</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>カーソルから取得した結果のリスト。各行は辞書として表されます。</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[Dict[str, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.get_context">
+<span class="sig-name descname"><span class="pre">get_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dsconfig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.get_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.get_context" title="Link to this definition"></a></dt>
+<dd><p>データソース設定に基づいてデータベース接続を取得し、コンテキストマネージャーとして使用できるようにします。
+:param dsconfig: データソース設定の辞書</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>コンテキストマネージャーとして使用できるデータベース接続オブジェクトとデータベース種別のタプル (conn, dbtype)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- dbtype がサポートされていない場合</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.is_dbtype_postgresql">
+<span class="sig-name descname"><span class="pre">is_dbtype_postgresql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dsconfig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.is_dbtype_postgresql"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.is_dbtype_postgresql" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>dsconfig の dbtype が PostgreSQL かどうかを判定します。</dt><dd><ul class="simple">
+<li><p>dsconfig に dbtype がない場合は SQLite とみなします。</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dsconfig</strong> -- データソース設定の辞書</p></li>
+<li><p><strong>dbtype</strong> -- 判定したいデータベース種別（'postgresql' または 'sqlite'）</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dsconfig の dbtype が PostgreSQL の場合 True</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- dbtype がサポートされていない場合</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.is_dbtype_sqlite">
+<span class="sig-name descname"><span class="pre">is_dbtype_sqlite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dsconfig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.is_dbtype_sqlite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.is_dbtype_sqlite" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>dsconfig の dbtype が SQLite かどうかを判定します。</dt><dd><ul class="simple">
+<li><p>dsconfig に dbtype がない場合は SQLite とみなします。</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dsconfig</strong> -- データソース設定の辞書</p></li>
+<li><p><strong>dbtype</strong> -- 判定したいデータベース種別（'postgresql' または 'sqlite'）</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dsconfig の dbtype が SQLite の場合 True</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.load_datasource">
+<span class="sig-name descname"><span class="pre">load_datasource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dsname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.load_datasource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.load_datasource" title="Link to this definition"></a></dt>
+<dd><p>データソース設定をファイルから読み込みます。
+:param data_dir: データディレクトリのパス
+:param dsname: データソース名</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>データソース設定の辞書</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> -- 指定されたデータソース設定ファイルが存在しない場合</p></li>
+<li><p><strong>json.JSONDecodeError</strong> -- データソース設定ファイルの内容が有効なJSONでない場合</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.qualified_name">
+<span class="sig-name descname"><span class="pre">qualified_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.qualified_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.qualified_name" title="Link to this definition"></a></dt>
+<dd><p>スキーマ名とオブジェクト名を結合して完全修飾名を作成します。
+SQLiteの場合はスキーマをサポートしないため、nameをそのまま返します。
+:param schema: スキーマ名
+:param name: オブジェクト名
+:param dbtype: データベース種別。DBTYPE_SQLITE の場合はスキーマを無視します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>完全修飾名</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.route_apprun">
+<span class="sig-name descname"><span class="pre">route_apprun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.route_apprun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.route_apprun" title="Link to this definition"></a></dt>
+<dd><p>データソース設定の scope に基づいて apprun 処理をルーティングします。
+client_data から dsconfig を読み込み、scope=='server' なら Redis 経由で svrun を呼び出し、
+それ以外ならローカルで _do_run を実行します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.save_datasource">
+<span class="sig-name descname"><span class="pre">save_datasource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">dsname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'client'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.save_datasource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.save_datasource" title="Link to this definition"></a></dt>
+<dd><p>データソース設定をファイルに保存します。
+:param data_dir: データディレクトリのパス
+:param dsname: データソース名
+:param dbtype: データベース種別（'postgresql' または 'sqlite'）
+:param scope: 参照スコープ（'client' または 'server'）
+:param client_data: ローカルを参照させる場合のデータフォルダのパス（scope='client' の場合に必要）
+:param db_host: データベースホスト（PostgreSQLの場合）
+:param db_port: データベースポート（PostgreSQLの場合）
+:param db_user: データベースユーザー（PostgreSQLの場合）
+:param db_password: データベースパスワード（PostgreSQLの場合）
+:param db_name: データベース名（PostgreSQLの場合）
+:param db_timeout: データベース接続のタイムアウト（秒）（PostgreSQLの場合）
+:param db_path: SQLiteのデータベースファイルパス（SQLiteの場合）</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> -- dbtype がサポートされていない場合</p></li>
+<li><p><strong>IOError</strong> -- データソース設定ファイルの書き込みに失敗した場合</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_col_type">
+<span class="sig-name descname"><span class="pre">validate_col_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.validate_col_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_col_type" title="Link to this definition"></a></dt>
+<dd><p>カラムのデータ型として有効かどうかを検査します。
+:param col_type: 検査するカラムのデータ型の文字列</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>入力されたカラムのデータ型が有効な場合はそのまま返します。</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>col_type</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> -- col_type が有効なカラムのデータ型でない場合に発生します。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_columns">
+<span class="sig-name descname"><span class="pre">validate_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.validate_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_columns" title="Link to this definition"></a></dt>
+<dd><p>カラムリストの文字列を検査し、SQLクエリで使用できる形式に変換します。
+:param columns_str: カラムリストの文字列。カラム名をカンマ区切りで指定します。空文字列や '*' の場合は全カラムを意味します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SQLクエリで使用できるカラムリストの文字列。</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> -- columns_str に無効なカラム名が含まれている場合</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_identifier">
+<span class="sig-name descname"><span class="pre">validate_identifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.validate_identifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_identifier" title="Link to this definition"></a></dt>
+<dd><p>SQLの識別子（テーブル名、カラム名、スキーマ名など）として有効かどうかを検査します。
+有効な識別子は、英字またはアンダースコアで始まり、その後に英数字またはアンダースコアが続く文字列です。
+:param name: 検査する識別子の文字列</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>入力された識別子が有効な場合はそのまま返します。</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.resdata.NamePath.name" title="cmdbox.app.commons.resdata.NamePath.name">name</a></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> -- name が有効なSQL識別子でない場合に発生します。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_order_by">
+<span class="sig-name descname"><span class="pre">validate_order_by</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order_by_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/datasource/datasource_base.html#DatasourceBase.validate_order_by"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.datasource.datasource_base.DatasourceBase.validate_order_by" title="Link to this definition"></a></dt>
+<dd><p>ORDER BY句の文字列を検査し、SQLクエリで使用できる形式に変換します。
+:param order_by_str: ORDER BY句の文字列。カラム名とオプションのASC/DESCをカンマ区切りで指定します。例: &quot;name ASC, age DESC&quot;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SQLクエリで使用できるORDER BY句の文字列。空文字列の場合は空文字列を返します。</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> -- order_by_str に無効な形式が含まれている場合</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cmdbox.app.features.cli.datasource">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cmdbox.app.features.cli.datasource" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

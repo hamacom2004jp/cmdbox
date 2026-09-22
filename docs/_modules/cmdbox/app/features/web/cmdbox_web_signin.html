@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.web.cmdbox_web_signin &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.web.cmdbox_web_signin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.web.cmdbox_web_signin</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">signin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">Web</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">RedirectResponse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+
+<div class="viewcode-block" id="Signin">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_signin.Signin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Signin</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="p">):</span>
+<div class="viewcode-block" id="Signin.route">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_signin.Signin.route">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        webモードのルーティングを設定します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            app (FastAPI): FastAPIオブジェクト</span>
+<span class="sd">        """</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">load_signin_file</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">,</span>
+                                                                  <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">ondemand_load</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ondemand_load</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">signin_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">signin_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'signin_html is not found. (</span><span class="si">{</span><span class="n">web</span><span class="o">.</span><span class="n">signin_html</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">signin_html</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">signin_html_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">api_route</span><span class="p">(</span><span class="s1">'/signin/'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span> <span class="s1">'POST'</span><span class="p">],</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">api_route</span><span class="p">(</span><span class="s1">'/{full_path:path}/signin/'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span> <span class="s1">'POST'</span><span class="p">],</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_signin</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">full_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">_signin</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">api_route</span><span class="p">(</span><span class="s1">'/signin/{next:path}'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span> <span class="s1">'POST'</span><span class="p">],</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">api_route</span><span class="p">(</span><span class="s1">'/{full_path:path}/signin/{next:path}'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span> <span class="s1">'POST'</span><span class="p">],</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_signin</span><span class="p">(</span><span class="nb">next</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">full_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">signin</span><span class="o">.</span><span class="n">Signin</span><span class="o">.</span><span class="n">_enable_cors</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+            <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">signin_html</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime_ns</span><span class="p">))</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'Access-Control-Allow-Origin'</span><span class="p">:</span> <span class="s1">'*'</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">em</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">304</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ondemand_load</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">signin_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'signin_html is not found. (</span><span class="si">{</span><span class="n">web</span><span class="o">.</span><span class="n">signin_html</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">signin_html</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">signin_html_data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+        <span class="c1"># https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/oauth2/google/'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">oauth2_google</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">oauth2_google</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/oauth2/google/{next:path}'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">oauth2_google</span><span class="p">(</span><span class="nb">next</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">'../../</span><span class="si">{</span><span class="nb">next</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span> <span class="c1"># nginxのリバプロ対応のための相対パス</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">[</span><span class="s1">'oauth2'</span><span class="p">][</span><span class="s1">'providers'</span><span class="p">][</span><span class="s1">'google'</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'scope'</span><span class="p">:</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">'scope'</span><span class="p">]),</span>
+                    <span class="s1">'access_type'</span><span class="p">:</span> <span class="s1">'offline'</span><span class="p">,</span>
+                    <span class="s1">'response_type'</span><span class="p">:</span> <span class="s1">'code'</span><span class="p">,</span>
+                    <span class="s1">'redirect_uri'</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">'redirect_uri'</span><span class="p">],</span>
+                    <span class="s1">'client_id'</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">'client_id'</span><span class="p">],</span>
+                    <span class="s1">'state'</span><span class="p">:</span> <span class="nb">next</span><span class="p">}</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s1">'&amp;'</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+            <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">'https://accounts.google.com/o/oauth2/auth?</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+        <span class="c1"># https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/oauth2/github/'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">oauth2_github</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">oauth2_github</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/oauth2/github/{next:path}'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">oauth2_github</span><span class="p">(</span><span class="nb">next</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">'../../</span><span class="si">{</span><span class="nb">next</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span> <span class="c1"># nginxのリバプロ対応のための相対パス</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">[</span><span class="s1">'oauth2'</span><span class="p">][</span><span class="s1">'providers'</span><span class="p">][</span><span class="s1">'github'</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'scope'</span><span class="p">:</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">'scope'</span><span class="p">]),</span>
+                    <span class="s1">'access_type'</span><span class="p">:</span> <span class="s1">'offline'</span><span class="p">,</span>
+                    <span class="s1">'response_type'</span><span class="p">:</span> <span class="s1">'code'</span><span class="p">,</span>
+                    <span class="s1">'redirect_uri'</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">'redirect_uri'</span><span class="p">],</span>
+                    <span class="s1">'client_id'</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">'client_id'</span><span class="p">],</span>
+                    <span class="s1">'state'</span><span class="p">:</span> <span class="nb">next</span><span class="p">}</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s1">'&amp;'</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+            <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">'https://github.com/login/oauth/authorize?</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+        <span class="c1"># https://learn.microsoft.com/ja-jp/entra/identity-platform/v2-oauth2-auth-code-flow</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/oauth2/azure/'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">oauth2_azure</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">oauth2_azure</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/oauth2/azure/{next:path}'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">oauth2_azure</span><span class="p">(</span><span class="nb">next</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">'../../</span><span class="si">{</span><span class="nb">next</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span> <span class="c1"># nginxのリバプロ対応のための相対パス</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">[</span><span class="s1">'oauth2'</span><span class="p">][</span><span class="s1">'providers'</span><span class="p">][</span><span class="s1">'azure'</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'scope'</span><span class="p">:</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">'scope'</span><span class="p">]),</span>
+                    <span class="s1">'access_type'</span><span class="p">:</span> <span class="s1">'offline'</span><span class="p">,</span>
+                    <span class="s1">'response_type'</span><span class="p">:</span> <span class="s1">'code'</span><span class="p">,</span>
+                    <span class="s1">'redirect_uri'</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">'redirect_uri'</span><span class="p">],</span>
+                    <span class="s1">'client_id'</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">'client_id'</span><span class="p">],</span>
+                    <span class="s1">'response_mode'</span><span class="p">:</span> <span class="s1">'query'</span><span class="p">,</span>
+                    <span class="s1">'state'</span><span class="p">:</span> <span class="nb">next</span><span class="p">}</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s1">'&amp;'</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+            <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">'https://login.microsoftonline.com/</span><span class="si">{</span><span class="n">conf</span><span class="p">[</span><span class="s2">"tenant_id"</span><span class="p">]</span><span class="si">}</span><span class="s1">/oauth2/v2.0/authorize?</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/oauth2/enabled'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">oauth2_enabled</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">google</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">github</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">azure</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">signin_data</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">google</span><span class="o">=</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">'oauth2'</span><span class="p">][</span><span class="s1">'providers'</span><span class="p">][</span><span class="s1">'google'</span><span class="p">][</span><span class="s1">'enabled'</span><span class="p">],</span>
+                        <span class="n">github</span><span class="o">=</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">'oauth2'</span><span class="p">][</span><span class="s1">'providers'</span><span class="p">][</span><span class="s1">'github'</span><span class="p">][</span><span class="s1">'enabled'</span><span class="p">],</span>
+                        <span class="n">azure</span><span class="o">=</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">'oauth2'</span><span class="p">][</span><span class="s1">'providers'</span><span class="p">][</span><span class="s1">'azure'</span><span class="p">][</span><span class="s1">'enabled'</span><span class="p">],)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/saml/</span><span class="si">{prov}</span><span class="s1">/'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">saml_login</span><span class="p">(</span><span class="n">prov</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">saml_login</span><span class="p">(</span><span class="n">prov</span><span class="p">,</span> <span class="s1">'/'</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/saml/</span><span class="si">{prov}</span><span class="s1">/{next:path}'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">saml_login</span><span class="p">(</span><span class="n">prov</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="nb">next</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">"""</span>
+<span class="sd">            SAML認証のログイン処理を行います</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                prov (str): SAMLプロバイダ名</span>
+<span class="sd">                next (str): リダイレクト先のURL</span>
+<span class="sd">                req (Request): Requestオブジェクト</span>
+<span class="sd">                res (Response): Responseオブジェクト</span>
+<span class="sd">            """</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">form</span><span class="p">()</span>
+            <span class="n">auth</span> <span class="o">=</span> <span class="k">await</span> <span class="n">web</span><span class="o">.</span><span class="n">signin_saml</span><span class="o">.</span><span class="n">make_saml</span><span class="p">(</span><span class="n">prov</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">auth</span><span class="o">.</span><span class="n">login</span><span class="p">())</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/saml/enabled'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">saml_enabled</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">signin_saml</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">web</span><span class="o">.</span><span class="n">signin_saml</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">azure</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">signin_data</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin_saml</span><span class="o">.</span><span class="n">signin_file_data</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">azure</span><span class="o">=</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">'saml'</span><span class="p">][</span><span class="s1">'providers'</span><span class="p">][</span><span class="s1">'azure'</span><span class="p">][</span><span class="s1">'enabled'</span><span class="p">],)</span>
+
+        <span class="n">cmdbox_app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/signin_translation/</span><span class="si">{target_lang}</span><span class="s1">'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">load_cmd</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">target_lang</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">form</span><span class="p">()</span>
+            <span class="n">words</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'words'</span><span class="p">,</span> <span class="s1">'[]'</span><span class="p">))</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">'llm'</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="s1">'translation'</span><span class="p">,</span> <span class="n">target_lang</span><span class="o">=</span><span class="n">target_lang</span><span class="p">,</span> <span class="n">words</span><span class="o">=</span><span class="n">words</span><span class="p">,</span> <span class="n">nosave</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
+            <span class="n">opt_list</span><span class="p">,</span> <span class="n">file_dict</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">mk_opt_list</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+            <span class="n">status</span><span class="p">,</span> <span class="n">ret_main</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">cmdbox_app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">args_list</span><span class="o">=</span><span class="p">[</span><span class="n">common</span><span class="o">.</span><span class="n">chopdq</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opt_list</span><span class="p">],</span>
+                                                    <span class="n">file_dict</span><span class="o">=</span><span class="n">file_dict</span><span class="p">,</span> <span class="n">webcall</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret_main</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,316 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.web.cmdbox_web_exec_pipe &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.web.cmdbox_web_exec_pipe</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.web.cmdbox_web_exec_pipe</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">web</span> <span class="k">as</span> <span class="n">_web</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdbox_web_load_pipe</span><span class="p">,</span> <span class="n">cmdbox_web_raw_pipe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">Web</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.datastructures</span><span class="w"> </span><span class="kn">import</span> <span class="n">UploadFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gevent</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">html</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+
+
+<div class="viewcode-block" id="ExecPipe">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_pipe.ExecPipe">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExecPipe</span><span class="p">(</span><span class="n">cmdbox_web_load_pipe</span><span class="o">.</span><span class="n">LoadPipe</span><span class="p">,</span> <span class="n">cmdbox_web_raw_pipe</span><span class="o">.</span><span class="n">RawPipe</span><span class="p">):</span>
+<div class="viewcode-block" id="ExecPipe.route">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_pipe.ExecPipe.route">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        webモードのルーティングを設定します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            app (FastAPI): FastAPIオブジェクト</span>
+<span class="sd">        """</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/exec_pipe/</span><span class="si">{title}</span><span class="s1">'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/exec_pipe/</span><span class="si">{title}</span><span class="s1">'</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">feature</span><span class="o">.</span><span class="n">WebFeature</span><span class="o">.</span><span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">exec_pipe</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">upfiles</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">signin</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_signin</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">signin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_401_MESSAGE</span><span class="p">)</span>
+                <span class="n">opt</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">content_type</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'content-type'</span><span class="p">)</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">_marge_opt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">opt</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">param</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="n">opt</span>
+                <span class="k">if</span> <span class="n">content_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_pipe</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="n">_marge_opt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">query_params</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'multipart/form-data'</span><span class="p">):</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_pipe</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+                    <span class="n">opt</span><span class="p">[</span><span class="s1">'request_files'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                    <span class="n">form</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">form</span><span class="p">()</span>
+                    <span class="n">files</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">multi_items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">UploadFile</span><span class="p">)}</span>
+                    <span class="k">for</span> <span class="n">cmd_title</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'pipe_cmd'</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">cmd_title</span> <span class="o">==</span> <span class="s1">''</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">cmd_opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">cmd_title</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                                <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span> <span class="k">as</span> <span class="n">tf</span><span class="p">:</span>
+                                    <span class="n">upfiles</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">name</span>
+                                    <span class="n">tf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                                    <span class="n">tf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                                    <span class="n">opt</span><span class="p">[</span><span class="s1">'request_files'</span><span class="p">][</span><span class="n">fn</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">name</span>
+                                    <span class="k">if</span> <span class="n">fn</span> <span class="o">==</span> <span class="s1">'input_file'</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'request_files'</span><span class="p">][</span><span class="s1">'stdin'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">elif</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'application/json'</span><span class="p">):</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_pipe</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">cmd_title</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'pipe_cmd'</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">cmd_title</span> <span class="o">==</span> <span class="s1">''</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">cmd_opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">cmd_title</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">'mode'</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="s1">'cmd'</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="s2">"nouse_webmode"</span><span class="p">):</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">" failed. This command is not available in web mode.'</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">msg</span><span class="p">))</span>
+                            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_cmd</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="n">opt</span><span class="p">):</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">" failed. Execute command denyed. mode=</span><span class="si">{</span><span class="n">cmd_opt</span><span class="p">[</span><span class="s2">"mode"</span><span class="p">]</span><span class="si">}</span><span class="s1">, cmd=</span><span class="si">{</span><span class="n">cmd_opt</span><span class="p">[</span><span class="s2">"cmd"</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">msg</span><span class="p">))</span>
+                            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">'capture_stdout'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nothread</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exec_pipe</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Pipeline "</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">" failed. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">))</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">tfname</span> <span class="ow">in</span> <span class="n">upfiles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">tfname</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExecPipe.exec_pipe">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_exec_pipe.ExecPipe.exec_pipe">[docs]</a>
+    <span class="nd">@options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">audit</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span>
+                  <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">nothread</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        パイプラインを実行する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエスト</span>
+<span class="sd">            res (Response): レスポンス</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            opt (dict): オプション</span>
+<span class="sd">            nothread (bool, optional): スレッドを使わないかどうか. Defaults to False.</span>
+<span class="sd">            capture_stdin (bool, optional): 標準入力をキャプチャするかどうか. Defaults to False.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: パイプライン実行結果</span>
+<span class="sd">        """</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"exec_pipe: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+            <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'output_image'</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s1">'output_image_shape'</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+                <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">"output_image"</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">"output_image_shape"</span><span class="p">])</span>
+                <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">'png'</span><span class="p">)</span>
+                <span class="n">res_json</span><span class="p">[</span><span class="s2">"output_image"</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                <span class="n">res_json</span><span class="p">[</span><span class="s1">'output_image_name'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">res_json</span><span class="p">[</span><span class="s1">'output_image_name'</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">.png"</span>
+            <span class="k">return</span> <span class="n">res_json</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">capture_stdout</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cmd_title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'pipe_cmd'</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">cmd_title</span> <span class="o">==</span> <span class="s1">''</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">cmd_opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">cmd_title</span><span class="p">)</span>
+                <span class="c1">#cmd_ref = self.options.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'])</span>
+                <span class="c1">#chk_stdin = len([ref for ref in cmd_ref if ref['opt'] == 'stdin']) &gt; 0</span>
+                <span class="c1">#chk_input_file = len([ref for ref in cmd_ref if ref['opt'] == 'input_file']) &gt; 0</span>
+                <span class="k">if</span> <span class="s1">'capture_stdout'</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                    <span class="n">capture_stdout</span> <span class="o">=</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'capture_stdout'</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">capture_stdout</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="s1">'output_csv'</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'output_csv'</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">''</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'The "output_csv" option is not supported in pipe. (</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="n">cmdline</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">has_warn</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_pipe</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cl</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'cmdline'</span><span class="p">:</span>
+                    <span class="n">cmdline</span> <span class="o">=</span> <span class="n">cl</span><span class="p">[</span><span class="s1">'raw'</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">cl</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'warn'</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">cl</span><span class="p">)</span>
+                    <span class="n">has_warn</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">cmdline</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">'No command to execute.'</span><span class="p">))</span>
+                <span class="n">has_warn</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">has_warn</span><span class="p">:</span> <span class="k">return</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">container</span><span class="p">[</span><span class="s1">'pipe_proc'</span><span class="p">]</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmdline</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">,</span>
+                                                        <span class="n">stdin</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span> <span class="k">if</span> <span class="n">capture_stdin</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
+                                                        <span class="n">stdout</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span> <span class="k">if</span> <span class="n">capture_stdout</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
+                                                        <span class="n">stderr</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span> <span class="k">if</span> <span class="n">capture_stdout</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="s2">""</span>
+                <span class="n">output_size</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="n">container</span><span class="p">[</span><span class="s1">'pipe_proc'</span><span class="p">]</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">capture_stdout</span><span class="p">:</span>
+                        <span class="n">o</span> <span class="o">=</span> <span class="n">container</span><span class="p">[</span><span class="s1">'pipe_proc'</span><span class="p">]</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="mi">0</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+                            <span class="k">continue</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_CAPTURE_MAXSIZE</span><span class="p">:</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                    <span class="n">o</span> <span class="o">=</span> <span class="n">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+                                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_console_modal_log_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_CAPTURE_MAXSIZE</span><span class="si">}</span><span class="s1"> bytes.'</span><span class="p">)]</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="si">}</span><span class="s1">&lt;/pre&gt;&lt;br&gt;&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span><span class="si">}</span><span class="s1">&lt;/pre&gt;'</span><span class="p">)]</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">capture_stdout</span><span class="p">:</span>
+                    <span class="n">container</span><span class="p">[</span><span class="s1">'pipe_proc'</span><span class="p">]</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="c1"># 最後のストリームは読み捨て</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">'capture_stdout is off.'</span><span class="p">)]</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span><span class="si">}</span><span class="s1">&lt;/pre&gt;'</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="s1">'capture_stdout'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'capture_stdout'</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_console_modal_log_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">''</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">to_json</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">ret</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">output</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">web</span><span class="o">.</span><span class="n">pipe_th</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">pipe_th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">pipe_th</span> <span class="o">=</span> <span class="n">_web</span><span class="o">.</span><span class="n">RaiseThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_exec_pipe</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="p">))</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">pipe_th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="c1">#gevent.spawn(_exec_pipe, title, opt, self.container, False, capture_stdin)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s1">'start_pipe'</span><span class="p">)</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

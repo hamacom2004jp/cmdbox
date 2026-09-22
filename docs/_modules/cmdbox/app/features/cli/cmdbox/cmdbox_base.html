@@ -1,0 +1,829 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.cmdbox.cmdbox_base &mdash; cmdbox 2026/09/22 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.cmdbox.cmdbox_base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.cmdbox.cmdbox_base</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">resources</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="CmdboxBase">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CmdboxBase</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">OneshotEdgeFeature</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CmdboxBase.get_option">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        この機能のオプションを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: オプション</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">description_ja</span><span class="o">=</span><span class="s2">"-"</span><span class="p">,</span>
+            <span class="n">description_en</span><span class="o">=</span><span class="s2">"-"</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="p">[]</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_base_compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="s1">'docker-compose.yml'</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_dockerfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="s1">'Dockerfile'</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">resources</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">.docker.</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">resources</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">.docker'</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">resources</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">.docker.</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">resources</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">.docker.</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">resources</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">.docker'</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CmdboxBase.up">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.up">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コンテナを起動します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'Windows'</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Up server command is Unsupported in windows platform."</span><span class="p">}</span>
+
+            <span class="n">newenv</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">newenv</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+            <span class="n">app_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">newenv</span><span class="p">[</span><span class="s2">"CWD"</span><span class="p">]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span>
+            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/up.sh'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">'bash </span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/up.sh'</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">newenv</span><span class="o">=</span><span class="n">newenv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to up </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to up </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to up </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+                <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">"docker compose -f </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2"> up -d </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to up </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to up </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to up </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.down">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.down">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コンテナを停止します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            container (str): コンテナ名</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'Windows'</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Down server command is Unsupported in windows platform."</span><span class="p">}</span>
+
+            <span class="n">newenv</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">newenv</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+            <span class="n">app_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">newenv</span><span class="p">[</span><span class="s2">"CWD"</span><span class="p">]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span>
+            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/down.sh'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">'bash </span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/down.sh'</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">newenv</span><span class="o">=</span><span class="n">newenv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to down </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to down </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to down </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">"docker stop </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to stop </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to stop </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">"docker rm -f </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to rm </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to rm </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to down </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.reboot">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.reboot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reboot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コンテナを再起動します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+<span class="sd">            tm (float): 実行開始時間</span>
+<span class="sd">            pf (List): 呼出元のパフォーマンス情報</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">down_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">down</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">down_ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="n">up_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">up</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">compose_path</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">up_ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'success'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">up_ret</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">up_ret</span>
+            <span class="k">return</span> <span class="n">up_ret</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.exec">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.exec">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        cmdboxサーバーコンテナ内で任意のコマンドを実行します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            command (str): 実行するコマンド</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'Windows'</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Server exec command is Unsupported in windows platform."</span><span class="p">}</span>
+
+            <span class="n">newenv</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">newenv</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+            <span class="n">app_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">newenv</span><span class="p">[</span><span class="s2">"CWD"</span><span class="p">]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span>
+            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/exec.sh'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"compose_path is specified but not used because down.sh exists."</span><span class="p">)</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">'bash </span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/exec.sh </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">newenv</span><span class="o">=</span><span class="n">newenv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to exec </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to exec </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to exec </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+                <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'docker compose -f </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s1"> exec </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s1">'</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to exec </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to exec </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to exec </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.logs">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.logs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">follow</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">number</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        cmdboxサーバーのログを表示します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            follow (bool): ログ出力をフォローするかどうか</span>
+<span class="sd">            number (int): ログの最後から指定行数出力する</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'Windows'</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Logs server command is Unsupported in windows platform."</span><span class="p">}</span>
+            <span class="n">newenv</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">newenv</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+            <span class="n">app_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">newenv</span><span class="p">[</span><span class="s2">"CWD"</span><span class="p">]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span>
+            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/logs.sh'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"compose_path is specified but not used because logs.sh exists."</span><span class="p">)</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">'bash </span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/logs.sh'</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">newenv</span><span class="o">=</span><span class="n">newenv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to logs </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to logs </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to logs </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+                <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'docker compose -f </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s1"> logs </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="s2">"-f"</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">follow</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">""</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="sa">f</span><span class="s2">"-n </span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">""</span><span class="si">}</span><span class="s1">'</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to logs </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to logs </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to logs </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to logs </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">."</span><span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.uninstall">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.uninstall">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uninstall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コンテナをアンインストールします。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'Windows'</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Uninstall server command is Unsupported in windows platform."</span><span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'container'</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="s2">"container is not specified."</span><span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">down</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="p">)</span>
+
+            <span class="n">newenv</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">newenv</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+            <span class="n">app_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">newenv</span><span class="p">[</span><span class="s2">"CWD"</span><span class="p">]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span>
+            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/rmi.sh'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">'bash </span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/rmi.sh'</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">newenv</span><span class="o">=</span><span class="n">newenv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to uninstall </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to uninstall </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">imgname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_imgname</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"docker rmi </span><span class="si">{</span><span class="n">imgname</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to uninstall </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to uninstall </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'compose_path'</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">compose_path</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+            <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">compose_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"docker-compose.yml file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"docker-compose.yml file not found: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">services</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">'services'</span><span class="p">]</span>
+                <span class="n">services</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to uninstall </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.save">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_tag</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        cmdboxサーバーのイメージをtar形式で保存します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            install_tag (str): インストールタグ</span>
+<span class="sd">            file (str): 保存先ファイルパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'Windows'</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Save server command is Unsupported in windows platform."</span><span class="p">}</span>
+            <span class="n">newenv</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">newenv</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+            <span class="n">app_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">newenv</span><span class="p">[</span><span class="s2">"CWD"</span><span class="p">]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span>
+            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/save.sh'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"compose_path is specified but not used because save.sh exists."</span><span class="p">)</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">'bash </span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/save.sh'</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">newenv</span><span class="o">=</span><span class="n">newenv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to save </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to save </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to save </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+                <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                    <span class="n">comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+                    <span class="n">services</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'services'</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="k">if</span> <span class="n">container</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">services</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Container </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2"> not found in compose file."</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Container </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2"> not found in compose file."</span><span class="p">}</span>
+                    <span class="n">imgname</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="n">container</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'image'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">imgname</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Image name for container </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2"> not found in compose file."</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Image name for container </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2"> not found in compose file."</span><span class="p">}</span>
+                    <span class="n">file</span> <span class="o">=</span> <span class="n">file</span> <span class="k">if</span> <span class="n">file</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__version__</span><span class="si">}{</span><span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">install_tag</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">""</span><span class="si">}</span><span class="s1">.tar.gz'</span>
+                    <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'docker save </span><span class="si">{</span><span class="n">imgname</span><span class="si">}</span><span class="s1"> | gzip &gt; </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s1">'</span>
+                    <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to save </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to save </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to save </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.load">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_tag</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        tar形式で保存されたcmdboxサーバーのイメージをロードします。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            install_tag (str): インストールタグ</span>
+<span class="sd">            file (str): ロードするtarファイルパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 処理結果</span>
+<span class="sd">        """</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'Windows'</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"warn"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Load server command is Unsupported in windows platform."</span><span class="p">}</span>
+            <span class="n">newenv</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">newenv</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+            <span class="n">app_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">newenv</span><span class="p">[</span><span class="s2">"CWD"</span><span class="p">]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span>
+            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/load.sh'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"compose_path is specified but not used because load.sh exists."</span><span class="p">)</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">'bash </span><span class="si">{</span><span class="n">app_path</span><span class="si">}</span><span class="s1">/scripts/load.sh'</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">newenv</span><span class="o">=</span><span class="n">newenv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to load </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to load </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to load </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+                    <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+                <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"compose_path file not found: </span><span class="si">{</span><span class="n">docker_compose_path</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                    <span class="n">comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+                    <span class="n">services</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'services'</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="k">if</span> <span class="n">container</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">services</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Container </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2"> not found in compose file."</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Container </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2"> not found in compose file."</span><span class="p">}</span>
+                    <span class="n">imgname</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="n">container</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'image'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">imgname</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Image name for container </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2"> not found in compose file."</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Image name for container </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2"> not found in compose file."</span><span class="p">}</span>
+
+                    <span class="n">file</span> <span class="o">=</span> <span class="n">file</span> <span class="k">if</span> <span class="n">file</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__version__</span><span class="si">}{</span><span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">install_tag</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">""</span><span class="si">}</span><span class="s1">.tar.gz'</span>
+                    <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'docker load -i </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s1">'</span>
+                    <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to load </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Failed to load </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Success to load </span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">. cmd:</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.copy_scripts">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.copy_scripts">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        モジュール内のスクリプトをホストにコピーします。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Path: コピー先のパス</span>
+<span class="sd">        """</span>
+        <span class="n">start_sh_hst</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="p">)</span> <span class="o">/</span> <span class="n">container</span> <span class="o">/</span> <span class="s1">'scripts'</span>
+        <span class="n">start_sh_hst</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">scripts_src</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'docker'</span> <span class="o">/</span> <span class="n">container</span> <span class="o">/</span> <span class="s1">'scripts'</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">scripts_src</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">scripts_src</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'docker'</span> <span class="o">/</span> <span class="s1">'scripts'</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">scripts_src</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">scripts_src</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'docker'</span> <span class="o">/</span> <span class="n">container</span> <span class="o">/</span> <span class="s1">'scripts'</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">scripts_src</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">scripts_src</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'docker'</span> <span class="o">/</span> <span class="n">version</span><span class="o">.</span><span class="n">__appid__</span> <span class="o">/</span> <span class="s1">'scripts'</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">scripts_src</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">scripts_src</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'docker'</span> <span class="o">/</span> <span class="s1">'scripts'</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">scripts_src</span><span class="p">,</span> <span class="n">start_sh_hst</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">start_sh_hst</span></div>
+
+
+
+<div class="viewcode-block" id="CmdboxBase.make_compose_default">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_default">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_compose_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">imgname</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        デフォルトのdocker-compose.ymlを作成します。</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            imgname (str): イメージ名</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: composeファイルの内容</span>
+<span class="sd">            Path: compose_path</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+            <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+        <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+        <span class="n">base_comp_str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">base_comp_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_base_compose</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+            <span class="n">base_comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">base_comp_str</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">base_comp_str</span><span class="p">:</span>
+                    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">base_comp_str</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s1">'3'</span><span class="p">,</span> <span class="n">services</span><span class="o">=</span><span class="p">{})))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+            <span class="n">services</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">'services'</span><span class="p">]</span>
+            <span class="n">sv</span> <span class="o">=</span> <span class="n">base_comp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'services'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">if</span> <span class="n">base_comp</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">sv</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sv</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">services</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">services</span><span class="p">[</span><span class="n">container</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">imgname</span><span class="p">,</span>
+                    <span class="n">container_name</span><span class="o">=</span><span class="n">container</span><span class="p">,</span>
+                    <span class="n">environment</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">APPID</span><span class="o">=</span><span class="s1">'${APPID:-'</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="o">+</span><span class="s1">'}'</span><span class="p">,</span>
+                        <span class="n">TZ</span><span class="o">=</span><span class="s1">'Asia/Tokyo'</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">restart</span><span class="o">=</span><span class="s1">'always'</span><span class="p">,</span>
+                    <span class="n">working_dir</span><span class="o">=</span><span class="sa">f</span><span class="s1">'/opt/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">comp</span><span class="p">,</span> <span class="n">docker_compose_path</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.make_compose_redis">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_redis">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_compose_redis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">imgname</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        redis用のdocker-compose.ymlを作成します。</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            imgname (str): イメージ名</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: composeファイルの内容</span>
+<span class="sd">            Path: compose_path</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+            <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+        <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_base_compose</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+            <span class="n">services</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">'services'</span><span class="p">]</span>
+            <span class="n">services</span><span class="p">[</span><span class="n">container</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">image</span><span class="o">=</span><span class="n">imgname</span><span class="p">,</span>
+                <span class="n">container_name</span><span class="o">=</span><span class="n">container</span><span class="p">,</span>
+                <span class="n">environment</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">APPID</span><span class="o">=</span><span class="s1">'${APPID:-'</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="o">+</span><span class="s1">'}'</span><span class="p">,</span>
+                    <span class="n">TZ</span><span class="o">=</span><span class="s1">'Asia/Tokyo'</span><span class="p">,</span>
+                    <span class="n">REDIS_PORT</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span>
+                    <span class="n">REDIS_PASSWORD</span><span class="o">=</span><span class="s1">'password'</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s1">'6379:6379'</span><span class="p">],</span>
+                <span class="n">restart</span><span class="o">=</span><span class="s1">'always'</span><span class="p">,</span>
+                <span class="n">working_dir</span><span class="o">=</span><span class="sa">f</span><span class="s1">'/opt/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">comp</span><span class="p">,</span> <span class="n">docker_compose_path</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.make_compose_pgsql">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_pgsql">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_compose_pgsql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">imgname</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">install_pgsqlver</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        pgsql用のdocker-compose.ymlを作成します。</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            imgname (str): イメージ名</span>
+<span class="sd">            install_pgsqlver (str): インストールするPostgreSQLのバージョン</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: composeファイルの内容</span>
+<span class="sd">            Path: compose_path</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+            <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+        <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_base_compose</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">dbname</span> <span class="o">=</span> <span class="s1">'pgsql'</span>
+            <span class="n">services</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">'services'</span><span class="p">]</span>
+            <span class="n">services</span><span class="p">[</span><span class="n">container</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">image</span><span class="o">=</span><span class="n">imgname</span><span class="p">,</span>
+                <span class="n">container_name</span><span class="o">=</span><span class="n">container</span><span class="p">,</span>
+                <span class="n">environment</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">APPID</span><span class="o">=</span><span class="s1">'${APPID:-'</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="o">+</span><span class="s1">'}'</span><span class="p">,</span>
+                    <span class="n">POSTGRES_USER</span><span class="o">=</span><span class="n">dbname</span><span class="p">,</span>
+                    <span class="n">POSTGRES_PASSWORD</span><span class="o">=</span><span class="n">dbname</span><span class="p">,</span>
+                    <span class="n">POSTGRES_DB</span><span class="o">=</span><span class="n">dbname</span><span class="p">,</span>
+                    <span class="n">POSTGRES_HOST_AUTH_METHOD</span><span class="o">=</span><span class="s1">'trust'</span><span class="p">,</span>
+                    <span class="n">POSTGRES_PORT</span><span class="o">=</span><span class="s1">'5432'</span><span class="p">,</span>
+                    <span class="c1">#PGDATA='/var/lib/postgresql/data/pgdata',</span>
+                <span class="p">),</span>
+                <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s1">'5432:5432'</span><span class="p">],</span>
+                <span class="n">restart</span><span class="o">=</span><span class="s1">'always'</span><span class="p">,</span>
+                <span class="n">working_dir</span><span class="o">=</span><span class="sa">f</span><span class="s1">'/opt/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+                <span class="n">volumes</span><span class="o">=</span><span class="p">[</span>
+                    <span class="sa">f</span><span class="s1">'./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">:/opt/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s1">'./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s1">/data:/var/lib/postgresql/</span><span class="si">{</span><span class="n">install_pgsqlver</span><span class="si">}</span><span class="s1">/docker'</span><span class="p">,</span>
+                    <span class="c1">#f'./{self.ver.__appid__}/{container}:/var/lib/postgresql/data',</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">comp</span><span class="p">,</span> <span class="n">docker_compose_path</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.make_compose_server">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.make_compose_server">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_compose_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">compose_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                            <span class="n">imgname</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">start_sh_tgt</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">install_use_gpu</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span>
+                            <span class="n">install_tag</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        server用のdocker-compose.ymlを作成します。</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            compose_path (str): docker-compose.ymlファイルパス</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            imgname (str): イメージ名</span>
+<span class="sd">            user (str): ホストのユーザー名</span>
+<span class="sd">            data (str): ホストのデータ保存先ディレクトリパス</span>
+<span class="sd">            start_sh_tgt (str): コンテナ内のstart.shのパス</span>
+<span class="sd">            install_use_gpu (bool): GPUを使用してインストールするかどうか</span>
+<span class="sd">            install_tag (str): インストールタグ</span>
+<span class="sd">            language (str): 言語</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: composeファイルの内容</span>
+<span class="sd">            Path: compose_path</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">compose_path</span><span class="p">:</span>
+            <span class="n">compose_path</span> <span class="o">=</span> <span class="s1">'docker-compose.yml'</span>
+        <span class="n">docker_compose_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">compose_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">docker_compose_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_base_compose</span><span class="p">(</span><span class="n">container</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">docker_compose_path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+            <span class="n">services</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">'services'</span><span class="p">]</span>
+            <span class="n">services</span><span class="p">[</span><span class="n">container</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">image</span><span class="o">=</span><span class="n">imgname</span><span class="p">,</span>
+                <span class="n">container_name</span><span class="o">=</span><span class="n">container</span><span class="p">,</span>
+                <span class="n">environment</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">TZ</span><span class="o">=</span><span class="s1">'Asia/Tokyo'</span><span class="p">,</span>
+                    <span class="n">CMDBOX_DEBUG</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">APPID</span><span class="o">=</span><span class="s1">'${APPID:-'</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="o">+</span><span class="s1">'}'</span><span class="p">,</span>
+                    <span class="n">REDIS_HOST</span><span class="o">=</span><span class="s1">'${REDIS_HOST:-redis}'</span><span class="p">,</span>
+                    <span class="n">REDIS_PORT</span><span class="o">=</span><span class="s1">'$</span><span class="si">{REDIS_PORT:-6379}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="n">REDIS_PASSWORD</span><span class="o">=</span><span class="s1">'${REDIS_PASSWORD:-password}'</span><span class="p">,</span>
+                    <span class="n">SVNAME</span><span class="o">=</span><span class="s1">'${SVNAME:-'</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="o">+</span><span class="n">install_tag</span><span class="o">+</span><span class="s1">'}'</span><span class="p">,</span>
+                    <span class="n">LISTEN_PORT</span><span class="o">=</span><span class="s1">'$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="n">MCPSV_LISTEN_PORT</span><span class="o">=</span><span class="s1">'$</span><span class="si">{MCPSV_LISTEN_PORT:-8091}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="n">A2ASV_LISTEN_PORT</span><span class="o">=</span><span class="s1">'$</span><span class="si">{A2ASV_LISTEN_PORT:-8071}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="n">SSL_LISTEN_PORT</span><span class="o">=</span><span class="s1">'$</span><span class="si">{SSL_LISTEN_PORT:-8443}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="n">SSL_MCPSV_LISTEN_PORT</span><span class="o">=</span><span class="s1">'$</span><span class="si">{SSL_MCPSV_LISTEN_PORT:-8453}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="n">SSL_A2ASV_LISTEN_PORT</span><span class="o">=</span><span class="s1">'$</span><span class="si">{SSL_A2ASV_LISTEN_PORT:-8433}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="n">SVCOUNT</span><span class="o">=</span><span class="s1">'$</span><span class="si">{SVCOUNT:-2}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="n">LANGUAGE</span><span class="o">=</span><span class="s1">'${LANGUAGE:-'</span><span class="o">+</span><span class="p">(</span><span class="n">language</span> <span class="k">if</span> <span class="n">language</span> <span class="k">else</span> <span class="s1">'ja_JP'</span><span class="p">)</span><span class="o">+</span><span class="s1">'}'</span>
+                <span class="p">),</span>
+                <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+                <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s1">'$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">:$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="s1">'$</span><span class="si">{MCPSV_LISTEN_PORT:-8091}</span><span class="s1">:$</span><span class="si">{MCPSV_LISTEN_PORT:-8091}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="s1">'$</span><span class="si">{A2ASV_LISTEN_PORT:-8071}</span><span class="s1">:$</span><span class="si">{A2ASV_LISTEN_PORT:-8071}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="s1">'$</span><span class="si">{SSL_LISTEN_PORT:-8443}</span><span class="s1">:$</span><span class="si">{SSL_LISTEN_PORT:-8443}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="s1">'$</span><span class="si">{SSL_MCPSV_LISTEN_PORT:-8453}</span><span class="s1">:$</span><span class="si">{SSL_MCPSV_LISTEN_PORT:-8453}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="s1">'$</span><span class="si">{SSL_A2ASV_LISTEN_PORT:-8433}</span><span class="s1">:$</span><span class="si">{SSL_A2ASV_LISTEN_PORT:-8433}</span><span class="s1">'</span><span class="p">],</span>
+                <span class="n">privileged</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">restart</span><span class="o">=</span><span class="s1">'always'</span><span class="p">,</span>
+                <span class="n">working_dir</span><span class="o">=</span><span class="sa">f</span><span class="s1">'/opt/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+                <span class="c1">#devices=['/dev/bus/usb:/dev/bus/usb'],</span>
+                <span class="n">volumes</span><span class="o">=</span><span class="p">[</span>
+                    <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">:/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s1">'/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">:/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s1">'./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">:/opt/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">'</span>
+                <span class="p">],</span>
+                <span class="n">command</span><span class="o">=</span><span class="sa">f</span><span class="s1">'bash </span><span class="si">{</span><span class="n">start_sh_tgt</span><span class="si">}</span><span class="s1">/start.sh'</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">install_use_gpu</span><span class="p">:</span>
+                <span class="n">services</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">'</span><span class="p">][</span><span class="s1">'deploy'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">resources</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">reservations</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">devices</span><span class="o">=</span><span class="p">[</span><span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">driver</span><span class="o">=</span><span class="s1">'nvidia'</span><span class="p">,</span>
+                        <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">'gpu'</span><span class="p">]</span>
+                    <span class="p">)]))</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">comp</span><span class="p">,</span> <span class="n">docker_compose_path</span></div>
+
+
+<div class="viewcode-block" id="CmdboxBase.get_imgname">
+<a class="viewcode-back" href="../../../../../../resources/cmdbox.app.features.cli.cmdbox.html#cmdbox.app.features.cli.cmdbox.cmdbox_base.CmdboxBase.get_imgname">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_imgname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        イメージ名を取得します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            container (str): コンテナ名</span>
+<span class="sd">            args (argparse.Namespace): 引数</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: イメージ名</span>
+<span class="sd">        """</span>
+        <span class="n">imgname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"hamacom/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">container</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__version__</span><span class="si">}{</span><span class="sa">f</span><span class="s1">'_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">args</span><span class="o">.</span><span class="n">install_tag</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">''</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">return</span> <span class="n">imgname</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

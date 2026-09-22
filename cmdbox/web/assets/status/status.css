@@ -302,8 +302,8 @@ body.status-sidebar-expanded .status-main {
 }
 
 .tail-log-new {
-    display: inline-block;
-    background: color-mix(in oklab, var(--bs-link-hover-color) 30%, transparent);
+    display: block;
+    background: color-mix(in oklab, var(--bs-link-hover-color) 25%, transparent);
     border-radius: 2px;
     animation: tail-log-new-fade 60s ease-out forwards;
 }
@@ -316,7 +316,7 @@ body.status-sidebar-expanded .status-main {
 
 @keyframes tail-log-new-fade {
     0% {
-        background: color-mix(in oklab, var(--bs-link-hover-color) 30%, transparent);
+        background: color-mix(in oklab, var(--bs-link-hover-color) 25%, transparent);
     }
     100% {
         background: transparent;

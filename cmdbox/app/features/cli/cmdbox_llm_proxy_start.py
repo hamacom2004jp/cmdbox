@@ -86,7 +86,10 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="proxy_apikey", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="LiteLLM Proxy の API キーを指定します。必ず「sk-」で始まる値を使用してください。",
                      description_en="Specify the API key for LiteLLM Proxy. It must start with 'sk-'."),
-                dict(opt="llm", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=[],
+                dict(opt="llm_config", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="LiteLLM Proxy の設定ファイル(config.yml)を直接指定します。指定時は --llm オプションは無視されます。",
+                     description_en="Directly specify the LiteLLM Proxy config file (config.yml). When specified, --llm options are ignored."),
+                dict(opt="llm", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
                      callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
                              + "const val = $(\"[name='llm']\").val() || [];"
                              + "$(\"[name='llm']\").empty();"
@@ -99,15 +102,27 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="num_retries", type=Options.T_INT, default=2, required=False, multi=False, hide=False, choice=None,
                      description_ja="LiteLLM Router の再試行回数を指定します。",
                      description_en="Specify retry count for LiteLLM Router."),
-                dict(opt="request_timeout", type=Options.T_INT, default=60, required=False, multi=False, hide=False, choice=None,
-                     description_ja="LiteLLM Proxy のリクエストタイムアウト秒を指定します。",
-                     description_en="Specify request timeout seconds for LiteLLM Proxy."),
+                dict(opt="request_timeout", type=Options.T_INT, default=90, required=False, multi=False, hide=False, choice=None,
+                     description_ja="LiteLLM Proxy のリクエストタイムアウト秒を指定します。商用環境では90秒推奨。",
+                     description_en="Specify request timeout seconds for LiteLLM Proxy. 90 seconds recommended for production."),
                 dict(opt="allowed_fails", type=Options.T_INT, default=3, required=False, multi=False, hide=False, choice=None,
                      description_ja="クールダウン判定の失敗回数しきい値を指定します。",
                      description_en="Specify failure threshold for cooldown."),
-                dict(opt="cooldown_time", type=Options.T_INT, default=30, required=False, multi=False, hide=False, choice=None,
-                     description_ja="クールダウン時間(秒)を指定します。",
-                     description_en="Specify cooldown duration in seconds."),
+                dict(opt="cooldown_time", type=Options.T_INT, default=60, required=False, multi=False, hide=False, choice=None,
+                     description_ja="クールダウン時間(秒)を指定します。商用環境では60秒推奨。",
+                     description_en="Specify cooldown duration in seconds. 60 seconds recommended for production."),
+                dict(opt="connection_timeout", type=Options.T_INT, default=10, required=False, multi=False, hide=False, choice=None,
+                     description_ja="LLMとの接続タイムアウト秒を指定します。高負荷下での安定性向上。",
+                     description_en="Specify connection timeout seconds to LLM. Improves stability under high load."),
+                dict(opt="cache_responses", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=None,
+                     description_ja="レスポンスキャッシングを有効にします。パフォーマンス向上と負荷軽減。",
+                     description_en="Enable response caching. Improves performance and reduces load."),
+                dict(opt="max_retries_per_call", type=Options.T_INT, default=3, required=False, multi=False, hide=False, choice=None,
+                     description_ja="各LLM呼び出しの最大再試行回数を指定します。",
+                     description_en="Specify max retries per LLM call."),
+                dict(opt="enable_polling_logs", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=None,
+                     description_ja="ポーリングログを有効にします。",
+                     description_en="Enable polling logs."),
             ]
         )
 
@@ -129,13 +144,25 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
             msg = dict(warn="Please specify a valid LiteLLM Proxy API key starting with 'sk-'.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        llm_names = args.llm if isinstance(args.llm, list) else [args.llm]
-        llm_names = list(set([n for n in llm_names if isinstance(n, str) and n.strip() != ""]))
 
-        if len(llm_names) <= 0:
-            msg = dict(warn="Please specify one or more --llm options.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        # 設定ファイルが直接指定されているかどうかを確認する
+        config_path = None
+        llm_names = []
+        if hasattr(args, 'llm_config') and args.llm_config:
+            config_path = Path(args.llm_config)
+            if not config_path.is_file():
+                msg = dict(warn=f"Specified config file does not exist: {args.llm_config}")
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+        else:
+            # LLM オプションから設定を構築する
+            llm_names = args.llm if isinstance(args.llm, list) else [args.llm]
+            llm_names = list(set([n for n in llm_names if isinstance(n, str) and n.strip() != ""]))
+
+            if len(llm_names) <= 0:
+                msg = dict(warn="Please specify one or more --llm options or use --llm_config to specify a config file.")
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
 
         litellm_exe = shutil.which("litellm")
         if litellm_exe is None:
@@ -144,15 +171,18 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
             return self.RESP_WARN, msg, None
         try:
             data_dir = Path(args.data)
-            cfg = self._build_proxy_config(logger, data_dir, llm_names, args)
-            proxy_dir = data_dir / ".agent" / f"llmproxy-{args.proxy_listen_port}"
-            proxy_dir.mkdir(parents=True, exist_ok=True)
-            config_path = proxy_dir / "config.yaml"
-            pid_path = proxy_dir / "llmproxy.pid"
-            common.save_file(config_path, lambda f: yaml.safe_dump(cfg, f, allow_unicode=False, sort_keys=False),
-                             encoding='utf-8', nolock=False)
-            
-            # Check if proxy is already running on the same port
+            if config_path is None:
+                # LLMオプションからビルド設定を作成する
+                cfg = self._build_proxy_config(logger, data_dir, llm_names, args)
+                proxy_dir = data_dir / ".agent" / f"llmproxy-{args.proxy_listen_port}"
+                proxy_dir.mkdir(parents=True, exist_ok=True)
+                config_path = proxy_dir / "config.yaml"
+                common.save_file(config_path, lambda f: yaml.safe_dump(cfg, f, allow_unicode=False, sort_keys=False),
+                                 encoding='utf-8', nolock=False)
+            pid_path = data_dir / ".agent" / f"llmproxy-{args.proxy_listen_port}" / "llmproxy.pid"
+            pid_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # 同じポートでプロキシが既に実行中かどうかを確認する
             if pid_path.is_file():
                 def _read_pid(f):
                     return f.read().strip()
@@ -174,7 +204,6 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
                                     is_running = True
                                 except (ProcessLookupError, OSError):
                                     is_running = False
-                            
                             if is_running:
                                 msg = dict(warn=f"LiteLLM Proxy is already running on port {args.proxy_listen_port}. pid={existing_pid}")
                                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -184,7 +213,6 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
                             pass
                 except Exception as e:
                     logger.warning(f"Failed to check existing process. {e}")
-            
             cmd = [
                 litellm_exe,
                 "--config", str(config_path),
@@ -234,15 +262,34 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
             others = [n for n in llm_names if n != name]
             if others:
                 fallbacks.append({name: others})
+        # 高可用性の litellm 設定を構築する
+        litellm_settings = dict(
+            num_retries=int(args.num_retries),
+            request_timeout=int(args.request_timeout),
+            allowed_fails=int(args.allowed_fails),
+            cooldown_time=int(args.cooldown_time),
+            fallbacks=fallbacks,
+            # 高負荷時の安定性設定
+            connect_timeout=int(getattr(args, 'connection_timeout', 10)),
+            max_retries=int(getattr(args, 'max_retries_per_call', 3)),
+        )
+        # 高負荷時のキャッシュ設定を追加する
+        if getattr(args, 'cache_responses', True):
+            litellm_settings['cache'] = {
+                'type': 'redis',
+                'host': args.host,
+                'port': int(args.port),
+                'password': args.password if args.password and args.password.strip() else None,
+            }
+        # デバッグ設定
+        if getattr(args, 'debug', False):
+            litellm_settings['debug'] = True
+        # ポーリングログを有効にする設定
+        if getattr(args, 'enable_polling_logs', False):
+            litellm_settings['verbose'] = True
         return dict(
             model_list=model_list,
-            litellm_settings=dict(
-                num_retries=int(args.num_retries),
-                request_timeout=int(args.request_timeout),
-                allowed_fails=int(args.allowed_fails),
-                cooldown_time=int(args.cooldown_time),
-                fallbacks=fallbacks,
-            ),
+            litellm_settings=litellm_settings,
             general_settings=dict(
                 master_key=args.proxy_apikey,
             ),
