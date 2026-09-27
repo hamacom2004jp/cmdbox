@@ -38,7 +38,7 @@ class UrlDel(feature.OneshotResultEdgeFeature, validator.Validator):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="短縮URLを削除します。指定されたurl_idのJSONファイルを削除します。",
             description_en="Delete a short URL. Removes the JSON file for the specified url_id.",
             choice=[

@@ -146,6 +146,18 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="signin_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja="`signin.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。",
                      description_en="Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."),
+                dict(opt="x_content_type_options", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=None,
+                     description_ja="X-Content-Type-Options ヘッダーを有効にするかを指定します。有効にするとレスポンスに含まれるコンテンツタイプ以外での実行がブラウザによって防止されます。",
+                     description_en="Specifies whether to enable the X-Content-Type-Options header. If enabled, the browser will prevent execution using content types other than those included in the response."),
+                dict(opt="x_frame_options", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=None,
+                     description_ja="X-Frame-Options ヘッダーを有効にするかを指定します。有効にするとブラウザはコンテンツのフレーム内での表示を、同一ドメイン内に限定します。",
+                     description_en="Specifies whether to enable the X-Frame-Options header. If enabled, the browser will restrict the display of this page within frames to the same domain."),
+                dict(opt="strict_transport_security", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=None,
+                     description_ja="Strict-Transport-Security ヘッダーを有効にするかを指定します。有効にするとブラウザに対しこのサイトへの通信を常にHTTPSで行うよう通知します。",
+                     description_en="Specifies whether to enable the Strict-Transport-Security header. If enabled, it instructs browsers to always use HTTPS when communicating with this site."),
+                dict(opt="cache_control_max_age", type=Options.T_INT, default=600, required=False, multi=False, hide=True, choice=None,
+                     description_ja="Cache-Control ヘッダーの max-age を指定します。単位は秒です。静的コンテンツを中心にブラウザに対してキャッシュするように通知します。",
+                     description_en="Specifies the `max-age` value for the `Cache-Control` header. The unit is seconds. This instructs the browser to cache the content, primarily static content.")
             ]
         )
 
@@ -218,7 +230,10 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                 ssl_cert=args.ssl_cert, ssl_key=args.ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=args.ssl_ca_certs,
                 session_domain=args.session_domain, session_path=args.session_path,
                 session_secure=args.session_secure, session_timeout=args.session_timeout,
-                outputs_key=args.outputs_key, gunicorn_workers=args.gunicorn_workers, gunicorn_timeout=args.gunicorn_timeout)
+                outputs_key=args.outputs_key, gunicorn_workers=args.gunicorn_workers, gunicorn_timeout=args.gunicorn_timeout,
+                x_content_type_options=args.x_content_type_options, x_frame_options=args.x_frame_options, strict_transport_security=args.strict_transport_security,
+                cache_control_max_age=args.cache_control_max_age,
+                )
 
     def output_schema(self) -> type:
         class Data(resdata.Data):

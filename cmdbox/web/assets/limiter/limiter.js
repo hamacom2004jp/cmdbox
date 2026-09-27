@@ -139,23 +139,24 @@ limiter_page.get_scope = () => $('#scope_select').val() || 'server';
 /**
  * フィルタ select ボックスを初期化（モード一覧を取得して表示）
  */
-limiter_page.init_filter_options = async () => {
+limiter_page.init_filter_options = async (only_limitername = false) => {
     try {
-        const opts = await cmdbox.get_cmd_choices('limiter', 'save');
-        // target_mode の options を取得
-        const target_mode_opt = opts.find(o => o.opt === 'target_mode');
-        if (target_mode_opt && target_mode_opt.choice) {
-            const mode_select = $('#filter_target_mode');
-            mode_select.empty();
-            target_mode_opt.choice.forEach(mode => {
-                const val = typeof mode === 'object' ? Object.keys(mode)[0] : mode;
-                mode_select.append(`<option value="${val}">${val}</option>`);
-            });
+        if (!only_limitername) {
+            const opts = await cmdbox.get_cmd_choices('limiter', 'save');
+            // target_mode の options を取得
+            const target_mode_opt = opts.find(o => o.opt === 'target_mode');
+            if (target_mode_opt && target_mode_opt.choice) {
+                const mode_select = $('#filter_target_mode');
+                mode_select.empty();
+                target_mode_opt.choice.forEach(mode => {
+                    const val = typeof mode === 'object' ? Object.keys(mode)[0] : mode;
+                    mode_select.append(`<option value="${val}">${val}</option>`);
+                });
+            }
         }
-        
         // リミッター一覧を取得して filter_limiter_name を初期化
         const scope = limiter_page.get_scope();
-        const list_res = await cmdbox.sv_exec_cmd({ mode: 'limiter', cmd: 'list', scope: scope });
+        const list_res = await cmdbox.sv_exec_cmd({ mode:'limiter', cmd:'list', scope:scope, cache_clear:true });
         if (list_res) {
             const data_list = Array.isArray(list_res) ? list_res : [list_res];
             const first = data_list[0];
@@ -165,7 +166,8 @@ limiter_page.init_filter_options = async () => {
                 limiter_select.empty();
                 limiter_select.append('<option value=""></option>');
                 limiters.forEach(lm => {
-                    limiter_select.append(`<option value="${lm.name}">${lm.name}</option>`);
+                    const selected = filter_limiter_name === lm.name;
+                    limiter_select.append(`<option value="${lm.name}"${selected ? ' selected' : ''}>${lm.name}</option>`);
                 });
             }
         }
@@ -527,6 +529,7 @@ limiter_page.save_limiter = async () => {
     }
     cmdbox.message(first['success']['data'], true, true);
     $('#limiter_modal').modal('hide');
+    await limiter_page.init_filter_options(data.limiter_name);
     await limiter_page.refresh_all();
 };
 
@@ -557,6 +560,7 @@ limiter_page.delete_limiter = async (name) => {
     }
     cmdbox.message(first['success']['data'], true, true);
     $('#limiter_modal').modal('hide');
+    await limiter_page.init_filter_options(name);
     await limiter_page.refresh_all();
 };
 

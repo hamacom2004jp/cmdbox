@@ -127,7 +127,11 @@ class RedisClient(object):
                     found = self.redis_cli.keys(_hbname)
                     if len(found) <= 0:
                         self.logger.warning(f"Server not found. svname={self.svname.split('-')[1]}")
-                        return False
+                        if i >= retry_count and retry_count > 0:
+                            return False
+                        time.sleep(retry_interval if retry_interval > 0 else 5)
+                        i += 1
+                        continue
                 i = 0
                 return True
             except redis.exceptions.ConnectionError as e:
@@ -138,6 +142,8 @@ class RedisClient(object):
                 i += 1
             except KeyboardInterrupt as e:
                 return False
+        self.logger.warning(f"Server check failed. svname={self.svname.split('-')[1]}")
+        return False
 
     def send_cmd(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5,
                  outstatus:bool=False, timeout:int=60, nowait:bool=False):

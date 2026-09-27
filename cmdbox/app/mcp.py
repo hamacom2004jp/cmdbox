@@ -339,12 +339,20 @@ class ToolList(object):
             cmd_list = sorted(cmd_list, key=lambda cmd: cmd["title"])
             # ユーザーコマンドリストの取得(すべてのコマンドを取得するためにgroupsをadminに設定)
             # 実行時にはユーザーのグループに応じて認可する
-            cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
-                        description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
-                        tag=r.get('tag','')) for r in cmd_list \
-                       if signin.Signin._check_cmd(signin_file_data=data, user_groups=['admin'], mode=r['mode'], cmd=r['cmd'],
-                                                   opt=r, user_name="unknown", user_session={}, logger=self.logger,
-                                                   appcls=self.appcls, ver=self.ver, language=web.language)]
+            ret = []
+            for r in cmd_list:
+                # エージェント経由での実行が許可されているかどうかをチェック
+                if not options.get_cmd_attr(r['mode'], r['cmd'], 'use_agent'):
+                    continue
+                # ユーザーコマンドが実行可能かどうかをチェック
+                if not signin.Signin._check_cmd(signin_file_data=data, user_groups=['admin'], mode=r['mode'], cmd=r['cmd'],
+                                           opt=r, user_name="unknown", user_session={}, logger=self.logger,
+                                           appcls=self.appcls, ver=self.ver, language=web.language):
+                    continue
+                ret.append(dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
+                                description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
+                                tag=r.get('tag','')))
+            cmd_list = ret
         except Exception as e:
             # ユーザーコマンドの読み込みに失敗した場合は警告を出して登録済みのリストを返す
             self.logger.warning(f"Error loading user commands: {e}", exc_info=True)

@@ -51,6 +51,10 @@ gui ( start ) : ``cmdbox -m gui -c start <Option>``
     "--limiter_html <limiter_html>","file","","","","","Specify `limiter.html`. If omitted, the cmdbox built-in HTML file is used."
     "--status_html <status_html>","file","","","","","Specify `status.html`. If omitted, the cmdbox built-in HTML file is used."
     "--signin_html <signin_html>","file","","","","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--x_content_type_options <x_content_type_options>","bool","","","False","","Specifies whether to enable the X-Content-Type-Options header. If enabled, the browser will prevent execution using content types other than those included in the response."
+    "--x_frame_options <x_frame_options>","bool","","","False","","Specifies whether to enable the X-Frame-Options header. If enabled, the browser will restrict the display of this page within frames to the same domain."
+    "--strict_transport_security <strict_transport_security>","bool","","","False","","Specifies whether to enable the Strict-Transport-Security header. If enabled, it instructs browsers to always use HTTPS when communicating with this site."
+    "--cache_control_max_age <cache_control_max_age>","int","","","600","","Specifies the `max-age` value for the `Cache-Control` header. The unit is seconds. This instructs the browser to cache the content, primarily static content."
 
 **Output Schema**
 

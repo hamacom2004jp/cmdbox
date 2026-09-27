@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( gui mode ) &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>Command Reference ( gui mode ) &mdash; cmdbox 2026/09/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../_static/documentation_options.js?v=a248f298"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -418,6 +418,38 @@
 <td></td>
 <td></td>
 <td><p>Specify <cite>signin.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--x_content_type_options &lt;x_content_type_options&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specifies whether to enable the X-Content-Type-Options header. If enabled, the browser will prevent execution using content types other than those included in the response.</p></td>
+</tr>
+<tr class="row-even"><td><p>--x_frame_options &lt;x_frame_options&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specifies whether to enable the X-Frame-Options header. If enabled, the browser will restrict the display of this page within frames to the same domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--strict_transport_security &lt;strict_transport_security&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specifies whether to enable the Strict-Transport-Security header. If enabled, it instructs browsers to always use HTTPS when communicating with this site.</p></td>
+</tr>
+<tr class="row-even"><td><p>--cache_control_max_age &lt;cache_control_max_age&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>600</p></td>
+<td></td>
+<td><p>Specifies the <cite>max-age</cite> value for the <cite>Cache-Control</cite> header. The unit is seconds. This instructs the browser to cache the content, primarily static content.</p></td>
 </tr>
 </tbody>
 </table>

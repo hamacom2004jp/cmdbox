@@ -7,6 +7,7 @@ import functools
 import logging
 import pydantic
 import re
+import unicodedata
 
 
 def apprun_check(func:Callable) -> Callable:
@@ -131,6 +132,16 @@ class Validator(feature.Feature):
         cls = self.output_schema()
         return cls.model_validate(output)
 
+    @staticmethod
+    def _nomalize_path(value: Union[str, Path]) -> str:
+        if value is None:
+            return None
+        if isinstance(value, Path):
+            return Path(unicodedata.normalize('NFC',  str(value)))
+        if isinstance(value, str):
+            return unicodedata.normalize('NFC', value)
+        return value
+
     validator_types = {
         options.Options.T_BOOL: [bool],
         options.Options.T_DATE: [str],
@@ -149,8 +160,8 @@ class Validator(feature.Feature):
         options.Options.T_DATE: lambda v: v,
         options.Options.T_DATETIME: lambda v: v,
         options.Options.T_DICT: lambda v: v,
-        options.Options.T_DIR: lambda v: Path(v) if isinstance(v, str) else v,
-        options.Options.T_FILE: lambda v: Path(v) if isinstance(v, str) else v,
+        options.Options.T_DIR: lambda v: Validator._nomalize_path(v),
+        options.Options.T_FILE: lambda v: Validator._nomalize_path(v),
         options.Options.T_FLOAT: lambda v: float(v) if isinstance(v, str) and re.match(r'^-?\d+(\.\d+)?$', v) else v,
         options.Options.T_INT: lambda v: int(v) if isinstance(v, str) and re.match(r'^-?\d+$', v) else v,
         options.Options.T_PASSWD: lambda v: v,
@@ -247,6 +258,7 @@ class Validator(feature.Feature):
             self.valid_type,
             self.valid_name,
             self.valid_str_max_length,
+            self.valid_str_ctrlchar,
             self.valid_data,
             self.valid_signin_file,
         ]
@@ -311,6 +323,36 @@ class Validator(feature.Feature):
             return self.RESP_SUCCESS, {}, None
         if len(val)>=LONG_TEXT_BOUNDARY:
             msg = dict(warn=f"Invalid value for --{opt}: {val} (must be less than {LONG_TEXT_BOUNDARY} characters)")
+            return self.RESP_WARN, msg, None
+        return self.RESP_SUCCESS, {}, None
+
+    regs_ctrlchar = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]")
+    def valid_str_ctrlchar(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        文字列に制御文字が含まれていないかの妥当性を検証します
+
+        Args:
+            logger (logging.Logger): ロガー
+            opt (str): オプション名
+            type (str): オプションの型
+            val (Any): オプションの値
+            fileio (str): ファイル入出力の種別 ('in' or 'out')
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        str_types = [k for k, v in self.validator_types.items() if str in v]
+        if type not in str_types or val is None:
+            return self.RESP_SUCCESS, {}, None
+        if isinstance(val, list):
+            for v in val:
+                if isinstance(v, Path): v = str(v)
+                if self.regs_ctrlchar.search(v):
+                    msg = dict(warn=f"Invalid value for --{opt}: {v} (contains control characters)")
+                    return self.RESP_WARN, msg, None
+            return self.RESP_SUCCESS, {}, None
+        if isinstance(val, Path): val = str(val)
+        if self.regs_ctrlchar.search(val):
+            msg = dict(warn=f"Invalid value for --{opt}: {val} (contains control characters)")
             return self.RESP_WARN, msg, None
         return self.RESP_SUCCESS, {}, None
 

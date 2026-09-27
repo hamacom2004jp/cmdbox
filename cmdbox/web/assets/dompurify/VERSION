@@ -1,0 +1,20 @@
+DOMPurify 3.4.15
+License:   Apache-2.0 OR MPL-2.0 (dual; see LICENSE.txt)
+Source:    https://github.com/cure53/DOMPurify
+Package:   https://www.npmjs.com/package/dompurify
+
+Used by assets/agent/magenai_agent_render_guard.js to sanitize marked.parse
+output through marked's hooks.postprocess (the `sanitize` option was removed
+in marked v5). cmdbox does not ship DOMPurify; MaGenAI serves it from here.
+
+Vendored files are byte-identical to the published dist/ of 3.4.15.
+Verify with:
+  curl -sS https://unpkg.com/dompurify@3.4.15/dist/purify.js | sha256sum
+  curl -sS https://unpkg.com/dompurify@3.4.15/LICENSE       | sha256sum
+
+sha256:
+979b6c28df92881a36009de0bda1e866bee043ad69d36e54509e7210723d9af4  purify.js
+cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  LICENSE.txt
+
+Only the unminified UMD build is shipped, matching the other vendored assets in
+this project (no build step, no source maps).

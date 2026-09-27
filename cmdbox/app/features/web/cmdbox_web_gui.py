@@ -48,7 +48,6 @@ class Gui(feature.WebFeature):
             if signin is not None:
                 return signin
             em, headers = self.etag(web, req, str(web.gui_html.stat().st_mtime_ns))
-            headers.update({'Access-Control-Allow-Origin': '*'})
             if em:
                 return Response(status_code=304, headers=headers)
             if ondemand_load:
@@ -64,8 +63,8 @@ class Gui(feature.WebFeature):
         @app.get('/signin/gui/appid', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         @app.get('/gui/appid', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def appid(req:Request, res:Response):
-            em, headers = self.etag(web, req, str(self.ver.__appid__))
-            headers.update({'Access-Control-Allow-Origin': '*'})
+            hash_value = int(common.hash_password(self.ver.__appid__, 'md5')[:16], 16)
+            em, headers = self.etag(web, req, str(hash_value), force_cache=True)
             if em:
                 return Response(status_code=304, headers=headers)
             return Response(content=self.ver.__appid__, headers=headers)
@@ -73,16 +72,16 @@ class Gui(feature.WebFeature):
         @app.get('/signin/gui/title', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         @app.get('/gui/title', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def title(req:Request, res:Response):
-            em, headers = self.etag(web, req, str(self.ver.__title__))
-            headers.update({'Access-Control-Allow-Origin': '*'})
+            hash_value = int(common.hash_password(self.ver.__title__, 'md5')[:16], 16)
+            em, headers = self.etag(web, req, str(hash_value), force_cache=True)
             if em:
                 return Response(status_code=304, headers=headers)
             return Response(content=self.ver.__title__, headers=headers)
 
         @app.get('/gui/version_info', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def version_info(req:Request, res:Response):
-            em, headers = self.etag(web, req, str(self.version_info))
-            headers.update({'Access-Control-Allow-Origin': '*'})
+            hash_value = int(common.hash_password(common.to_str(self.version_info), 'md5')[:16], 16)
+            em, headers = self.etag(web, req, str(hash_value), force_cache=True)
             if em:
                 return Response(status_code=304, headers=headers)
             res.headers.update(headers)

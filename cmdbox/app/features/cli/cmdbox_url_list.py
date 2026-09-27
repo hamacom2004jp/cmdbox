@@ -39,7 +39,7 @@ class UrlList(feature.OneshotResultEdgeFeature, validator.Validator):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="登録済みの短縮URLを一覧表示します。",
             description_en="Lists registered short URLs.",
             choice=[

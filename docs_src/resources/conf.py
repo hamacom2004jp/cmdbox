@@ -48,3 +48,17 @@ html_static_path = ['static']
 # https://www.sphinx-doc.org/en/master/usage/extensions/todo.html#configuration
 
 todo_include_todos = True
+
+# -- Suppress autodoc warnings and mock problematic imports ---
+# google.adk has compatibility issues with Pydantic v2, mock it to avoid import errors
+autodoc_mock_imports = ['google.adk', 'google.adk.agents', 'google.adk.plugins']
+
+# Ignore warnings from modules with Pydantic compatibility issues
+suppress_warnings = ['autodoc.import_object', 'autodoc.import_error']
+
+# Configure autodoc to continue on import errors
+autodoc_default_options = {
+    'members': True,
+    'undoc-members': True,
+    'show-inheritance': True,
+}

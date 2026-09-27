@@ -29,7 +29,6 @@ class UserData(feature.WebFeature):
                 return dict(warn='Category and key are required.')
             sess = req.session['signin']
             em, headers = self.etag(web, req, str(web.user_data_hash(sess['uid'], sess['name'])))
-            headers.update({'Access-Control-Allow-Origin': '*'})
             if em:
                 return Response(status_code=304, headers=headers)
             ret = web.user_data(req, sess['uid'], sess['name'], categoly, key)
@@ -86,7 +85,6 @@ class UserData(feature.WebFeature):
                 return Response(status_code=200, content=svg, media_type='image/svg+xml')
             sess = req.session['signin']
             em, headers = self.etag(web, req, str(web.user_data_hash(sess['uid'], sess['name'])))
-            headers.update({'Access-Control-Allow-Origin': '*'})
             if em:
                 return Response(status_code=200, content=svg, media_type='image/svg+xml')
             ret_b64:str = web.user_data(req, sess['uid'], sess['name'], 'profile', 'icon')

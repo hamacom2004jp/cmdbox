@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.commons.validator &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>cmdbox.app.commons.validator &mdash; cmdbox 2026/09/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../_static/documentation_options.js?v=a248f298"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -88,6 +88,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">unicodedata</span>
 
 
 <div class="viewcode-block" id="apprun_check">
@@ -226,6 +227,16 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
 
 
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_nomalize_path</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s1">'NFC'</span><span class="p">,</span>  <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s1">'NFC'</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
     <span class="n">validator_types</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">:</span> <span class="p">[</span><span class="nb">bool</span><span class="p">],</span>
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DATE</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -244,8 +255,8 @@
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DATE</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DATETIME</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DICT</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DIR</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FILE</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_DIR</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">Validator</span><span class="o">.</span><span class="n">_nomalize_path</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FILE</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">Validator</span><span class="o">.</span><span class="n">_nomalize_path</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FLOAT</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^-?\d+(\.\d+)?$'</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span><span class="p">,</span>
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^-?\d+$'</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span><span class="p">,</span>
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_PASSWD</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
@@ -347,6 +358,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">valid_type</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">valid_name</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">valid_str_max_length</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_str_ctrlchar</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">valid_data</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">valid_signin_file</span><span class="p">,</span>
         <span class="p">]</span></div>
@@ -420,6 +432,39 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">LONG_TEXT_BOUNDARY</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Invalid value for --</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> (must be less than </span><span class="si">{</span><span class="n">LONG_TEXT_BOUNDARY</span><span class="si">}</span><span class="s2"> characters)"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span></div>
+
+
+    <span class="n">regs_ctrlchar</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]"</span><span class="p">)</span>
+<div class="viewcode-block" id="Validator.valid_str_ctrlchar">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.validator.Validator.valid_str_ctrlchar">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">valid_str_ctrlchar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span><span class="n">Any</span><span class="p">,</span> <span class="n">fileio</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        文字列に制御文字が含まれていないかの妥当性を検証します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            opt (str): オプション名</span>
+<span class="sd">            type (str): オプションの型</span>
+<span class="sd">            val (Any): オプションの値</span>
+<span class="sd">            fileio (str): ファイル入出力の種別 ('in' or 'out')</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト</span>
+<span class="sd">        """</span>
+        <span class="n">str_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator_types</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">str</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">str_types</span> <span class="ow">or</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span> <span class="n">v</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">regs_ctrlchar</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Invalid value for --</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> (contains control characters)"</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span> <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">regs_ctrlchar</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Invalid value for --</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> (contains control characters)"</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span></div>
 

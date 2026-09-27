@@ -31,7 +31,6 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             em, headers = self.etag(web, req, str(web.users_html.stat().st_mtime_ns))
-            headers.update({'Access-Control-Allow-Origin': '*'})
             if em:
                 return Response(status_code=304, headers=headers)
             if ondemand_load:

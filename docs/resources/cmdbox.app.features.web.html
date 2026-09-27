@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.web package &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>cmdbox.app.features.web package &mdash; cmdbox 2026/09/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../_static/documentation_options.js?v=a248f298"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -181,6 +181,32 @@
 <dt class="sig sig-object py" id="cmdbox.app.features.web.cmdbox_web_assets.Assets">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.web.cmdbox_web_assets.</span></span><span class="sig-name descname"><span class="pre">Assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;module</span> <span class="pre">'cmdbox.version'</span> <span class="pre">from</span> <span class="pre">'F:\\devenv\\cmdbox\\cmdbox\\version.py'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/web/cmdbox_web_assets.html#Assets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.web.cmdbox_web_assets.Assets" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.WebFeature" title="cmdbox.app.feature.WebFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebFeature</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.features.web.cmdbox_web_assets.Assets.is_force_cache_path">
+<span class="sig-name descname"><span class="pre">is_force_cache_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">web</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web" title="cmdbox.app.web.Web"><span class="pre">Web</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/web/cmdbox_web_assets.html#Assets.is_force_cache_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.web.cmdbox_web_assets.Assets.is_force_cache_path" title="Link to this definition"></a></dt>
+<dd><p>指定されたパスが強制キャッシュ対象かどうかを判定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>web</strong> (<a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web" title="cmdbox.app.web.Web"><em>Web</em></a>) -- Webオブジェクト</p></li>
+<li><p><strong>req</strong> (<em>Request</em>) -- クライアントからのリクエストオブジェクト</p></li>
+<li><p><strong>path</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em>) -- 判定対象のパス</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>強制キャッシュ対象であればTrue、そうでなければFalse</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.web.cmdbox_web_assets.Assets.regs_force_cache_path">
+<span class="sig-name descname"><span class="pre">regs_force_cache_path</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[re.compile('assets/apexcharts'),</span> <span class="pre">re.compile('assets/bootstrap'),</span> <span class="pre">re.compile('assets/dompurify'),</span> <span class="pre">re.compile('assets/encodingjs'),</span> <span class="pre">re.compile('assets/highlight'),</span> <span class="pre">re.compile('assets/jquery'),</span> <span class="pre">re.compile('assets/lightbox2'),</span> <span class="pre">re.compile('assets/marked'),</span> <span class="pre">re.compile('assets/split-pane'),</span> <span class="pre">re.compile('assets/tree-menu')]</span></span><a class="headerlink" href="#cmdbox.app.features.web.cmdbox_web_assets.Assets.regs_force_cache_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.features.web.cmdbox_web_assets.Assets.route">
 <span class="sig-name descname"><span class="pre">route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">web</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web" title="cmdbox.app.web.Web"><span class="pre">Web</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FastAPI</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/web/cmdbox_web_assets.html#Assets.route"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.web.cmdbox_web_assets.Assets.route" title="Link to this definition"></a></dt>

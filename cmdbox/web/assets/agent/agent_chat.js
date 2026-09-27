@@ -402,6 +402,11 @@ agentView.render_msgjson_json_to_table = (value) => {
     }
     return `<span>${agentView.render_msgjson_escape_html(value)}</span>`;
 };
+/**
+ * メッセージの内容をレンダリングする際に特殊文字をエスケープし、MarkdownをHTMLに変換します。
+ * @param {string} str 
+ * @returns 
+ */
 agentView.render_msgjson_rep = (str) => {
     try {
         str = str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '');
@@ -411,10 +416,11 @@ agentView.render_msgjson_rep = (str) => {
             el.html(marked.parse(el.html()));
         });
         if (elem.length > 0) str = elem.prop('outerHTML');
+        elem.remove();
     } catch (e) {
-        console.error(`Failed to parse message: ${str}`, e);
+        //console.warn(`Failed to parse message: ${str}`, e);
     }
-    return str;
+    return cmdbox.sanitize_html(str);
 };
 /**
  * Agentから返されるmessageをレンダリングする拡張ポイントです
@@ -422,7 +428,90 @@ agentView.render_msgjson_rep = (str) => {
  * @param {Array<string>} ret レンダリング結果を格納する配列
  */
 agentView.render_msgjson_message = (content, ret=[]) => {
-    content && ret.push(`${agentView.render_msgjson_rep(content)}\n`);
+    if (!content) return;
+    if (typeof content === 'string') {
+        ret.push(`${agentView.render_msgjson_rep(content)}\n`);
+        return;
+    }
+    if (Array.isArray(content)) {
+        content.forEach(item => {
+            const content_type = item['content_type'];
+            const content_name = item['content_name'];
+            const content_link = item['content_link'];
+            const content_body_b64 = item['content_body_b64'];
+            agentView.render_msgjson_message_content(content_name, content_type, content_link, content_body_b64, ret);
+        });
+        return;
+    }
+};
+/**
+ * Agentから返されるmessage内のコンテンツをレンダリングする拡張ポイントです
+ * @param {string} name コンテンツの名前
+ * @param {string} type コンテンツのタイプ
+ * @param {string} body_b64 コンテンツのBase64エンコードされた内容
+ * @param {Array<string>} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_message_content = (name, type, link, body_b64, ret=[]) => {
+    agentView.render_msgjson_message_link(name, link, ret);
+    if (body_b64) {
+        let content;
+        try {
+            content = atob(body_b64);
+        } catch (e) {
+            content = body_b64;
+        }
+        if (type === 'text/html') {
+            agentView.render_msgjson_message_html(name, content, ret);
+            return;
+        }
+        if (type.startsWith('image')) {
+            agentView.render_msgjson_message_image(name, type, content, link, ret);
+            return;
+        }
+        ret.push(`${agentView.render_msgjson_rep(content)}\n`);
+    }
+};
+/**
+ * Agentから返されるmessage内のリンクをレンダリングする拡張ポイントです
+ * @param {string} name リンクの表示名
+ * @param {string} link リンクのURL
+ * @param {Array<string>} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_message_link = (name, link, ret=[]) => {
+    if (link) {
+        ret.push(`<a href="${agentView.render_msgjson_escape_html(link)}" target="_blank">${agentView.render_msgjson_escape_html(name)}</a>`);
+    }
+};
+/**
+ * Agentから返されるHTMLコンテンツをレンダリングする拡張ポイントです
+ * @param {string} name コンテンツの名前
+ * @param {string} html HTMLコンテンツ
+ * @param {Array<string>} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_message_html = (name, html, ret=[]) => {
+    if (html) {
+        const contentid = cmdbox.random_string(16);
+        ret.push(`<div id="${contentid}" style="display:none;">${html}</div>\n`);
+        ret.push(`<a href="javascript:void(0);" onclick="cmdbox.message($('#${contentid}').html());">${agentView.render_msgjson_escape_html(name)}</a>\n`);
+    }
+};
+/**
+ * Agentから返される画像コンテンツをレンダリングする拡張ポイントです
+ * @param {string} name コンテンツの名前
+ * @param {string} type コンテンツのタイプ
+ * @param {string} base64 コンテンツのBase64エンコードされた内容
+ * @param {string} link コンテンツのリンク
+ * @param {Array<string>} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_message_image = (name, type, base64, link, ret=[]) => {
+    if (base64) {
+        const contentid = cmdbox.random_string(16);
+        ret.push(`<img id="${contentid}" src="data:${type};base64,${base64}" alt="${agentView.render_msgjson_escape_html(name)}" />\n`);
+    }
+    if (link) {
+        const contentid = cmdbox.random_string(16);
+        ret.push(`<img id="${contentid}" src="${agentView.render_msgjson_escape_html(link)}" alt="${agentView.render_msgjson_escape_html(name)}" />\n`);
+    }
 };
 /**
  * Agentから返されるcommandをレンダリングする拡張ポイントです

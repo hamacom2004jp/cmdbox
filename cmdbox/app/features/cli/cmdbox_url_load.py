@@ -40,7 +40,7 @@ class UrlLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="短縮URLを読み込みます。指定されたurl_idの情報を取得します。",
             description_en="Load a short URL. Retrieves information for the specified url_id.",
             choice=[

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.web.cmdbox_web_assets &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>cmdbox.app.features.web.cmdbox_web_assets &mdash; cmdbox 2026/09/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/documentation_options.js?v=a248f298"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -84,10 +84,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">HTTPException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamingResponse</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">mimetypes</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 
 <div class="viewcode-block" id="Assets">
@@ -113,7 +115,8 @@
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">asset</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'asset is not found. (</span><span class="si">{</span><span class="n">asset</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
                     <span class="n">mime</span><span class="p">,</span> <span class="n">enc</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-                    <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">asset</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime_ns</span><span class="p">))</span>
+                    <span class="n">force_cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_force_cache_path</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'assets/</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                    <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">asset</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime_ns</span><span class="p">),</span> <span class="n">force_cache</span><span class="o">=</span><span class="n">force_cache</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">em</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">304</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
                     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -125,7 +128,8 @@
                 <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">'/assets/</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
                 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
                     <span class="n">mime</span><span class="p">,</span> <span class="n">enc</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-                    <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">hs</span><span class="p">)</span>
+                    <span class="n">force_cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_force_cache_path</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'assets/</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                    <span class="n">em</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">etag</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">hs</span><span class="p">,</span> <span class="n">force_cache</span><span class="o">=</span><span class="n">force_cache</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">em</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">304</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">asset_data</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="n">mime</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
@@ -154,6 +158,34 @@
                         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">path</span><span class="o">==</span><span class="sa">f</span><span class="s1">'/signin/assets/</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1">'</span> <span class="ow">or</span> <span class="n">r</span><span class="o">.</span><span class="n">path</span><span class="o">==</span><span class="sa">f</span><span class="s1">'/assets/</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1">'</span><span class="p">:</span>
                             <span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
                     <span class="n">asset_func</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ondemand_load</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">asset</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'</span><span class="se">\\</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'/'</span><span class="p">))</span></div>
+
+
+    <span class="n">regs_force_cache_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/apexcharts"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/bootstrap"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/dompurify"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/encodingjs"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/highlight"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/jquery"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/lightbox2"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/marked"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/split-pane"</span><span class="p">),</span>
+                             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"assets/tree-menu"</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="Assets.is_force_cache_path">
+<a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_assets.Assets.is_force_cache_path">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_force_cache_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        指定されたパスが強制キャッシュ対象かどうかを判定します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            req (Request): クライアントからのリクエストオブジェクト</span>
+<span class="sd">            path (Union[str, Path]): 判定対象のパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 強制キャッシュ対象であればTrue、そうでなければFalse</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="k">for</span> <span class="n">reg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regs_force_cache_path</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

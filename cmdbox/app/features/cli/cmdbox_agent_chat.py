@@ -21,6 +21,13 @@ import json
 import pydantic
 
 
+class AgentOutputContent(pydantic.BaseModel):
+    """Agentの出力内容のスキーマ。"""
+    content_type: Optional[str] = pydantic.Field(default=None, description="実行結果のコンテンツタイプ")
+    content_name: Optional[str] = pydantic.Field(default=None, description="実行結果のコンテンツ名")
+    content_link: Optional[str] = pydantic.Field(default=None, description="実行結果のコンテンツ内容が取得できるハイパーリンク")
+    content_body_b64: Optional[str] = pydantic.Field(default=None, description="実行結果のコンテンツ内容をBase64エンコードしたもの")
+
 class AgentOutput(pydantic.BaseModel):
     """Agentの出力スキーマ。
 
@@ -40,18 +47,12 @@ class AgentOutput(pydantic.BaseModel):
     側で指示するのが本来の役割で、応答の検証は従来どおり本モデルで行われます。
     native 経路ではスキーマがそのまま送られ、description も届きます。
     """
-    success: Optional[bool] = pydantic.Field(
-        default=None, description="コマンド実行が成功したかどうか")
-    command: Optional[str] = pydantic.Field(
-        default=None, description="実行したコマンド名")
-    parameters_json: Optional[str] = pydantic.Field(
-        default=None, description="コマンドに指定したパラメータ(JSON文字列)")
-    result_json: Optional[str] = pydantic.Field(
-        default=None, description="コマンド実行結果(JSON文字列)")
-    error: Optional[str] = pydantic.Field(
-        default=None, description="エラーが発生した場合のエラーメッセージ")
-    message: Optional[str] = pydantic.Field(
-        default=None, description="実行結果のメッセージ")
+    success: Optional[bool] = pydantic.Field(default=None, description="コマンド実行が成功したかどうか")
+    command: Optional[str] = pydantic.Field(default=None, description="実行したコマンド名")
+    parameters_json: Optional[str] = pydantic.Field(default=None, description="コマンドに指定したパラメータ(JSON文字列)")
+    result_json: Optional[str] = pydantic.Field(default=None, description="コマンド実行結果(JSON文字列)")
+    error: Optional[str] = pydantic.Field(default=None, description="エラーが発生した場合のエラーメッセージ")
+    message: Optional[Union[str, List[AgentOutputContent]]] = pydantic.Field(default=None, description="実行結果のメッセージ")
 
     @classmethod
     def _none_junk(cls, v: Any) -> Any:

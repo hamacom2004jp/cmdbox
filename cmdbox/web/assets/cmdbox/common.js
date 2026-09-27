@@ -106,6 +106,22 @@ cmdbox.range = (start, stop, step) => {
     return Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 };
 /**
+ * 指定されたHTML文字列をサニタイズする
+ * @param {string} html - サニタイズするHTML文字列
+ * @param {object} config - DOMPurifyの設定オブジェクト
+ * @returns {string} - サニタイズされたHTML文字列
+ */
+cmdbox.sanitize_html = (html, config={}) => {
+    if (!DOMPurify || typeof DOMPurify.sanitize !== 'function') {
+        throw new Error('DOMPurify is not available');
+    }
+    config = {
+        FORBID_TAGS: ['style', 'form', 'input', 'button', 'select', 'textarea', 'option'],
+        ...config
+    };
+    return DOMPurify.sanitize(html, config);
+};
+/**
  * 確認メッセージ表示
  * @param {object} res - レスポンス
  * @param {boolean} i18n - 翻訳を有効にするかどうか

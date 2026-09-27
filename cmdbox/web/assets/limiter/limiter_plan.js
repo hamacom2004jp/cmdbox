@@ -382,21 +382,12 @@ limiter_plan_page.open_edit_modal = async (name) => {
         limiters = form.find('[name="limiters"]');
     }
     limiters = form.find('[name="limiters"]');
-    limiters.empty().append('<option></option>');
-    limiter_names.forEach(elm => {
-        limiters.append(`<option value="${elm}">${elm}</option>`);
-    });
     limiters.each((i, e) => {
-        if (limiter_names[i]) $(e).val(limiter_names[i]);
-        else $(e).parent().parent().remove();
+        if (limiter_names.length > i && limiter_names[i]) $(e).val(limiter_names[i]);
     });
     // billing_limiterリスト
     if(cfg.billing_limiter) {
         const billing_limiter = form.find('[name="billing_limiter"]');
-        billing_limiter.empty().append('<option></option>');
-        limiter_names.forEach(elm => {
-            billing_limiter.append(`<option value="${elm}">${elm}</option>`);
-        });
         billing_limiter.val(cfg.billing_limiter);
     }
     form.find('[name="save_mode"]').val('update');

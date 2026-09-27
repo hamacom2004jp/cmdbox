@@ -42,7 +42,7 @@ class UrlAdd(feature.OneshotResultEdgeFeature, validator.Validator):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="短縮URLを追加します。target_urlとperiodを指定すると、url_idが生成され、.urlsフォルダにurl_id.jsonファイルが作成されます。",
             description_en="Add a short URL. When target_url and period are specified, a url_id is generated and a url_id.json file is created in the .urls folder.",
             choice=[

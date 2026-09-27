@@ -39,7 +39,6 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
             if signin is not None:
                 return signin
             em, headers = self.etag(web, req, str(web.agent_html.stat().st_mtime_ns))
-            headers.update({'Access-Control-Allow-Origin': '*'})
             if em:
                 return Response(status_code=304, headers=headers)
             if ondemand_load:

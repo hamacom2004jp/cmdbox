@@ -37,7 +37,6 @@ class Signin(feature.WebFeature):
         async def _signin(next:str, req:Request, res:Response, full_path:str=None):
             signin.Signin._enable_cors(req, res)
             em, headers = self.etag(web, req, str(web.signin_html.stat().st_mtime_ns))
-            headers.update({'Access-Control-Allow-Origin': '*'})
             if em:
                 return Response(status_code=304, headers=headers)
             if ondemand_load:

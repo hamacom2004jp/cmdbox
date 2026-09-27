@@ -420,7 +420,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.message.parameters_json","str | null","no","null","コマンドに指定したパラメータ(JSON文字列)"
     "success.message.result_json","str | null","no","null","コマンド実行結果(JSON文字列)"
     "success.message.error","str | null","no","null","エラーが発生した場合のエラーメッセージ"
-    "success.message.message","str | null","no","null","実行結果のメッセージ"
+    "success.message.message","str | list[AgentOutputContent] | null","no","null","実行結果のメッセージ"
     "success.function_calls","list[FunctionCall] | null","no","null","関数呼び出し一覧"
     "success.function_responses","list[FunctionResponse] | null","no","null","関数応答一覧"
     "success.artifact_delta","dict[str, int] | null","no","null","更新されたアーティファクト一覧"

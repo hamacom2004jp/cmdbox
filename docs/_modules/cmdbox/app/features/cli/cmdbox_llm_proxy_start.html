@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.cmdbox_llm_proxy_start &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>cmdbox.app.features.cli.cmdbox_llm_proxy_start &mdash; cmdbox 2026/09/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/documentation_options.js?v=a248f298"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -367,6 +367,9 @@
             <span class="c1"># 高負荷時の安定性設定</span>
             <span class="n">connect_timeout</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'connection_timeout'</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span>
             <span class="n">max_retries</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'max_retries_per_call'</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
+            <span class="c1"># メトリクス取得を有効化</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="s2">"prometheus"</span><span class="p">],</span>
+            <span class="n">require_auth_for_metrics_endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># 高負荷時のキャッシュ設定を追加する</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'cache_responses'</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>

@@ -382,6 +382,91 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "end","bool | null","no","null","終了フラグ"
 
 
+llm ( metrics ) : ``cmdbox -m llm -c metrics <Option>``
+=======================================================
+
+- Retrieves metrics information for the specified LLM.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
+    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
+    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
+    "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to get metrics for."
+    "--groups <groups>","str","multi","","","","Specify user groups used to authorize access to the LLM configuration."
+    "--format_raw <format_raw>","bool","","","False","","Return the metrics in raw Prometheus text format."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "save_mode": "string",
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "llmname": "string",
+        "endpoint": "string",
+        "metrics_raw": "string",
+        "metrics": [
+          {
+            "name": "string",
+            "value": 0.0,
+            "help_text": "string"
+          }
+        ],
+        "gpu_load": 0.0,
+        "requests_running": 0,
+        "requests_waiting": 0,
+        "tokens_generated_total": 0,
+        "cache_usage_perc": 0.0
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.llmname","str | null","no","null","LLM名"
+    "success.endpoint","str | null","no","null","メトリクスエンドポイント"
+    "success.metrics_raw","str | null","no","null","生のPrometheusフォーマットメトリクス"
+    "success.metrics","list[MetricValue] | null","no","null","パースされたメトリクス"
+    "success.gpu_load","float | null","no","null","GPU負荷率（%）"
+    "success.requests_running","int | null","no","null","実行中のリクエスト数"
+    "success.requests_waiting","int | null","no","null","待機中のリクエスト数"
+    "success.tokens_generated_total","int | null","no","null","生成されたトークンの合計数"
+    "success.cache_usage_perc","float | null","no","null","キャッシュ使用率（%）"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
 llm ( proxy_start ) : ``cmdbox -m llm -c proxy_start <Option>``
 ===============================================================
 

@@ -972,7 +972,9 @@ class Web:
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, ssl_listen_port:int=8443,
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
               session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=900, outputs_key:List[str]=[],
-              gunicorn_workers:int=-1, gunicorn_timeout:int=30):
+              gunicorn_workers:int=-1, gunicorn_timeout:int=30,
+              x_content_type_options:bool=False, x_frame_options:bool=False, strict_transport_security:bool=False,
+              cache_control_max_age:int=600):
         """
         Webサーバを起動する
 
@@ -991,6 +993,10 @@ class Web:
             outputs_key (list, optional): 出力キー. Defaults to [].
             gunicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.
             gunicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.
+            x_content_type_options (bool, optional): X-Content-Type-Options ヘッダーを有効にするか. Defaults to False.
+            x_frame_options (bool, optional): X-Frame-Options ヘッダーを有効にするか. Defaults to False.
+            strict_transport_security (bool, optional): Strict-Transport-Security ヘッダーを有効にするか. Defaults to False.
+            cache_control_max_age (int, optional): Cache-Control ヘッダーの max-age. Defaults to 600.
         """
         self.allow_host = allow_host
         self.listen_port = listen_port
@@ -1006,6 +1012,10 @@ class Web:
         self.session_timeout = session_timeout
         self.gunicorn_workers = gunicorn_workers
         self.gunicorn_timeout = gunicorn_timeout
+        self.x_content_type_options = x_content_type_options
+        self.x_frame_options = x_frame_options
+        self.strict_transport_security = strict_transport_security
+        self.cache_control_max_age = cache_control_max_age
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
             self.logger.debug(f"web start parameter: listen_port={self.listen_port}")
@@ -1021,6 +1031,10 @@ class Web:
             self.logger.debug(f"web start parameter: session_timeout={self.session_timeout}")
             self.logger.debug(f"web start parameter: gunicorn_workers={self.gunicorn_workers}")
             self.logger.debug(f"web start parameter: gunicorn_timeout={self.gunicorn_timeout}")
+            self.logger.debug(f"web start parameter: x_content_type_options={self.x_content_type_options}")
+            self.logger.debug(f"web start parameter: x_frame_options={self.x_frame_options}")
+            self.logger.debug(f"web start parameter: strict_transport_security={self.strict_transport_security}")
+            self.logger.debug(f"web start parameter: cache_control_max_age={self.cache_control_max_age}")
 
         session_redis = Redis(host=self.redis_host, port=self.redis_port, password=self.redis_password, protocol=2)
         @asynccontextmanager
@@ -1038,9 +1052,15 @@ class Web:
             return res
 
         @app.middleware("http")
-        async def set_allow_origin(req:Request, call_next):
+        async def set_secure_headers(req:Request, call_next):
             res:Response = await call_next(req)
             res.headers["Access-Control-Allow-Origin"] = "*"
+            if self.x_content_type_options:
+                res.headers["X-Content-Type-Options"] = "nosniff"
+            if self.x_frame_options:
+                res.headers["X-Frame-Options"] = "SAMEORIGIN"
+            if self.strict_transport_security:
+                res.headers["Strict-Transport-Security"] = "max-age=15768000"
             return res
 
         session_store = RedisStore(connection=session_redis, prefix=f"{self.ver.__appid__}:{self.svname}:session.")
@@ -1058,7 +1078,9 @@ class Web:
             res:Response = await call_next(req)
             path = req.url.path if req.url is not None else ''
             is_assets = path.startswith('/assets/') or path.startswith('/signin/assets/')
-            if is_assets:
+            val_cache = str(res.headers.get('cache-control')).lower()
+            is_cache = 'cache-control' in res.headers and val_cache.startswith('private')
+            if is_assets or is_cache:
                 set_cookies = res.headers.getlist('set-cookie')
                 if set_cookies:
                     del res.headers['set-cookie']

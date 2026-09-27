@@ -1,5 +1,5 @@
 from cmdbox import version
-from cmdbox.app import feature
+from cmdbox.app import common, feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from pathlib import Path
@@ -17,9 +17,11 @@ class VersionsCmdbox(feature.WebFeature):
         """
         @app.get('/versions', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def versions(req:Request, res:Response):
-            signin = web.signin.check_signin(req, res)
-            if signin is not None:
-                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
+            hash_value = int(common.hash_password(self.ver.__version__, 'md5')[:16], 16)
+            em, headers = self.etag(web, req, str(hash_value), force_cache=True)
+            if em:
+                return Response(status_code=304, headers=headers)
+            res.headers.update(headers)
             ret = dict()
             if hasattr(self.ver, '__version__'): ret['version'] = self.ver.__version__
             if hasattr(self.ver, '__appid__'): ret['appid'] = self.ver.__appid__

@@ -272,6 +272,9 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
             # 高負荷時の安定性設定
             connect_timeout=int(getattr(args, 'connection_timeout', 10)),
             max_retries=int(getattr(args, 'max_retries_per_call', 3)),
+            # メトリクス取得を有効化
+            callbacks=["prometheus"],
+            require_auth_for_metrics_endpoint=True,
         )
         # 高負荷時のキャッシュ設定を追加する
         if getattr(args, 'cache_responses', True):

@@ -425,21 +425,24 @@ class WebFeature(object):
         """
         return dict()
 
-    def etag(self, web:web.Web, req:Request, etag_val:str, static:bool=True) -> Tuple[bool, Dict[str, str]]:
+    def etag(self, web:web.Web, req:Request, etag_val:str, static:bool=True, force_cache:bool=False) -> Tuple[bool, Dict[str, str]]:
         """
         etagの検証を行い、If-None-Matchリクエストヘッダの値と合致するかどうかを返します。
 
         Args:
+            web (Web): Webオブジェクト
             req (Request): クライアントからのリクエストオブジェクト。
             etag_val (str): 検証するETagの値。
             static (bool): 静的ファイルかどうか。デフォルトはTrue。
+            force_cache (bool): 強制キャッシュ対象かどうか。デフォルトはFalse。
 
         Returns:
             Tuple[bool, Dict[str, str]]: ETagが一致するかどうかと、レスポンスヘッダの辞書を返します。
         """
         im = req.headers.get('If-None-Match')
-        if web.logger.level == logging.DEBUG or not static:
-            headers = {'Cache-Control':'private, no-cache', 'ETag': etag_val}
+        if not force_cache and (web.logger.level == logging.DEBUG or not static):
+            headers = {'Cache-Control':'private, no-cache', 'ETag': f'"{etag_val}"'}
         else:
-            headers = {'Cache-Control':'private, max-age=300', 'ETag': etag_val}
+            headers = {'Cache-Control':f'private, max-age={web.cache_control_max_age}', 'ETag': f'"{etag_val}"'}
+        headers.update({'Access-Control-Expose-Headers': 'Cache-Control, ETag'})
         return im == etag_val, headers

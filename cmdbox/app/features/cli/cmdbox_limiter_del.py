@@ -1,6 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
+from cmdbox.app.features.cli import cmdbox_limiter_plan_list
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -10,6 +11,10 @@ import pydantic
 
 
 class LimiterDel(feature.OneshotResultEdgeFeature, validator.Validator):
+    def __init__(self, appcls, ver, language = None):
+        super().__init__(appcls, ver, language)
+        self.plan_list = cmdbox_limiter_plan_list.LimiterPlanList(appcls, ver, language)
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
 
@@ -60,6 +65,21 @@ class LimiterDel(feature.OneshotResultEdgeFeature, validator.Validator):
             logger.warning("Limiters are supported only in the “client” and “server” scopes.")
             common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, result, None
+
+        args.cache_clear = True
+        st, ret, _ = self.plan_list.apprun(logger, args, tm, pf=pf)
+        if st == self.RESP_SUCCESS:
+            data = ret['success']['data']
+            if data and any([args.limiter_name in lm['limiters'] for lm in data if 'limiters' in lm]):
+                msg = dict(warn=f"Limiter configuration '{args.limiter_name}' is currently in use and cannot be deleted.")
+                logger.warning(msg['warn'])
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+            if data and any([args.limiter_name == lm['billing_limiter'] for lm in data if 'billing_limiter' in lm]):
+                msg = dict(warn=f"Limiter configuration '{args.limiter_name}' is currently used as a billing limiter and cannot be deleted.")
+                logger.warning(msg['warn'])
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
 
         if args.scope == 'client':
             client_data = args.client_data if hasattr(args, 'client_data') else None
