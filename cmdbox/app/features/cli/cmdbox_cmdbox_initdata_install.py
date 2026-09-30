@@ -160,7 +160,7 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                 (svp, msg_dict, is_warning)
             """
             try:
-                ret = cl.file_upload(svp, file_path, scope=args.scope, client_data=client_data,
+                ret = cl.file_upload(svp, file_path, scope=args.scope, client_data=client_data, meta_chk=False,
                                      fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, overwrite=args.overwrite,
                                      retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 msg = dict(scope=args.scope, svpath=svp)

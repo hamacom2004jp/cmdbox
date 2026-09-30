@@ -12,6 +12,10 @@ import os
 
 
 class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limiter.LimitedFeature):
+    def __init__(self, appcls, ver, language=None, meta_chk=True):
+        super().__init__(appcls, ver, language)
+        self.meta_chk = meta_chk
+
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -122,7 +126,8 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         lmpaths = [str(p).replace('"','') for p in args.lmpath] if args.lmpath is not None else []
         ret = cl.file_upload(str(args.svpath).replace('"',''), upload_file, scope=args.scope, client_data=client_data,
-                             fwpaths=fwpaths, rjpaths=rjpaths, lmpaths=sorted(lmpaths, reverse=True), meta=args.meta, mkdir=args.mkdir, overwrite=args.overwrite,
+                             fwpaths=fwpaths, rjpaths=rjpaths, lmpaths=sorted(lmpaths, reverse=True),
+                             meta_chk=self.meta_chk, meta=args.meta, mkdir=args.mkdir, overwrite=args.overwrite,
                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -171,9 +176,10 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         overwrite = payload.get("overwrite", False)=='True' or payload.get("overwrite", False) is True
         fwpaths = payload.get("fwpaths")
         rjpaths = payload.get("rjpaths")
+        meta_chk = payload.get("meta_chk")
         meta = payload.get("meta", None)
         st = self.file_upload(msg[1], svpath, file_name, file_data, mkdir, overwrite,
-                              fwpaths, rjpaths, meta, data_dir, logger, redis_cli, sessions)
+                              fwpaths, rjpaths, meta_chk, meta, data_dir, logger, redis_cli, sessions)
         return st
 
     def apprun_registrations(self, data_dir, logger, args, msg):
@@ -264,7 +270,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         return total_size
 
     def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes, mkdir:bool, overwrite:bool,
-                    fwpaths:List[str], rjpaths:List[str], meta:Dict[str, Any],
+                    fwpaths:List[str], rjpaths:List[str], meta_chk:bool, meta:Dict[str, Any],
                     data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをアップロードする
@@ -278,6 +284,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
             overwrite (bool): 上書きするかどうか
             fwpaths (List[str]): 範囲内パスのリスト
             rjpaths (List[str]): 範囲外パスのリスト
+            meta_chk (bool): .metaディレクトリのチェックを行うかどうか
             meta (Dict[str, Any]): メタデータ
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
@@ -289,7 +296,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_upload(current_path, file_name, file_data, mkdir, overwrite, fwpaths, rjpaths, meta)
+            rescode, msg = f.file_upload(current_path, file_name, file_data, mkdir, overwrite, fwpaths, rjpaths, meta_chk, meta)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

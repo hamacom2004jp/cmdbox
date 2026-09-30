@@ -2,15 +2,7 @@ from cmdbox.app import common, client, options
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_tts_say
-from cmdbox.app.features.cli.agent import (
-    agant_base,
-    SQLInjectionDetectionPlugin,
-    JavaScriptInjectionPlugin,
-    TemplateInjectionDetectionPlugin,
-    MaliciousKeywordDetectionPlugin,
-    DangerousSequencePlugin,
-    PromptInjectionException,
-)
+from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from contextlib import aclosing
 from pathlib import Path
@@ -792,6 +784,13 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         Returns:
             List[Any]: 作成したプラグインのリスト
         """
+        from cmdbox.app.features.cli.agent import (
+            SQLInjectionDetectionPlugin,
+            JavaScriptInjectionPlugin,
+            TemplateInjectionDetectionPlugin,
+            MaliciousKeywordDetectionPlugin,
+            DangerousSequencePlugin,
+        )
         plugins = [
             SQLInjectionDetectionPlugin(logger),
             JavaScriptInjectionPlugin(logger),
@@ -869,6 +868,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             int: ステータス
         """
         try:
+            from cmdbox.app.features.cli.agent import PromptInjectionException
             # プロンプトインジェクション検知エラーの場合は特別なメッセージを返す
             if isinstance(exc, PromptInjectionException):
                 msg = dict(warn=dict(

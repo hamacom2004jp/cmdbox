@@ -93,11 +93,10 @@ rag = [
     "pdfminer.six>=20250324",
     "python-docx>=1.2.0,<2.0",
     "mammoth>=1.9.1,<2.0",
-    "docutils>=0.21.2,<1.0",
     "markdownify>=1.1.0,<2.0",
     "striprtf>=0.0.29,<1.0",
     "pylatexenc>=2.10",
-    "odfpy>=1.4.1,<2.0",
+    #"odfpy>=1.4.1,<2.0",
     "openpyxl>=3.1.5,<4.0",
     "tabulate2>=1.10.2,<2.0",
     "langchain_community",
@@ -115,6 +114,7 @@ saml = [
 ]
 dev = [
     "build",
+    "docutils>=0.21.2,<1.0",
     "collectlicense",
     "pipdeptree",
     "pytest",
@@ -127,7 +127,7 @@ dev = [
     "wheel",
 ]
 app = [
-    "cmdbox[dev, agent_mcp, agent_adk, rag]"
+    "cmdbox[agent_mcp, agent_adk, rag]"
 ]
 
 [project.urls]

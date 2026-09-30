@@ -74,7 +74,8 @@ class Filer(object):
             return False, abspath, dict(warn=f"Path {apath} exist.")
         return True, abspath, dict(success=f"Path {apath} exists.")
 
-    def check_fwpath(self, path:str, fwpaths:List[str], rjpaths:List[str]=None, exists_chk:bool=True) -> Tuple[int, Dict[str, Any]]:
+    def check_fwpath(self, path:str, fwpaths:List[str], rjpaths:List[str]=None,
+                     exists_chk:bool=True, meta_chk:bool=True) -> Tuple[int, Dict[str, Any]]:
         """
         パスが範囲内かどうかを確認する
         Args:
@@ -82,6 +83,7 @@ class Filer(object):
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト, by default None
             exists_chk (bool, optional): パス存在チェックを行うかどうか, by default True
+            meta_chk (bool, optional): .metaディレクトリのチェックを行うかどうか, by default True
         Returns:
             int: レスポンスコード
             dict: メッセージ
@@ -96,7 +98,7 @@ class Filer(object):
         rjpaths = rjpaths if isinstance(rjpaths, list) else [rjpaths] if rjpaths is not None and rjpaths != "********" else []
         if rjpaths is not None and any(re.match(rjpath, rpath) for rjpath in rjpaths):
             return False, dict(warn=f"The specified path ( {rpath} ) is rejected.")
-        if re.search(r'\.meta/', rpath):
+        if meta_chk and re.search(r'\.meta/', rpath):
             return False, dict(warn=f"The specified path ( {rpath} ) is rejected.")
         return True, None
 
@@ -349,7 +351,8 @@ class Filer(object):
             return self.RESP_WARN, dict(warn=f"Failed to remove {apath}. {e}")
 
     def file_download(self, current_path:str, img_thumbnail:float=0.0,
-                      fwpaths:List[str]=None, rjpaths:List[str]=None, meta:Dict[str, Any]=None, etag:str=None) -> Tuple[int, Dict[str, Any]]:
+                      fwpaths:List[str]=None, rjpaths:List[str]=None, meta_chk:bool=True,
+                      meta:Dict[str, Any]=None, etag:str=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをダウンロードする
 
@@ -358,6 +361,7 @@ class Filer(object):
             img_thumbnail (float, optional): サムネイルのサイズ, by default 0.0
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta_chk (bool, optional): .metaディレクトリのチェックを行うかどうか, by default True
             meta (Dict[str, Any], optional): メタデータ. Defaults to None.
             etag (str, optional): ETag. Defaults to None.
 
@@ -366,7 +370,7 @@ class Filer(object):
             dict: メッセージ
         """
         img_thumbnail = 0.0 if img_thumbnail is None else img_thumbnail
-        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, meta_chk=meta_chk)
         if not chk:
             return self.RESP_WARN, msg
         chk, abspath, msg = self._file_exists(current_path)
@@ -495,7 +499,7 @@ class Filer(object):
 
     def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool,
                     overwrite:bool, fwpaths:List[str]=None, rjpaths:List[str]=None,
-                    meta: Dict[str, Any]=None) -> Tuple[int, Dict[str, Any]]:
+                    meta_chk: bool=True, meta: Dict[str, Any]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをアップロードする
 
@@ -507,6 +511,7 @@ class Filer(object):
             overwrite (bool): 上書きするかどうか
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta_chk (bool, optional): .metaディレクトリのチェックを行うかどうか. Defaults to True.
             meta (Dict[str, Any], optional): メタデータ. Defaults to None.
 
         Returns:
@@ -514,7 +519,7 @@ class Filer(object):
             dict: メッセージ
             meta (Dict[str, Any], optional): メタデータ. Defaults to None.
         """
-        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=False)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=False, meta_chk=meta_chk)
         if not chk:
             return self.RESP_WARN, msg
         chk, abspath, msg = self._file_exists(current_path, exists_chk=False)

@@ -174,19 +174,21 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
     
     def file_download(self, svpath:str, download_file:Path, scope:str="client", client_data:Path=None,
-                      fwpaths:List[str]=None, rjpaths:List[str]=None, meta:Dict[str, Any]=None,
+                      fwpaths:List[str]=None, rjpaths:List[str]=None,
+                      meta_chk:bool=True, meta:Dict[str, Any]=None,
                       etag:str=None, rpath:str="", img_thumbnail:float=0.0,
                       retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルをダウンロードする
 
         Args:
-            svpath (Path): サーバー上のファイルパス
+            svpath (str): サーバー上のファイルパス
             download_file (Path): ローカルのファイルパス
             scope (str, optional): 参照先のスコープ. Defaults to "client".
             client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta_chk (bool, optional): .metaディレクトリのチェックを行うかどうか. Defaults to True.
             meta (Dict[str, Any], optional): メタデータ. Defaults to None.
             etag (str, optional): ETag. Defaults to None.
             rpath (str, optional): リクエストパス. Defaults to "".
@@ -201,13 +203,13 @@ class Client(object):
         if scope == "client":
             if client_data is not None:
                 f = filer.Filer(client_data, self.logger)
-                _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, rjpaths, meta, etag=etag)
+                _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, rjpaths, meta_chk=meta_chk, meta=meta, etag=etag)
             else:
                 self.logger.warning(f"client_data is empty.")
                 return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
-            _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, rjpaths, meta, etag=etag)
+            _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, rjpaths, meta_chk=meta_chk, meta=meta, etag=etag)
         elif scope == "server":
             payload = dict(svpath=svpath, img_thumbnail=img_thumbnail,
                            fwpaths=fwpaths, rjpaths=rjpaths, meta=meta, etag=etag)
@@ -283,6 +285,7 @@ class Client(object):
 
     def file_upload(self, svpath:str, upload_file:Path, scope:str="client", client_data:Path=None,
                     fwpaths:List[str]=None, rjpaths:List[str]=None, lmpaths:List[str]=None,
+                    meta_chk:bool=True,
                     meta:Dict[str, Any]=None, mkdir:bool=False, overwrite:bool=False,
                     retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
@@ -298,6 +301,7 @@ class Client(object):
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
             lmpaths (List[str], optional): サイズ計算するパスのリスト. Defaults to None.
+            meta_chk (bool, optional): .metaディレクトリのチェックを行うかどうか. Defaults to True.
             meta (Dict[str, Any], optional): メタデータ. Defaults to None.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
@@ -320,7 +324,7 @@ class Client(object):
                 if client_data is not None:
                     fi = filer.Filer(client_data, self.logger)
                     _, res_json = fi.file_upload(svpath, upload_file.name, f.read(), mkdir, overwrite,
-                                                  fwpaths, rjpaths, meta)
+                                                  fwpaths, rjpaths, meta_chk=meta_chk, meta=meta)
                     return res_json
                 else:
                     self.logger.warning(f"client_data is empty.")
@@ -328,7 +332,7 @@ class Client(object):
             elif scope == "current":
                 fi = filer.Filer(Path.cwd(), self.logger)
                 _, res_json = fi.file_upload(svpath, upload_file.name, f.read(), mkdir, overwrite,
-                                             fwpaths, rjpaths, meta)
+                                             fwpaths, rjpaths, meta_chk=meta_chk, meta=meta)
                 return res_json
             elif scope == "server":
                 payload = dict(svpath=svpath, file_name=upload_file.name, file_data=convert.bytes2b64str(f.read()),

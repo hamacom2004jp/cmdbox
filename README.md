@@ -69,6 +69,7 @@ A single feature implementation can be exposed through CLI / REST API / MCP SV /
 ## Installation
 
 ```bash
+pip install cmdbox[dev]
 pip install cmdbox[app]
 cmdbox -v
 ```

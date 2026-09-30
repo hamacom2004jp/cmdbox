@@ -10,6 +10,10 @@ import pydantic
 
 
 class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limiter.LimitedFeature):
+    def __init__(self, appcls, ver, language=None, meta_chk=True):
+        super().__init__(appcls, ver, language)
+        self.meta_chk = meta_chk
+
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -121,7 +125,9 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
         fwpaths = [str(p).replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
         rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         ret = cl.file_download(str(args.svpath).replace('"',''), download_file, scope=args.scope, client_data=client_data,
-                               fwpaths=fwpaths, rjpaths=rjpaths, meta=args.meta, etag=args.etag, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
+                               fwpaths=fwpaths, rjpaths=rjpaths,
+                               meta_chk=self.meta_chk, meta=args.meta,
+                               etag=args.etag, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -173,6 +179,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
         svpath = payload.get("svpath")
         fwpaths = payload.get("fwpaths")
         rjpaths = payload.get("rjpaths")
+        meta_chk = payload.get("meta_chk")
         meta = payload.get("meta")
         etag = payload.get("etag")
         img_thumbnail = payload.get("img_thumbnail", 0.0)
@@ -180,11 +187,13 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
             img_thumbnail = 0.0
         else:
             img_thumbnail = float(img_thumbnail)
-        st = self.file_download(msg[1], svpath, img_thumbnail, fwpaths, rjpaths, meta, etag, data_dir, logger, redis_cli, sessions)
+        st = self.file_download(msg[1], svpath, img_thumbnail, fwpaths, rjpaths, meta_chk, meta,
+                                etag, data_dir, logger, redis_cli, sessions)
         return st
 
     def file_download(self, reskey:str, current_path:str, img_thumbnail:float,
-                      fwpaths:List[str], rjpaths:List[str], meta:Dict[str, Any], etag:str,
+                      fwpaths:List[str], rjpaths:List[str],
+                      meta_chk:bool, meta:Dict[str, Any], etag:str,
                       data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをダウンロードする
@@ -194,6 +203,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
             current_path (str): ファイルパス
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
             rjpaths (List[str]): 範囲外かどうかを示すパスのリスト
+            meta_chk (bool): .metaディレクトリのチェックを行うかどうか
             meta (Dict[str, Any]): メタデータ
             img_thumbnail (float, optional): サムネイルサイズ. Defaults to 0.0.
             etag (str, optional): ETag. Defaults to None.
@@ -207,7 +217,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_download(current_path, img_thumbnail, fwpaths=fwpaths, rjpaths=rjpaths, meta=meta, etag=etag)
+            rescode, msg = f.file_download(current_path, img_thumbnail, fwpaths=fwpaths, rjpaths=rjpaths, meta_chk=meta_chk, meta=meta, etag=etag)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

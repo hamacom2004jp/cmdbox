@@ -57,7 +57,7 @@ class RagStore:
         """
         データベースに接続します
         """
-        conn, dbtype = self.ds_load.get_connection(self.ds_conf)
+        conn, dbtype = self.ds_load.get_context(self.ds_conf)
         return conn
 
     def insert_doc(self, *, connection:Any=None, servicename:str=None,
