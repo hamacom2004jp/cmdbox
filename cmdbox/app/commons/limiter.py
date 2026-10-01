@@ -707,26 +707,23 @@ return cjson.encode(c)
                     # Redis にデータがない場合は、ファイルから読んだカウンタをそのまま保存する
                     self.redis_client.hset(redis_key, limiter_name, json.dumps(counter))
                 else:
-                    # Redis にデータがある場合は、ファイルから読んだカウンタとマージして保存する
+                    # Redis にデータがある場合は、周期の一致をチェックしてからマージする
                     text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
                     share_counter = json.loads(text)
-                    merged_counter = dict(counter)
-                    for k in self.COUNTER_VALKEYS:
-                        merged_counter[k] = max(counter.get(k, 0), share_counter.get(k, 0))
-                    # リセット日時と最終更新日時もマージする
-                    for ts_key in ('last_reset', 'last_update'):
-                        shared_ts = share_counter.get(ts_key)
-                        current_ts = counter.get(ts_key)
-                        if shared_ts and not current_ts:
-                            merged_counter[ts_key] = shared_ts
-                        elif shared_ts and current_ts:
-                            try:
-                                if datetime.fromisoformat(str(shared_ts)) > datetime.fromisoformat(str(current_ts)):
-                                    merged_counter[ts_key] = shared_ts
-                            except Exception:
-                                pass
-                    # Redis にマージしたカウンタを保存する
-                    counter = merged_counter
+                    # 周期判定: last_reset が異なる場合は、新しい周期のカウンタを優先
+                    try:
+                        counter_reset = datetime.fromisoformat(str(counter.get('last_reset', '1970-01-01T00:00:00')))
+                        share_reset = datetime.fromisoformat(str(share_counter.get('last_reset', '1970-01-01T00:00:00')))
+                        is_same_period = (counter_reset == share_reset)
+                    except (ValueError, TypeError):
+                        is_same_period = False
+                    if is_same_period:
+                        # 同一周期内: max マージを適用
+                        merged_counter = dict(counter)
+                        for k in self.COUNTER_VALKEYS:
+                            merged_counter[k] = max(counter.get(k, 0), share_counter.get(k, 0))
+                        counter = merged_counter
+                    # else: 異なる周期: counter（ファイル）を採用（Redis の旧周期値は採用しない）
                     self.redis_client.hset(redis_key, limiter_name, json.dumps(counter))
             except Exception:
                 pass
@@ -755,12 +752,9 @@ return cjson.encode(c)
                 for line in lines:
                     stripped = line.strip()
                     if stripped:
-                        last = stripped
                         try:
                             last_json:Dict[str, Any] = json.loads(stripped)
-                            enable = any(last_json.get(k) for k in self.COUNTER_VALKEYS)
-                            if not enable: continue
-                            last = last_json
+                            # すべての行を履歴として保持（リセット境界の0行を含む）
                             counters.append(last_json)
                         except Exception:
                             pass
@@ -771,8 +765,7 @@ return cjson.encode(c)
                     if stripped:
                         try:
                             last_json:Dict[str, Any] = json.loads(stripped)
-                            enable = any(last_json.get(k) for k in self.COUNTER_VALKEYS)
-                            if not enable: continue
+                            # 最終有効行を返す（リセット直後の0行も含む）
                             return last_json
                         except Exception:
                             pass
@@ -806,9 +799,19 @@ return cjson.encode(c)
                     is_same = all(counter.get(k, 0) == share_counter.get(k, 0) for k in self.COUNTER_VALKEYS)
                     if is_same:
                         return  # 変更なし
-                    # Redis 上のカウンタとマージする
-                    for k in self.COUNTER_VALKEYS:
-                        counter[k] = max(counter.get(k, 0), share_counter.get(k, 0))
+                    # 周期判定: last_reset が異なる場合は、新しい周期のカウンタを優先（旧周期値を採用しない）
+                    try:
+                        counter_reset = datetime.fromisoformat(str(counter.get('last_reset', '1970-01-01T00:00:00')))
+                        share_reset = datetime.fromisoformat(str(share_counter.get('last_reset', '1970-01-01T00:00:00')))
+                        is_same_period = (counter_reset == share_reset)
+                    except (ValueError, TypeError):
+                        is_same_period = False
+                    
+                    if is_same_period:
+                        # 同一周期内: max マージを適用
+                        for k in self.COUNTER_VALKEYS:
+                            counter[k] = max(counter.get(k, 0), share_counter.get(k, 0))
+                    # else: 異なる周期: counter をそのまま使用（share_counter は採用しない）
                 self.redis_client.hset(redis_key, limiter_name, json.dumps(counter))
             except Exception:
                 pass
