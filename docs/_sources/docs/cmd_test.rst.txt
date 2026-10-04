@@ -84,13 +84,13 @@ test ( gen_cli_spec ) : ``cmdbox -m test -c gen_cli_spec <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--feature_package <feature_package>","str","","required","cmdbox.app.features.cli","","Specify the Python package name containing features.(e.g. cmdbox.app.features.cli, myapp.app.features.cli)"
+    "--feature_package <feature_package>","str","","required","``cmdbox.app.features.cli``","","Specify the Python package name containing features.(e.g. ``cmdbox.app.features.cli``, ``myapp.app.features.cli``)"
     "--output_dir <output_dir>","dir","","","./Specifications/","","Specify the output directory for specifications.Defaults to ./Specifications when omitted."
     "--root_dir <root_dir>","dir","","","./","","Specify the project root directory used for computing relative source paths.Defaults to the current directory when omitted."
-    "--prefix <prefix>","str","","","cmdbox_","","Specify the filename prefix of feature modules."
+    "--prefix <prefix>","str","","","``cmdbox_``","","Specify the filename prefix of feature modules."
     "--clear_output_dir <clear_output_dir>","bool","","","False","True | False","If True, clears (deletes and recreates) the output directory before generating specifications when it already exists. If False, returns a warning when the output directory already exists."
-    "--app_class <app_class>","str","","","cmdbox.app.app.CmdBoxApp","","Specify the module path of the application class.(e.g. myapp.app.MyApp) Defaults to cmdbox.app.app.CmdBoxApp when omitted."
-    "--ver_module <ver_module>","str","","","cmdbox.version","","Specify the path of the version module.(e.g. myapp.version) Defaults to cmdbox.version when omitted."
+    "--app_class <app_class>","str","","","``cmdbox.app.app.CmdBoxApp``","","Specify the module path of the application class.(e.g. ``myapp.app.MyApp``) Defaults to ``cmdbox.app.app.CmdBoxApp`` when omitted."
+    "--ver_module <ver_module>","str","","","``cmdbox.version``","","Specify the path of the version module.(e.g. ``myapp.version``) Defaults to ``cmdbox.version`` when omitted."
 
 **Output Schema**
 

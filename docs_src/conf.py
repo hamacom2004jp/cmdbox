@@ -48,3 +48,10 @@ html_static_path = ['static']
 # https://www.sphinx-doc.org/en/master/usage/extensions/todo.html#configuration
 
 todo_include_todos = True
+
+# -- Options for autodoc extension -------------------------------------------
+# Mock imports for packages that have compatibility issues
+autodoc_mock_imports = ['google.adk', 'google.adk.plugins', 'google.adk.agents']
+
+# Suppress warnings for failed imports
+suppress_warnings = ['autodoc.import_object']

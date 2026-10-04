@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.Corpus2Skill.corpus2skill package &mdash; cmdbox 2026/10/04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=25a83bf6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.Corpus2Skill.corpus2skill package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmdbox-app-features-cli-corpus2skill-corpus2skill-package">
+<h1>cmdbox.app.features.cli.Corpus2Skill.corpus2skill package<a class="headerlink" href="#cmdbox-app-features-cli-corpus2skill-corpus2skill-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering">
+<span id="cmdbox-app-features-cli-corpus2skill-corpus2skill-clustering-module"></span><h2>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering module<a class="headerlink" href="#module-cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering" title="Link to this heading"></a></h2>
+<p>Hierarchical clustering with branching ratio p.</p>
+<dl class="simple">
+<dt>Builds a tree bottom-up:</dt><dd><p>Level 0: n documents (leaves)
+Level 1: ceil(n/p) clusters of ~p documents each
+Level 2: ceil(n/p²) clusters of ~p level-1 clusters each
+...
+Level t: stop when num_clusters &lt;= max_top</p>
+</dd>
+</dl>
+<p>At each level, clusters are formed by K-means on embeddings. Three
+extensions are layered on top of the basic K-means partition:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Soft assignment</strong>: each item also gets an optional secondary parent
+when the gap between its top-2 centroid similarities is below a margin.</p></li>
+<li><p><strong>Summary+raw embedding</strong>: the caller-provided embed_fn also receives
+a <code class="docutils literal notranslate"><span class="pre">context</span></code> block of sampled member excerpts, so the embedding sees
+both the LLM-abstractive summary and surface-lexical signal.</p></li>
+<li><p><strong>LLM repartition</strong>: a single LLM hop per level flags confusable or
+mixed clusters and proposes a fresh partition by item IDs. Each
+cluster_id is repartitioned at most once per compile.</p></li>
+</ul>
+</div></blockquote>
+<p>After clustering, an LLM summary is generated for each cluster, and that
+summary (plus sampled member excerpts) is embedded as the data point for
+the next level.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.</span></span><span class="sig-name descname"><span class="pre">ClusterNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secondary_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secondary_children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">named_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">related_skill_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exemplar_doc_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_cards</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/clustering.html#ClusterNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A node in the hierarchy tree.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.children">
+<span class="sig-name descname"><span class="pre">children</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.children" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.doc_cards">
+<span class="sig-name descname"><span class="pre">doc_cards</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.doc_cards" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.doc_ids">
+<span class="sig-name descname"><span class="pre">doc_ids</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.doc_ids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.doc_texts">
+<span class="sig-name descname"><span class="pre">doc_texts</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.doc_texts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.doc_types">
+<span class="sig-name descname"><span class="pre">doc_types</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.doc_types" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.embedding">
+<span class="sig-name descname"><span class="pre">embedding</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.embedding" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.exemplar_doc_ids">
+<span class="sig-name descname"><span class="pre">exemplar_doc_ids</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.exemplar_doc_ids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.label">
+<span class="sig-name descname"><span class="pre">label</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.label" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.level">
+<span class="sig-name descname"><span class="pre">level</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.named_entities">
+<span class="sig-name descname"><span class="pre">named_entities</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.named_entities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.node_id">
+<span class="sig-name descname"><span class="pre">node_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.node_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.primary_parent">
+<span class="sig-name descname"><span class="pre">primary_parent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.primary_parent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.related_skill_paths">
+<span class="sig-name descname"><span class="pre">related_skill_paths</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.related_skill_paths" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.secondary_children">
+<span class="sig-name descname"><span class="pre">secondary_children</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.secondary_children" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.secondary_parent">
+<span class="sig-name descname"><span class="pre">secondary_parent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.secondary_parent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode.summary" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.build_hierarchy">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.</span></span><span class="sig-name descname"><span class="pre">build_hierarchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_top</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cluster_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summarize_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summarize_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embed_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft_assignment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft_margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_cards</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/clustering.html#build_hierarchy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.build_hierarchy" title="Link to this definition"></a></dt>
+<dd><p>Build a multi-level cluster hierarchy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>doc_ids</strong> -- document identifiers</p></li>
+<li><p><strong>doc_texts</strong> -- document text content (full text used for the leaf-level
+&quot;summary + raw_text&quot; embedding when <code class="docutils literal notranslate"><span class="pre">embed_fn</span></code> accepts a
+<code class="docutils literal notranslate"><span class="pre">context=</span></code> keyword).</p></li>
+<li><p><strong>embeddings</strong> -- (n, dim) array of document embeddings (already aware of
+doc_cards when the caller embeds <code class="docutils literal notranslate"><span class="pre">concat(card_summary,</span> <span class="pre">raw_text)</span></code>).</p></li>
+<li><p><strong>p</strong> -- branching ratio — each cluster has ~p children</p></li>
+<li><p><strong>max_top</strong> -- stop when num_clusters &lt;= max_top</p></li>
+<li><p><strong>min_cluster_size</strong> -- minimum items per cluster</p></li>
+<li><p><strong>summarize_fn</strong> -- callable(texts, level) -&gt; str</p></li>
+<li><p><strong>summarize_batch_fn</strong> -- callable(batch, level) -&gt; list[str]</p></li>
+<li><p><strong>embed_fn</strong> -- callable(text: str, context: str | None = None) -&gt; ndarray.
+Internal clusters get <code class="docutils literal notranslate"><span class="pre">context=</span></code> filled with sampled member
+excerpts so the cluster embedding sees both summary and content.</p></li>
+<li><p><strong>soft_assignment</strong> -- enable soft / multi-parent K-means.</p></li>
+<li><p><strong>soft_margin</strong> -- gap threshold for triggering a secondary parent.</p></li>
+<li><p><strong>repartition_fn</strong> -- callable([cluster_record, ...], level) -&gt; {&quot;changes&quot;: [...]}.
+Each cluster_id is repartitioned at most once across the whole
+compile.</p></li>
+<li><p><strong>doc_cards</strong> -- {doc_id: {title, one_line, phrases}} from the per-document
+card stage; stored on the leaf ClusterNodes for downstream use
+(rich INDEX rows, exemplar listings).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.cluster_level">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.</span></span><span class="sig-name descname"><span class="pre">cluster_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/clustering.html#cluster_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.cluster_level" title="Link to this definition"></a></dt>
+<dd><p>Backward-compatible hard-partition wrapper.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.cluster_level_soft">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.</span></span><span class="sig-name descname"><span class="pre">cluster_level_soft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft_margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/clustering.html#cluster_level_soft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.cluster_level_soft" title="Link to this definition"></a></dt>
+<dd><p>K-means partition with an optional secondary cluster per item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>list of cluster member-index lists (each item in</dt><dd><p>exactly one primary cluster, same as classical K-means).</p>
+</dd>
+<dt>secondary_assignments: dict[item_index -&gt; secondary_cluster_index]. An</dt><dd><p>item appears here only when the gap between its top-1 and top-2
+centroid cosine similarity is below <code class="docutils literal notranslate"><span class="pre">soft_margin</span></code>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>primary_assignments</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.tree_stats">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.</span></span><span class="sig-name descname"><span class="pre">tree_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode" title="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode"><span class="pre">ClusterNode</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/clustering.html#tree_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.tree_stats" title="Link to this definition"></a></dt>
+<dd><p>Compute statistics about the hierarchy tree.</p>
+</dd></dl>
+
+</section>
+<section id="cmdbox-app-features-cli-corpus2skill-corpus2skill-compile-module">
+<h2>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.compile module<a class="headerlink" href="#cmdbox-app-features-cli-corpus2skill-corpus2skill-compile-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config">
+<span id="cmdbox-app-features-cli-corpus2skill-corpus2skill-config-module"></span><h2>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config module<a class="headerlink" href="#module-cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config" title="Link to this heading"></a></h2>
+<p>Configuration for Corpus2Skill compilation and serving.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.</span></span><span class="sig-name descname"><span class="pre">CompileConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Path'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">WindowsPath('wixqa_corpus/wix_kb_corpus')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Path'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">WindowsPath('c2s_output')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_top_clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cluster_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embed_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Qwen/Qwen3-Embedding-8B'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-sonnet-4-6'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_doc_chars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_max_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compact</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_doc_summaries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_summary_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-haiku-4-5'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_summary_max_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-sonnet-4-6'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-sonnet-4-6'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft_margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_exemplar_docs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_related_skills</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/config.html#CompileConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.batch_size">
+<span class="sig-name descname"><span class="pre">batch_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">32</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.batch_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.compact">
+<span class="sig-name descname"><span class="pre">compact</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.compact" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.doc_summary_max_tokens">
+<span class="sig-name descname"><span class="pre">doc_summary_max_tokens</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">250</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.doc_summary_max_tokens" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.doc_summary_model">
+<span class="sig-name descname"><span class="pre">doc_summary_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'claude-haiku-4-5'</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.doc_summary_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.embed_model">
+<span class="sig-name descname"><span class="pre">embed_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Qwen/Qwen3-Embedding-8B'</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.embed_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.entity_model">
+<span class="sig-name descname"><span class="pre">entity_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'claude-sonnet-4-6'</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.entity_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.input_dir">
+<span class="sig-name descname"><span class="pre">input_dir</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WindowsPath('wixqa_corpus/wix_kb_corpus')</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.input_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.llm_model">
+<span class="sig-name descname"><span class="pre">llm_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'claude-sonnet-4-6'</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.llm_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.max_doc_chars">
+<span class="sig-name descname"><span class="pre">max_doc_chars</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8000</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.max_doc_chars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.max_top_clusters">
+<span class="sig-name descname"><span class="pre">max_top_clusters</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.max_top_clusters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.min_cluster_size">
+<span class="sig-name descname"><span class="pre">min_cluster_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.min_cluster_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.num_exemplar_docs">
+<span class="sig-name descname"><span class="pre">num_exemplar_docs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.num_exemplar_docs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.num_related_skills">
+<span class="sig-name descname"><span class="pre">num_related_skills</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.num_related_skills" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WindowsPath('c2s_output')</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.output_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.p">
+<span class="sig-name descname"><span class="pre">p</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.p" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.repartition_model">
+<span class="sig-name descname"><span class="pre">repartition_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'claude-sonnet-4-6'</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.repartition_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.soft_margin">
+<span class="sig-name descname"><span class="pre">soft_margin</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.05</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.soft_margin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.summary_max_tokens">
+<span class="sig-name descname"><span class="pre">summary_max_tokens</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">300</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.summary_max_tokens" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.use_doc_summaries">
+<span class="sig-name descname"><span class="pre">use_doc_summaries</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.CompileConfig.use_doc_summaries" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.</span></span><span class="sig-name descname"><span class="pre">ServeConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skills_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Path'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">WindowsPath('c2s_output/.claude/skills')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-sonnet-4-6'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_turns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skills_betas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[str]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/config.html#ServeConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig.llm_model">
+<span class="sig-name descname"><span class="pre">llm_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'claude-sonnet-4-6'</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig.llm_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig.max_turns">
+<span class="sig-name descname"><span class="pre">max_turns</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig.max_turns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig.skills_betas">
+<span class="sig-name descname"><span class="pre">skills_betas</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig.skills_betas" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig.skills_dir">
+<span class="sig-name descname"><span class="pre">skills_dir</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WindowsPath('c2s_output/.claude/skills')</span></span><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.config.ServeConfig.skills_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="cmdbox-app-features-cli-corpus2skill-corpus2skill-eval-module">
+<h2>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.eval module<a class="headerlink" href="#cmdbox-app-features-cli-corpus2skill-corpus2skill-eval-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics">
+<span id="cmdbox-app-features-cli-corpus2skill-corpus2skill-metrics-module"></span><h2>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics module<a class="headerlink" href="#module-cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics" title="Link to this heading"></a></h2>
+<p>Evaluation metrics for Corpus2Skill.</p>
+<p>Lexical metrics (F1, BLEU, ROUGE), semantic metric (BERTScore-F1) and
+LLM-judge metrics:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">judge_factuality</span></code>           — answer vs gold (essential-info coverage)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">judge_context_recall</span></code>       — retrieved context vs gold</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">judge_faithfulness_grounded</span></code> — answer claims supported by retrieved context</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">judge_answer_relevance</span></code>     — does the answer address the question</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">judge_context_precision</span></code>    — fraction of retrieved context that is on-topic</p></li>
+</ul>
+</div></blockquote>
+<p>Plus an aggregate helper <code class="docutils literal notranslate"><span class="pre">hallucination_rate</span></code> (faithfulness_grounded &lt; 0.6).</p>
+<p>The factuality / context-recall prompts follow the WixQA evaluation protocol
+(arXiv:2505.08643). The faithfulness / answer-relevance / context-precision
+prompts are RAGAS-style 1-5 LLM judges.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bertscore_batch">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">compute_bertscore_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#compute_bertscore_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bertscore_batch" title="Link to this definition"></a></dt>
+<dd><p>Batched BERTScore for efficiency. Returns F1 per pair.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bertscore_f1">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">compute_bertscore_f1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#compute_bertscore_f1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bertscore_f1" title="Link to this definition"></a></dt>
+<dd><p>Single-pair BERTScore-F1. Returns 0.0 on empty input / model error.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bleu">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">compute_bleu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#compute_bleu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bleu" title="Link to this definition"></a></dt>
+<dd><p>Sentence-level BLEU with smoothing.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_f1">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">compute_f1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#compute_f1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_f1" title="Link to this definition"></a></dt>
+<dd><p>Token-level F1 score.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_rouge">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">compute_rouge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#compute_rouge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_rouge" title="Link to this definition"></a></dt>
+<dd><p>ROUGE-1 and ROUGE-2 F-measure.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.hallucination_rate">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">hallucination_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">per_q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'faithfulness_grounded'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#hallucination_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.hallucination_rate" title="Link to this definition"></a></dt>
+<dd><p>Fraction of queries where <code class="docutils literal notranslate"><span class="pre">key</span></code> &lt; <code class="docutils literal notranslate"><span class="pre">threshold</span></code>.</p>
+<p>Defaults to faithfulness_grounded &lt; 0.6 (raw 1-5 score ≤ 3), matching
+common production thresholds (target ≥ 0.8 / 4-of-5). Queries with a
+None / missing score are skipped.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_answer_relevance">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">judge_answer_relevance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#judge_answer_relevance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_answer_relevance" title="Link to this definition"></a></dt>
+<dd><p>Judge whether <code class="docutils literal notranslate"><span class="pre">predicted</span></code> actually answers <code class="docutils literal notranslate"><span class="pre">question</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_context_precision">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">judge_context_precision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#judge_context_precision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_context_precision" title="Link to this definition"></a></dt>
+<dd><p>Judge what fraction of <code class="docutils literal notranslate"><span class="pre">context</span></code> is relevant to <code class="docutils literal notranslate"><span class="pre">question</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_context_recall">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">judge_context_recall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#judge_context_recall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_context_recall" title="Link to this definition"></a></dt>
+<dd><p>Judge how well the retrieved context covers the gold answer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_factuality">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">judge_factuality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#judge_factuality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_factuality" title="Link to this definition"></a></dt>
+<dd><p>Judge how well the predicted answer captures the gold answer's essential info.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_faithfulness_grounded">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.</span></span><span class="sig-name descname"><span class="pre">judge_faithfulness_grounded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/Corpus2Skill/corpus2skill/metrics.html#judge_faithfulness_grounded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_faithfulness_grounded" title="Link to this definition"></a></dt>
+<dd><p>Judge whether the claims in <code class="docutils literal notranslate"><span class="pre">predicted</span></code> are supported by <code class="docutils literal notranslate"><span class="pre">context</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="cmdbox-app-features-cli-corpus2skill-corpus2skill-serve-module">
+<h2>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.serve module<a class="headerlink" href="#cmdbox-app-features-cli-corpus2skill-corpus2skill-serve-module" title="Link to this heading"></a></h2>
+</section>
+<section id="cmdbox-app-features-cli-corpus2skill-corpus2skill-skill-builder-module">
+<h2>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.skill_builder module<a class="headerlink" href="#cmdbox-app-features-cli-corpus2skill-corpus2skill-skill-builder-module" title="Link to this heading"></a></h2>
+</section>
+<section id="cmdbox-app-features-cli-corpus2skill-corpus2skill-summarizer-module">
+<h2>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.summarizer module<a class="headerlink" href="#cmdbox-app-features-cli-corpus2skill-corpus2skill-summarizer-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-cmdbox.app.features.cli.Corpus2Skill.corpus2skill">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cmdbox.app.features.cli.Corpus2Skill.corpus2skill" title="Link to this heading"></a></h2>
+<p>Corpus2Skill — compile a document corpus into a navigable LLM-skill hierarchy.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

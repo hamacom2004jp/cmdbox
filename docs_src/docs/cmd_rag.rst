@@ -67,6 +67,186 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "end","bool | null","no","null","終了フラグ"
 
 
+rag ( corpus2skill_compile ) : ``cmdbox -m rag -c corpus2skill_compile <Option>``
+=================================================================================
+
+- Compile a document collection into a Corpus2Skill hierarchy.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
+    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
+    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server."
+    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server."
+    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server."
+    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","int","","","600","","Specify the maximum waiting time until the server responds."
+    "--svpath <svpath>","dir","","required","/","","Specify the directory path under the server's data folder. Supports text (.txt), markdown (.md), JSON (.json), and JSONL (.jsonl) formats. Each document should have 'id' and 'contents' fields."
+    "--scope <scope>","str","","required","server","server | current | client","Specify the access scope. Only 'server' is supported. 'current' and 'client' are not supported."
+    "--fwpath <fwpath>","file","multi","","","","Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path."
+    "--rjpath <rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
+    "--ragcorpus_name <ragcorpus_name>","str","","required","","","Specify the RAG corpus name. The skill tree will be generated in data_dir/.ragcorpus/<ragcorpus_name>."
+    "--llmname <llmname>","str","","","claude-sonnet-4-6","","Specify the LLM name for clustering and summarization. Default is claude-sonnet-4-6."
+    "--llmname_embed <llmname_embed>","str","","","text-embedding-3-small","","Specify the LLM name for embedding. Default is text-embedding-3-small."
+    "--doc_summary_model <doc_summary_model>","str","","","claude-haiku-4-5","","Specify the LLM name for per-document summary card generation. Default is claude-haiku-4-5."
+    "--p <p>","int","","","10","","Specify the branching ratio (children per cluster). Default is 10."
+    "--max_top <max_top>","int","","","8","","Specify the maximum number of top-level skills. Default is 8."
+    "--min_cluster_size <min_cluster_size>","int","","","3","","Specify the minimum cluster size. Default is 3."
+    "--max_doc_chars <max_doc_chars>","int","","","8000","","Specify the maximum characters per document. Default is 8000."
+    "--no_doc_summaries <no_doc_summaries>","bool","","","False","True | False","If True, skip document summary card generation. Faster but lower quality."
+    "--compact <compact>","bool","","","False","True | False","If True, merge leaf INDEX.md into parent to reduce file count."
+    "--dry_run <dry_run>","bool","","","False","True | False","If True, show execution plan without actually running."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "save_mode": "string",
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "message": "string",
+        "documents_count": 0,
+        "ragcorpus_dir": "string",
+        "compile_info": {
+          "input_dir": "string",
+          "ragcorpus_dir": "string",
+          "num_documents": 0,
+          "llm_model": "string",
+          "embed_model": "string",
+          "p": 0,
+          "max_top": 0,
+          "doc_summary_cards_enabled": false,
+          "compact": false,
+          "dry_run": false,
+          "status": "string"
+        },
+        "elapsed_seconds": 0.0
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.message","str","yes","(必須)","処理結果のメッセージ"
+    "success.documents_count","int","yes","(必須)","処理されたドキュメント数"
+    "success.ragcorpus_dir","str","yes","(必須)","コーパスディレクトリパス"
+    "success.compile_info","CompileInfo","yes","(必須)","コンパイル情報"
+    "success.compile_info.input_dir","str","yes","(必須)","入力ディレクトリ"
+    "success.compile_info.ragcorpus_dir","str","yes","(必須)","コーパスディレクトリ"
+    "success.compile_info.num_documents","int","yes","(必須)","ドキュメント数"
+    "success.compile_info.llm_model","str","yes","(必須)","LLMモデル名"
+    "success.compile_info.embed_model","str","yes","(必須)","埋め込みモデル名"
+    "success.compile_info.p","int","yes","(必須)","分岐比"
+    "success.compile_info.max_top","int","yes","(必須)","最大トップレベルスキル数"
+    "success.compile_info.doc_summary_cards_enabled","bool","yes","(必須)","ドキュメント要約カード有効フラグ"
+    "success.compile_info.compact","bool","yes","(必須)","コンパクト出力フラグ"
+    "success.compile_info.dry_run","bool","yes","(必須)","ドライランフラグ"
+    "success.compile_info.status","str","yes","(必須)","処理ステータス"
+    "success.elapsed_seconds","float","yes","(必須)","処理時間（秒）"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
+rag ( corpus2skill_query ) : ``cmdbox -m rag -c corpus2skill_query <Option>``
+=============================================================================
+
+- Execute a query against the compiled Corpus2Skill hierarchy and generate an answer.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
+    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
+    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server."
+    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server."
+    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server."
+    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","int","","","600","","Specify the maximum waiting time until the server responds."
+    "--ragcorpus_name <ragcorpus_name>","str","","required","","","Specify the RAG corpus name to query. The skill hierarchy will be loaded from data_dir/.ragcorpus/<ragcorpus_name>."
+    "--query <query>","str","","required","","","Specify the query (question) to execute."
+    "--llmname <llmname>","str","","","claude-3-5-sonnet-20241022","","Specify the LLM model name for answer generation."
+    "--max_turns <max_turns>","int","","","10","","Specify the maximum number of agent turns."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "save_mode": "string",
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "message": "string",
+        "answer": "string",
+        "query": "string",
+        "usage": {},
+        "turns": [
+          {}
+        ]
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.message","str","yes","(必須)","処理結果のメッセージ"
+    "success.answer","str","yes","(必須)","クエリに対する回答"
+    "success.query","str","yes","(必須)","実行されたクエリ"
+    "success.usage","dict[str, any]","yes","(必須)","トークン使用情報"
+    "success.turns","list[dict[str, str]]","yes","(必須)","マルチターンのやり取り履歴"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
 rag ( del ) : ``cmdbox -m rag -c del <Option>``
 ===============================================
 

@@ -1,0 +1,711 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering &mdash; cmdbox 2026/10/04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../../../_static/documentation_options.js?v=25a83bf6"></script>
+      <script src="../../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Hierarchical clustering with branching ratio p.</span>
+
+<span class="sd">Builds a tree bottom-up:</span>
+<span class="sd">  Level 0: n documents (leaves)</span>
+<span class="sd">  Level 1: ceil(n/p) clusters of ~p documents each</span>
+<span class="sd">  Level 2: ceil(n/p²) clusters of ~p level-1 clusters each</span>
+<span class="sd">  ...</span>
+<span class="sd">  Level t: stop when num_clusters &lt;= max_top</span>
+
+<span class="sd">At each level, clusters are formed by K-means on embeddings. Three</span>
+<span class="sd">extensions are layered on top of the basic K-means partition:</span>
+
+<span class="sd">  - **Soft assignment**: each item also gets an optional secondary parent</span>
+<span class="sd">    when the gap between its top-2 centroid similarities is below a margin.</span>
+<span class="sd">  - **Summary+raw embedding**: the caller-provided embed_fn also receives</span>
+<span class="sd">    a ``context`` block of sampled member excerpts, so the embedding sees</span>
+<span class="sd">    both the LLM-abstractive summary and surface-lexical signal.</span>
+<span class="sd">  - **LLM repartition**: a single LLM hop per level flags confusable or</span>
+<span class="sd">    mixed clusters and proposes a fresh partition by item IDs. Each</span>
+<span class="sd">    cluster_id is repartitioned at most once per compile.</span>
+
+<span class="sd">After clustering, an LLM summary is generated for each cluster, and that</span>
+<span class="sd">summary (plus sampled member excerpts) is embedded as the data point for</span>
+<span class="sd">the next level.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="ClusterNode">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.ClusterNode">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClusterNode</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A node in the hierarchy tree."""</span>
+    <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">level</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">embedding</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">children</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"ClusterNode"</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">doc_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">doc_texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Soft assignment bookkeeping</span>
+    <span class="n">primary_parent</span><span class="p">:</span> <span class="s2">"ClusterNode | None"</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">secondary_parent</span><span class="p">:</span> <span class="s2">"ClusterNode | None"</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Children whose primary_parent is elsewhere but who appear here as stubs.</span>
+    <span class="n">secondary_children</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"ClusterNode"</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Entity tagging (filled by the entity-extraction pass).</span>
+    <span class="n">named_entities</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">doc_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">related_skill_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Exemplar documents (doc_ids of representative leaves).</span>
+    <span class="n">exemplar_doc_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Leaf-only: per-document summary cards {title, one_line, phrases}.</span>
+    <span class="n">doc_cards</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_kmeans_labels</span><span class="p">(</span><span class="n">normed</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Run K-means (or fall back to agglomerative) and return cluster labels."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">KMeans</span><span class="p">,</span> <span class="n">AgglomerativeClustering</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">km</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">km</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">normed</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">agg</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">agg</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">normed</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="cluster_level_soft">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.cluster_level_soft">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cluster_level_soft</span><span class="p">(</span>
+    <span class="n">embeddings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">min_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">soft_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""K-means partition with an optional secondary cluster per item.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        primary_assignments: list of cluster member-index lists (each item in</span>
+<span class="sd">            exactly one primary cluster, same as classical K-means).</span>
+<span class="sd">        secondary_assignments: dict[item_index -&gt; secondary_cluster_index]. An</span>
+<span class="sd">            item appears here only when the gap between its top-1 and top-2</span>
+<span class="sd">            centroid cosine similarity is below ``soft_margin``.</span>
+<span class="sd">    """</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))],</span> <span class="p">{}</span>
+
+    <span class="n">normed</span> <span class="o">=</span> <span class="n">embeddings</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">_kmeans_labels</span><span class="p">(</span><span class="n">normed</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="n">clusters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">lab</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+        <span class="n">clusters</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lab</span><span class="p">),</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+    <span class="n">primary</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">min_size</span><span class="p">]</span>
+    <span class="n">orphans</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_size</span><span class="p">:</span>
+            <span class="n">orphans</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">primary</span><span class="p">:</span>
+        <span class="n">primary</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))]</span>
+
+    <span class="n">centroids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">primary</span><span class="p">:</span>
+        <span class="n">c_emb</span> <span class="o">=</span> <span class="n">normed</span><span class="p">[</span><span class="n">cl</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">centroids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_emb</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">c_emb</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">))</span>
+    <span class="n">centroids_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">oidx</span> <span class="ow">in</span> <span class="n">orphans</span><span class="p">:</span>
+        <span class="n">sims</span> <span class="o">=</span> <span class="n">centroids_arr</span> <span class="o">@</span> <span class="n">normed</span><span class="p">[</span><span class="n">oidx</span><span class="p">]</span>
+        <span class="n">best</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sims</span><span class="p">))</span>
+        <span class="n">primary</span><span class="p">[</span><span class="n">best</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oidx</span><span class="p">)</span>
+
+    <span class="n">secondary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">soft_margin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">primary</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># Recompute centroids after orphan re-attachment.</span>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">primary</span><span class="p">:</span>
+            <span class="n">c_emb</span> <span class="o">=</span> <span class="n">normed</span><span class="p">[</span><span class="n">cl</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">centroids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_emb</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">c_emb</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">))</span>
+        <span class="n">centroids_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
+
+        <span class="n">item_to_primary</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ci</span><span class="p">,</span> <span class="n">members</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">primary</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
+                <span class="n">item_to_primary</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span>
+
+        <span class="n">sims_all</span> <span class="o">=</span> <span class="n">normed</span> <span class="o">@</span> <span class="n">centroids_arr</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># (n, k)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">sims_all</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">top1</span><span class="p">,</span> <span class="n">top2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">pi</span> <span class="o">=</span> <span class="n">item_to_primary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">top1</span> <span class="o">!=</span> <span class="n">pi</span><span class="p">:</span>
+                <span class="c1"># K-means split didn't pick the nearest centroid; treat the</span>
+                <span class="c1"># nearest as the secondary signal.</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">pi</span><span class="p">]</span> <span class="o">-</span> <span class="n">row</span><span class="p">[</span><span class="n">top1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">soft_margin</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">secondary</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">top1</span>
+                <span class="k">continue</span>
+            <span class="n">gap</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">top1</span><span class="p">]</span> <span class="o">-</span> <span class="n">row</span><span class="p">[</span><span class="n">top2</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">gap</span> <span class="o">&lt;</span> <span class="n">soft_margin</span><span class="p">:</span>
+                <span class="n">secondary</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">top2</span>
+
+    <span class="k">return</span> <span class="n">primary</span><span class="p">,</span> <span class="n">secondary</span></div>
+
+
+
+<div class="viewcode-block" id="cluster_level">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.cluster_level">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cluster_level</span><span class="p">(</span><span class="n">embeddings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">min_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Backward-compatible hard-partition wrapper."""</span>
+    <span class="n">primary</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cluster_level_soft</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">min_size</span><span class="p">,</span> <span class="n">soft_margin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">primary</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_sampled_member_excerpts</span><span class="p">(</span>
+    <span class="n">member_indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">current_nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ClusterNode</span><span class="p">],</span>
+    <span class="n">embeddings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">excerpt_chars</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Pick the n_samples most-central members and join their summary heads.</span>
+
+<span class="sd">    Used for context-aware cluster embedding: the embedding model sees</span>
+<span class="sd">    both the abstractive summary and surface-lexical snippets from the</span>
+<span class="sd">    actual member content, restoring discriminative tokens when summaries</span>
+<span class="sd">    collapse onto near-identical wording.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">member_indices</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">""</span>
+    <span class="n">member_embs</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">member_indices</span><span class="p">]</span>
+    <span class="n">normed</span> <span class="o">=</span> <span class="n">member_embs</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">member_embs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">normed</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>
+    <span class="n">sims</span> <span class="o">=</span> <span class="n">normed</span> <span class="o">@</span> <span class="n">mean</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">sims</span><span class="p">)</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="p">[</span><span class="n">member_indices</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">order</span><span class="p">[:</span> <span class="nb">max</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]]</span>
+
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">top</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">current_nodes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">snippet</span> <span class="o">=</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">summary</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="n">excerpt_chars</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">snippet</span><span class="p">:</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">snippet</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">---</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_aggregate_doc_content</span><span class="p">(</span>
+    <span class="n">children</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ClusterNode</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Walk descendants and collect (doc_ids, doc_texts, doc_cards)."""</span>
+    <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cards</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+        <span class="n">ids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">doc_ids</span><span class="p">)</span>
+        <span class="n">texts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">doc_texts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">doc_cards</span><span class="p">:</span>
+            <span class="n">cards</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">doc_cards</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ids</span><span class="p">,</span> <span class="n">texts</span><span class="p">,</span> <span class="n">cards</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_repartition</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">changes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">current_nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ClusterNode</span><span class="p">],</span>
+    <span class="n">embeddings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">repartitioned_cluster_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Apply LLM-proposed repartition changes to ``clusters`` in-place-ish.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        new_clusters: the updated cluster list (clusters that survived plus</span>
+<span class="sd">            new clusters produced by the partition).</span>
+<span class="sd">        affected_new_indices: indices into new_clusters of clusters that</span>
+<span class="sd">            need fresh summarization.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">changes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">clusters</span><span class="p">,</span> <span class="p">[]</span>
+
+    <span class="n">id_to_cluster_idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="s2">"cluster_id"</span><span class="p">]:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clusters</span><span class="p">)}</span>
+    <span class="n">node_id_to_global</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="o">.</span><span class="n">node_id</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_nodes</span><span class="p">)}</span>
+
+    <span class="n">drop_indices</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">new_clusters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">affected_new_indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">repart_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">changes</span><span class="p">:</span>
+        <span class="n">old_ids</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"old_cluster_ids"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="n">new_part</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"new_partition"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">old_ids</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">new_part</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Skip if any flagged cluster_id was already repartitioned in a</span>
+        <span class="c1"># prior level (cap: once per compile).</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">oid</span> <span class="ow">in</span> <span class="n">repartitioned_cluster_ids</span> <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">old_ids</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">oid</span> <span class="ow">in</span> <span class="n">id_to_cluster_idx</span> <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">old_ids</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="n">union_indices</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">old_ids</span><span class="p">:</span>
+            <span class="n">union_indices</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clusters</span><span class="p">[</span><span class="n">id_to_cluster_idx</span><span class="p">[</span><span class="n">oid</span><span class="p">]][</span><span class="s2">"member_indices"</span><span class="p">])</span>
+        <span class="n">union_node_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">current_nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">node_id</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">union_indices</span><span class="p">}</span>
+
+        <span class="c1"># Aggregate secondary memberships from the affected old clusters so</span>
+        <span class="c1"># we can redistribute them to the new clusters by item identity.</span>
+        <span class="n">old_secondary_lookup</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">old_ids</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sec_idx</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">[</span><span class="n">id_to_cluster_idx</span><span class="p">[</span><span class="n">oid</span><span class="p">]]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">"secondary_member_indices"</span><span class="p">,</span> <span class="p">[]</span>
+            <span class="p">):</span>
+                <span class="n">old_secondary_lookup</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">sec_idx</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oid</span><span class="p">)</span>
+
+        <span class="n">new_assignments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">seen_indices</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">new_label</span><span class="p">,</span> <span class="n">raw_id_list</span> <span class="ow">in</span> <span class="n">new_part</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_id_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">mapped</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">raw_id_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">raw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">union_node_ids</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">gi</span> <span class="o">=</span> <span class="n">node_id_to_global</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">gi</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">gi</span> <span class="ow">in</span> <span class="n">seen_indices</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">mapped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gi</span><span class="p">)</span>
+                <span class="n">seen_indices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">gi</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mapped</span><span class="p">:</span>
+                <span class="n">new_assignments</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">new_label</span><span class="p">,</span> <span class="n">mapped</span><span class="p">))</span>
+
+        <span class="n">leftover</span> <span class="o">=</span> <span class="n">union_indices</span> <span class="o">-</span> <span class="n">seen_indices</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_assignments</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">leftover</span><span class="p">:</span>
+            <span class="c1"># Attach leftover items to the new cluster whose centroid they're</span>
+            <span class="c1"># most similar to.</span>
+            <span class="n">normed</span> <span class="o">=</span> <span class="n">embeddings</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>
+            <span class="n">new_centroids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">mems</span> <span class="ow">in</span> <span class="n">new_assignments</span><span class="p">:</span>
+                <span class="n">c_emb</span> <span class="o">=</span> <span class="n">normed</span><span class="p">[</span><span class="n">mems</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">new_centroids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_emb</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">c_emb</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">))</span>
+            <span class="n">new_centroids_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_centroids</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="n">leftover</span><span class="p">:</span>
+                <span class="n">sims</span> <span class="o">=</span> <span class="n">new_centroids_arr</span> <span class="o">@</span> <span class="n">normed</span><span class="p">[</span><span class="n">li</span><span class="p">]</span>
+                <span class="n">best</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sims</span><span class="p">))</span>
+                <span class="n">new_assignments</span><span class="p">[</span><span class="n">best</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">li</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">old_ids</span><span class="p">:</span>
+            <span class="n">drop_indices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">id_to_cluster_idx</span><span class="p">[</span><span class="n">oid</span><span class="p">])</span>
+            <span class="n">repartitioned_cluster_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">oid</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">new_label</span><span class="p">,</span> <span class="n">mems</span> <span class="ow">in</span> <span class="n">new_assignments</span><span class="p">:</span>
+            <span class="n">cid</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"L</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">-CR</span><span class="si">{</span><span class="n">repart_counter</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">repart_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">new_clusters</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">"cluster_id"</span><span class="p">:</span> <span class="n">cid</span><span class="p">,</span>
+                <span class="s2">"member_indices"</span><span class="p">:</span> <span class="n">mems</span><span class="p">,</span>
+                <span class="s2">"secondary_member_indices"</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">"summary"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">"repartitioned_from"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">old_ids</span><span class="p">),</span>
+            <span class="p">})</span>
+            <span class="n">repartitioned_cluster_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">new_clusters</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">clusters</span><span class="p">,</span> <span class="p">[]</span>
+
+    <span class="n">surviving</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">drop_indices</span><span class="p">]</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">surviving</span><span class="p">)</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">surviving</span> <span class="o">+</span> <span class="n">new_clusters</span>
+    <span class="n">affected_new_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">merged</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">merged</span><span class="p">,</span> <span class="n">affected_new_indices</span>
+
+
+<div class="viewcode-block" id="build_hierarchy">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.build_hierarchy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_hierarchy</span><span class="p">(</span>
+    <span class="n">doc_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">doc_texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">embeddings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">max_top</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">min_cluster_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">summarize_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">summarize_batch_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">embed_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">soft_assignment</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">soft_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">repartition_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">doc_cards</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ClusterNode</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Build a multi-level cluster hierarchy.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        doc_ids: document identifiers</span>
+<span class="sd">        doc_texts: document text content (full text used for the leaf-level</span>
+<span class="sd">            "summary + raw_text" embedding when ``embed_fn`` accepts a</span>
+<span class="sd">            ``context=`` keyword).</span>
+<span class="sd">        embeddings: (n, dim) array of document embeddings (already aware of</span>
+<span class="sd">            doc_cards when the caller embeds ``concat(card_summary, raw_text)``).</span>
+<span class="sd">        p: branching ratio — each cluster has ~p children</span>
+<span class="sd">        max_top: stop when num_clusters &lt;= max_top</span>
+<span class="sd">        min_cluster_size: minimum items per cluster</span>
+<span class="sd">        summarize_fn: callable(texts, level) -&gt; str</span>
+<span class="sd">        summarize_batch_fn: callable(batch, level) -&gt; list[str]</span>
+<span class="sd">        embed_fn: callable(text: str, context: str | None = None) -&gt; ndarray.</span>
+<span class="sd">            Internal clusters get ``context=`` filled with sampled member</span>
+<span class="sd">            excerpts so the cluster embedding sees both summary and content.</span>
+<span class="sd">        soft_assignment: enable soft / multi-parent K-means.</span>
+<span class="sd">        soft_margin: gap threshold for triggering a secondary parent.</span>
+<span class="sd">        repartition_fn: callable([cluster_record, ...], level) -&gt; {"changes": [...]}.</span>
+<span class="sd">            Each cluster_id is repartitioned at most once across the whole</span>
+<span class="sd">            compile.</span>
+<span class="sd">        doc_cards: {doc_id: {title, one_line, phrases}} from the per-document</span>
+<span class="sd">            card stage; stored on the leaf ClusterNodes for downstream use</span>
+<span class="sd">            (rich INDEX rows, exemplar listings).</span>
+<span class="sd">    """</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">doc_ids</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">n</span> <span class="o">==</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">leaf_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">did</span><span class="p">,</span> <span class="n">txt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">doc_ids</span><span class="p">,</span> <span class="n">doc_texts</span><span class="p">)):</span>
+        <span class="n">card</span> <span class="o">=</span> <span class="p">(</span><span class="n">doc_cards</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">did</span><span class="p">)</span>
+        <span class="n">leaf_summary</span> <span class="o">=</span> <span class="n">txt</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">card</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">corpus2skill.summarizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">card_to_summary</span>
+            <span class="n">leaf_summary</span> <span class="o">=</span> <span class="n">card_to_summary</span><span class="p">(</span><span class="n">card</span><span class="p">)</span> <span class="ow">or</span> <span class="n">leaf_summary</span>
+        <span class="n">leaf</span> <span class="o">=</span> <span class="n">ClusterNode</span><span class="p">(</span>
+            <span class="n">node_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">"doc-</span><span class="si">{</span><span class="n">did</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">did</span><span class="p">,</span>
+            <span class="n">summary</span><span class="o">=</span><span class="n">leaf_summary</span><span class="p">,</span>
+            <span class="n">embedding</span><span class="o">=</span><span class="n">embeddings</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="n">doc_ids</span><span class="o">=</span><span class="p">[</span><span class="n">did</span><span class="p">],</span>
+            <span class="n">doc_texts</span><span class="o">=</span><span class="p">[</span><span class="n">txt</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">card</span><span class="p">:</span>
+            <span class="n">leaf</span><span class="o">.</span><span class="n">doc_cards</span> <span class="o">=</span> <span class="p">{</span><span class="n">did</span><span class="p">:</span> <span class="n">card</span><span class="p">}</span>
+        <span class="n">leaf_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">leaf</span><span class="p">)</span>
+
+    <span class="n">current_nodes</span> <span class="o">=</span> <span class="n">leaf_nodes</span>
+    <span class="n">current_embeddings</span> <span class="o">=</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">repartitioned_cluster_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_top</span><span class="p">:</span>
+        <span class="n">level</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_top</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">current_nodes</span><span class="p">)</span> <span class="o">/</span> <span class="n">p</span><span class="p">))</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_nodes</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Level </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">: clustering </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">current_nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> items → </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> clusters"</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">soft_assignment</span><span class="p">:</span>
+            <span class="n">prim_assign</span><span class="p">,</span> <span class="n">sec_assign</span> <span class="o">=</span> <span class="n">cluster_level_soft</span><span class="p">(</span>
+                <span class="n">current_embeddings</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">min_cluster_size</span><span class="p">,</span> <span class="n">soft_margin</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prim_assign</span> <span class="o">=</span> <span class="n">cluster_level</span><span class="p">(</span><span class="n">current_embeddings</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">min_cluster_size</span><span class="p">)</span>
+            <span class="n">sec_assign</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">prim_assign</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="n">clusters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ci</span><span class="p">,</span> <span class="n">members</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prim_assign</span><span class="p">):</span>
+            <span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">"cluster_id"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"L</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">-C</span><span class="si">{</span><span class="n">ci</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="s2">"member_indices"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="p">),</span>
+                <span class="s2">"secondary_member_indices"</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">"summary"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">})</span>
+        <span class="k">for</span> <span class="n">item_idx</span><span class="p">,</span> <span class="n">parent_ci</span> <span class="ow">in</span> <span class="n">sec_assign</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">parent_ci</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">):</span>
+                <span class="n">clusters</span><span class="p">[</span><span class="n">parent_ci</span><span class="p">][</span><span class="s2">"secondary_member_indices"</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item_idx</span><span class="p">)</span>
+
+        <span class="c1"># ---- summarize primary members ---------------------------------</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_summarize</span><span class="p">(</span><span class="n">clusters_to_run</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">clusters_to_run</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">[</span><span class="n">current_nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">summary</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s2">"member_indices"</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters_to_run</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="n">summarize_batch_fn</span><span class="p">:</span>
+                <span class="n">summaries</span> <span class="o">=</span> <span class="n">summarize_batch_fn</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">summarize_fn</span><span class="p">:</span>
+                <span class="n">summaries</span> <span class="o">=</span> <span class="p">[</span><span class="n">summarize_fn</span><span class="p">(</span><span class="n">si</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">summaries</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">"Cluster of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">'member_indices'</span><span class="p">])</span><span class="si">}</span><span class="s2"> items."</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters_to_run</span>
+                <span class="p">]</span>
+            <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">clusters_to_run</span><span class="p">,</span> <span class="n">summaries</span><span class="p">):</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"summary"</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    Summarizing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span><span class="si">}</span><span class="s2"> clusters concurrently..."</span><span class="p">)</span>
+        <span class="n">_summarize</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+
+        <span class="c1"># ---- LLM verify+repartition ------------------------------------</span>
+        <span class="k">if</span> <span class="n">repartition_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eligible</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s2">"cluster_id"</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repartitioned_cluster_ids</span><span class="p">]</span>
+            <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">eligible</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"summary"</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s2">"cluster_id"</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s2">"cluster_id"</span><span class="p">],</span>
+                    <span class="s2">"label"</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s2">"cluster_id"</span><span class="p">],</span>
+                    <span class="s2">"summary"</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s2">"summary"</span><span class="p">],</span>
+                    <span class="s2">"members"</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="p">{</span>
+                            <span class="s2">"id"</span><span class="p">:</span> <span class="n">current_nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span>
+                            <span class="c1"># First non-empty line of the child summary is the</span>
+                            <span class="c1"># de-facto title; _build_clusters_block in</span>
+                            <span class="c1"># summarizer applies a final title_chars cap.</span>
+                            <span class="s2">"title"</span><span class="p">:</span> <span class="nb">next</span><span class="p">(</span>
+                                <span class="p">(</span>
+                                    <span class="n">ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                                    <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="p">(</span><span class="n">current_nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">summary</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+                                    <span class="k">if</span> <span class="n">ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                                <span class="p">),</span>
+                                <span class="s2">""</span><span class="p">,</span>
+                            <span class="p">),</span>
+                        <span class="p">}</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s2">"member_indices"</span><span class="p">][:</span><span class="mi">12</span><span class="p">]</span>
+                    <span class="p">],</span>
+                <span class="p">})</span>
+            <span class="k">if</span> <span class="n">records</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    Repartition pass over </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span><span class="si">}</span><span class="s2"> clusters..."</span><span class="p">)</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">repartition_fn</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+                    <span class="n">changes</span> <span class="o">=</span> <span class="p">(</span><span class="n">out</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"changes"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+                    <span class="k">if</span> <span class="n">changes</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      LLM proposed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">changes</span><span class="p">)</span><span class="si">}</span><span class="s2"> repartition change(s)"</span><span class="p">)</span>
+                    <span class="n">clusters</span><span class="p">,</span> <span class="n">affected</span> <span class="o">=</span> <span class="n">_apply_repartition</span><span class="p">(</span>
+                        <span class="n">clusters</span><span class="p">,</span> <span class="n">changes</span><span class="p">,</span> <span class="n">current_nodes</span><span class="p">,</span>
+                        <span class="n">current_embeddings</span><span class="p">,</span> <span class="n">repartitioned_cluster_ids</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">affected</span><span class="p">:</span>
+                        <span class="n">_summarize</span><span class="p">([</span><span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">affected</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      repartition skipped: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+
+        <span class="c1"># ---- build next-level nodes -----------------------------------</span>
+        <span class="n">next_nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ClusterNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">next_embeddings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ci</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clusters</span><span class="p">):</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s2">"member_indices"</span><span class="p">]]</span>
+            <span class="n">secondary_children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">current_nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s2">"secondary_member_indices"</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="n">all_doc_ids</span><span class="p">,</span> <span class="n">all_doc_texts</span><span class="p">,</span> <span class="n">all_cards</span> <span class="o">=</span> <span class="n">_aggregate_doc_content</span><span class="p">(</span><span class="n">children</span><span class="p">)</span>
+
+            <span class="n">summary</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s2">"summary"</span><span class="p">]</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"Cluster of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">'member_indices'</span><span class="p">])</span><span class="si">}</span><span class="s2"> items."</span>
+            <span class="k">if</span> <span class="n">embed_fn</span><span class="p">:</span>
+                <span class="n">ctx</span> <span class="o">=</span> <span class="n">_sampled_member_excerpts</span><span class="p">(</span>
+                    <span class="n">c</span><span class="p">[</span><span class="s2">"member_indices"</span><span class="p">],</span> <span class="n">current_nodes</span><span class="p">,</span> <span class="n">current_embeddings</span>
+                <span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">emb</span> <span class="o">=</span> <span class="n">embed_fn</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">ctx</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="n">emb</span> <span class="o">=</span> <span class="n">embed_fn</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">member_embs</span> <span class="o">=</span> <span class="n">current_embeddings</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="s2">"member_indices"</span><span class="p">]]</span>
+                <span class="n">emb</span> <span class="o">=</span> <span class="n">member_embs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">emb</span> <span class="o">=</span> <span class="n">emb</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">emb</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>
+
+            <span class="n">node_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"L</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">-C</span><span class="si">{</span><span class="n">ci</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">ClusterNode</span><span class="p">(</span>
+                <span class="n">node_id</span><span class="o">=</span><span class="n">node_id</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span>
+                <span class="n">summary</span><span class="o">=</span><span class="n">summary</span><span class="p">,</span>
+                <span class="n">embedding</span><span class="o">=</span><span class="n">emb</span><span class="p">,</span>
+                <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span>
+                <span class="n">secondary_children</span><span class="o">=</span><span class="n">secondary_children</span><span class="p">,</span>
+                <span class="n">doc_ids</span><span class="o">=</span><span class="n">all_doc_ids</span><span class="p">,</span>
+                <span class="n">doc_texts</span><span class="o">=</span><span class="n">all_doc_texts</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">all_cards</span><span class="p">:</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">doc_cards</span> <span class="o">=</span> <span class="n">all_cards</span>
+            <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+                <span class="n">ch</span><span class="o">.</span><span class="n">primary_parent</span> <span class="o">=</span> <span class="n">node</span>
+            <span class="k">for</span> <span class="n">sch</span> <span class="ow">in</span> <span class="n">secondary_children</span><span class="p">:</span>
+                <span class="c1"># Only set if no explicit secondary parent yet (don't overwrite).</span>
+                <span class="k">if</span> <span class="n">sch</span><span class="o">.</span><span class="n">secondary_parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">sch</span><span class="o">.</span><span class="n">secondary_parent</span> <span class="o">=</span> <span class="n">node</span>
+            <span class="n">next_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="n">next_embeddings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">emb</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">next_nodes</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="n">current_nodes</span> <span class="o">=</span> <span class="n">next_nodes</span>
+        <span class="n">current_embeddings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">next_embeddings</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"    → </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">current_nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> clusters (docs per cluster: "</span>
+            <span class="sa">f</span><span class="s2">"min=</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">doc_ids</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">current_nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"max=</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">doc_ids</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">current_nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"mean=</span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">doc_ids</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">current_nodes</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">current_nodes</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">)"</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">current_nodes</span></div>
+
+
+
+<div class="viewcode-block" id="tree_stats">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering.tree_stats">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tree_stats</span><span class="p">(</span><span class="n">roots</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ClusterNode</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Compute statistics about the hierarchy tree."""</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_depth</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ClusterNode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">_depth</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_count_nodes</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ClusterNode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">_count_nodes</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="n">max_depth</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_depth</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roots</span><span class="p">)</span>
+    <span class="n">total_nodes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">_count_nodes</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roots</span><span class="p">)</span>
+    <span class="n">total_docs</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">doc_ids</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roots</span><span class="p">)</span>
+    <span class="n">total_secondary</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roots</span><span class="p">:</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">total_secondary</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">secondary_children</span><span class="p">)</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"num_top_clusters"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">roots</span><span class="p">),</span>
+        <span class="s2">"max_depth"</span><span class="p">:</span> <span class="n">max_depth</span><span class="p">,</span>
+        <span class="s2">"total_nodes"</span><span class="p">:</span> <span class="n">total_nodes</span><span class="p">,</span>
+        <span class="s2">"total_documents"</span><span class="p">:</span> <span class="n">total_docs</span><span class="p">,</span>
+        <span class="s2">"total_secondary_stubs"</span><span class="p">:</span> <span class="n">total_secondary</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

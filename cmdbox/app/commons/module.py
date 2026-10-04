@@ -25,7 +25,7 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], ref_
 
     Args:
         package_name (str): パッケージ名
-        prefix (str, optional): プレフィックス. Defaults to "cmdbox_".
+        prefix (str, optional): プレフィックス. Defaults to ``"cmdbox_"``.
         excludes (list, optional): 除外するモジュール名のリスト. Defaults to [].
         ref_options (options.Options, optional): 参照用のオプション. Defaults to None.
         appcls ([type], optional): アプリケーションクラス. Defaults to None.
@@ -96,7 +96,7 @@ def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", excludes:list=[
 
     Args:
         package_name (str): パッケージ名
-        prefix (str, optional): プレフィックス. Defaults to "cmdbox_web_".
+        prefix (str, optional): プレフィックス. Defaults to ``"cmdbox_web_"``.
         excludes (list, optional): 除外するモジュール名のリスト. Defaults to [].
         appcls ([type], optional): アプリケーションクラス. Defaults to None.
         ver ([type], optional): バージョンモジュール. Defaults to None.

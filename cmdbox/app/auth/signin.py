@@ -1181,14 +1181,15 @@ async def create_request_scope(req:Request=None, res:Response=None, websocket:We
     FastAPIのDepends用に、ContextVarを使用してリクエストスコープを提供します。
     これにより、リクエストごとに異なるRequestオブジェクトを取得できます。
     これは、FastAPIのDependsで使用されることを意図しています。
-    次のように使用します。
+    
+    使用例::
+    
+        from cmdbox.app.auth import signin
+        from fastapi import Depends, Request, Response
 
-    from cmdbox.app.auth import signin
-    from fastapi import Depends, Request, Response
-
-    @app.get("/some-endpoint")
-    async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):
-        pass
+        @app.get("/some-endpoint")
+        async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):
+            pass
 
     Args:
         req (Request): リクエスト

@@ -176,10 +176,9 @@ class DatasourceBase(feature.ResultEdgeFeature):
     def is_dbtype_sqlite(self, dsconfig: Dict[str, Any]) -> bool:
         """
         dsconfig の dbtype が SQLite かどうかを判定します。
-         - dsconfig に dbtype がない場合は SQLite とみなします。
+        なお、dsconfig に dbtype がない場合は SQLite とみなします。
         Args:
             dsconfig: データソース設定の辞書
-            dbtype: 判定したいデータベース種別（'postgresql' または 'sqlite'）
         Returns:
             bool: dsconfig の dbtype が SQLite の場合 True
         """

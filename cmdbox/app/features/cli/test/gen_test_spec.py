@@ -3,13 +3,15 @@
 cmdboxを拡張して作成したコマンドでも利用できるよう、
 入力JSONパスや出力先をパラメータとして受け取ります。
 
-使い方 (コマンドライン):
+使い方 (コマンドライン)::
+
     python -m cmdbox.tools.test.generate_unit_test_specifications \\
         --input-json path/to/Specifications/cli-command-specifications.json \\
         --output-dir path/to/Specifications_forUnitTest \\
         --root-dir path/to/project
 
-使い方 (Python API):
+使い方 (Python API)::
+
     from cmdbox.tools.test.generate_unit_test_specifications import generate
     generate(
         input_json=Path("path/to/Specifications/cli-command-specifications.json"),

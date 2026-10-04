@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.test.gen_cli_spec &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>cmdbox.app.features.cli.test.gen_cli_spec &mdash; cmdbox 2026/10/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../../_static/documentation_options.js?v=25a83bf6"></script>
       <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../../_static/js/theme.js"></script>
@@ -84,13 +84,15 @@
 <span class="sd">cmdboxを拡張して作成したコマンドでも利用できるよう、</span>
 <span class="sd">フィーチャーパッケージ名や出力先をパラメータとして受け取ります。</span>
 
-<span class="sd">使い方 (コマンドライン):</span>
+<span class="sd">使い方 (コマンドライン)::</span>
+
 <span class="sd">    python -m cmdbox.tools.test.generate_cli_specifications \\</span>
 <span class="sd">        --feature-package myapp.app.features.cli \\</span>
 <span class="sd">        --output-dir path/to/Specifications \\</span>
 <span class="sd">        --root-dir path/to/project</span>
 
-<span class="sd">使い方 (Python API):</span>
+<span class="sd">使い方 (Python API)::</span>
+
 <span class="sd">    from cmdbox.tools.test.generate_cli_specifications import generate</span>
 <span class="sd">    generate(</span>
 <span class="sd">        feature_package="myapp.app.features.cli",</span>
@@ -172,13 +174,13 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        feature_package: フィーチャーを含むPythonパッケージ名</span>
-<span class="sd">                         (例: "cmdbox.app.features.cli", "myapp.app.features.cli")</span>
+<span class="sd">                         (例: ``cmdbox.app.features.cli``, ``myapp.app.features.cli``)</span>
 <span class="sd">        output_dir: 仕様書の出力先ディレクトリ</span>
 <span class="sd">        root_dir: プロジェクトルートディレクトリ (ソースファイルの相対パス計算に使用)</span>
-<span class="sd">        prefix: フィーチャーモジュールのファイル名プレフィックス (デフォルト: "cmdbox_")</span>
+<span class="sd">        prefix: フィーチャーモジュールのファイル名プレフィックス (デフォルト: ``cmdbox_``)</span>
 <span class="sd">        appcls: アプリケーションクラス (省略時はCmdBoxAppを使用)</span>
-<span class="sd">        ver: バージョンモジュール (省略時はcmdbox.versionを使用)</span>
-<span class="sd">        language: 言語設定 (デフォルト: "ja_JP")</span>
+<span class="sd">        ver: バージョンモジュール (省略時は``cmdbox.version``を使用)</span>
+<span class="sd">        language: 言語設定 (デフォルト: ``ja_JP``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        生成された仕様書の辞書リスト</span>

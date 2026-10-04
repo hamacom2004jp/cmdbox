@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.datasource.datasource_base &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>cmdbox.app.features.cli.datasource.datasource_base &mdash; cmdbox 2026/10/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../../_static/documentation_options.js?v=25a83bf6"></script>
       <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../../_static/js/theme.js"></script>
@@ -273,10 +273,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">is_dbtype_sqlite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dsconfig</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        dsconfig の dbtype が SQLite かどうかを判定します。</span>
-<span class="sd">         - dsconfig に dbtype がない場合は SQLite とみなします。</span>
+<span class="sd">        なお、dsconfig に dbtype がない場合は SQLite とみなします。</span>
 <span class="sd">        Args:</span>
 <span class="sd">            dsconfig: データソース設定の辞書</span>
-<span class="sd">            dbtype: 判定したいデータベース種別（'postgresql' または 'sqlite'）</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: dsconfig の dbtype が SQLite の場合 True</span>
 <span class="sd">        """</span>

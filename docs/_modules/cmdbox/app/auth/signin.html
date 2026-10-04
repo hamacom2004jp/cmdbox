@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/09/27 documentation</title>
+  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/10/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=a248f298"></script>
+      <script src="../../../../_static/documentation_options.js?v=25a83bf6"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -1339,14 +1339,15 @@
 <span class="sd">    FastAPIのDepends用に、ContextVarを使用してリクエストスコープを提供します。</span>
 <span class="sd">    これにより、リクエストごとに異なるRequestオブジェクトを取得できます。</span>
 <span class="sd">    これは、FastAPIのDependsで使用されることを意図しています。</span>
-<span class="sd">    次のように使用します。</span>
+<span class="sd">    </span>
+<span class="sd">    使用例::</span>
+<span class="sd">    </span>
+<span class="sd">        from cmdbox.app.auth import signin</span>
+<span class="sd">        from fastapi import Depends, Request, Response</span>
 
-<span class="sd">    from cmdbox.app.auth import signin</span>
-<span class="sd">    from fastapi import Depends, Request, Response</span>
-
-<span class="sd">    @app.get("/some-endpoint")</span>
-<span class="sd">    async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):</span>
-<span class="sd">        pass</span>
+<span class="sd">        @app.get("/some-endpoint")</span>
+<span class="sd">        async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):</span>
+<span class="sd">            pass</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        req (Request): リクエスト</span>

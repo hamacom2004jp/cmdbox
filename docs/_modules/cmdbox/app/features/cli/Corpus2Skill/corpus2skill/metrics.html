@@ -1,0 +1,549 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics &mdash; cmdbox 2026/10/04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../../../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../../../_static/documentation_options.js?v=25a83bf6"></script>
+      <script src="../../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../docs/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Evaluation metrics for Corpus2Skill.</span>
+
+<span class="sd">Lexical metrics (F1, BLEU, ROUGE), semantic metric (BERTScore-F1) and</span>
+<span class="sd">LLM-judge metrics:</span>
+
+<span class="sd">  * ``judge_factuality``           — answer vs gold (essential-info coverage)</span>
+<span class="sd">  * ``judge_context_recall``       — retrieved context vs gold</span>
+<span class="sd">  * ``judge_faithfulness_grounded`` — answer claims supported by retrieved context</span>
+<span class="sd">  * ``judge_answer_relevance``     — does the answer address the question</span>
+<span class="sd">  * ``judge_context_precision``    — fraction of retrieved context that is on-topic</span>
+
+<span class="sd">Plus an aggregate helper ``hallucination_rate`` (faithfulness_grounded &lt; 0.6).</span>
+
+<span class="sd">The factuality / context-recall prompts follow the WixQA evaluation protocol</span>
+<span class="sd">(arXiv:2505.08643). The faithfulness / answer-relevance / context-precision</span>
+<span class="sd">prompts are RAGAS-style 1-5 LLM judges.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Simple whitespace + punctuation tokenizer."""</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\w+"</span><span class="p">,</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="compute_f1">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_f1">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_f1</span><span class="p">(</span><span class="n">prediction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reference</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Token-level F1 score."""</span>
+    <span class="n">pred_tokens</span> <span class="o">=</span> <span class="n">_tokenize</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">ref_tokens</span> <span class="o">=</span> <span class="n">_tokenize</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pred_tokens</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ref_tokens</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">pred_counter</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">pred_tokens</span><span class="p">)</span>
+    <span class="n">ref_counter</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">ref_tokens</span><span class="p">)</span>
+    <span class="n">common</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">pred_counter</span> <span class="o">&amp;</span> <span class="n">ref_counter</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">common</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">common</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred_tokens</span><span class="p">)</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">common</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref_tokens</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">precision</span> <span class="o">*</span> <span class="n">recall</span> <span class="o">/</span> <span class="p">(</span><span class="n">precision</span> <span class="o">+</span> <span class="n">recall</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_bleu">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bleu">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_bleu</span><span class="p">(</span><span class="n">prediction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reference</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Sentence-level BLEU with smoothing."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">nltk.translate.bleu_score</span><span class="w"> </span><span class="kn">import</span> <span class="n">sentence_bleu</span><span class="p">,</span> <span class="n">SmoothingFunction</span>
+    <span class="n">pred_tokens</span> <span class="o">=</span> <span class="n">_tokenize</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">ref_tokens</span> <span class="o">=</span> <span class="n">_tokenize</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pred_tokens</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ref_tokens</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="n">smoothing</span> <span class="o">=</span> <span class="n">SmoothingFunction</span><span class="p">()</span><span class="o">.</span><span class="n">method1</span>
+    <span class="k">return</span> <span class="n">sentence_bleu</span><span class="p">([</span><span class="n">ref_tokens</span><span class="p">],</span> <span class="n">pred_tokens</span><span class="p">,</span> <span class="n">smoothing_function</span><span class="o">=</span><span class="n">smoothing</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_rouge">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_rouge">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_rouge</span><span class="p">(</span><span class="n">prediction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reference</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""ROUGE-1 and ROUGE-2 F-measure."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rouge_score</span><span class="w"> </span><span class="kn">import</span> <span class="n">rouge_scorer</span>
+    <span class="n">scorer</span> <span class="o">=</span> <span class="n">rouge_scorer</span><span class="o">.</span><span class="n">RougeScorer</span><span class="p">([</span><span class="s2">"rouge1"</span><span class="p">,</span> <span class="s2">"rouge2"</span><span class="p">],</span> <span class="n">use_stemmer</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"rouge1"</span><span class="p">:</span> <span class="n">scores</span><span class="p">[</span><span class="s2">"rouge1"</span><span class="p">]</span><span class="o">.</span><span class="n">fmeasure</span><span class="p">,</span>
+        <span class="s2">"rouge2"</span><span class="p">:</span> <span class="n">scores</span><span class="p">[</span><span class="s2">"rouge2"</span><span class="p">]</span><span class="o">.</span><span class="n">fmeasure</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># LLM-judge metrics</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="n">FACTUALITY_PROMPT</span> <span class="o">=</span> <span class="s2">"""You are a Factual Alignment Expert. Your job is to evaluate how well an AI response includes the essential information from a ground truth answer (GT answer) according to a given user query.</span>
+
+<span class="s2">Note that the Ground Truth (GT Answer), is the "Correct" answer generated by an expert, and was created to evaluate the model, and is NOT part of the AI response or the context.</span>
+
+<span class="s2">TASK DESCRIPTION:</span>
+<span class="s2">You will be presented with three elements: a question, a GT answer, and an AI response. Determine how well the AI response includes the essential information from the GT answer that helps to solve the user's query. In case of any additional or extra information present in the AI response, only make sure it's not preventing the user from solving his query.</span>
+
+<span class="s2">EVALUATION CRITERIA:</span>
+<span class="s2">5: Complete Match - All essential information from GT answer appears in AI response, providing complete solution to the query</span>
+<span class="s2">4: Strong Match - Most essential information is present, with only minor details missing that don't impact the solution significantly</span>
+<span class="s2">3: Partial Match - Core information is present but missing some important details that would help better solve the query</span>
+<span class="s2">2: Limited Match - Only basic or partial information present, missing several essential elements needed for the solution</span>
+<span class="s2">1: Poor Match - Missing most essential information or contains incorrect information that could mislead the user</span>
+
+<span class="s2">INSTRUCTIONS:</span>
+<span class="s2">1. Read the question carefully and analyze the ground truth answer to identify all key information elements that help solve the query</span>
+<span class="s2">2. Compare the AI response (candidate answer) against the ground truth, focusing on presence of important information</span>
+<span class="s2">3. Evaluate the completeness and accuracy of the information transfer</span>
+<span class="s2">4. Assign a rating (1-5) based on how well important information is preserved</span>
+<span class="s2">5. Provide a brief explanation focusing on factuality</span>
+
+<span class="s2">## Question</span>
+<span class="si">{question}</span>
+
+<span class="s2">## GT Answer</span>
+<span class="si">{gold_answer}</span>
+
+<span class="s2">## AI Response</span>
+<span class="si">{predicted_answer}</span>
+
+<span class="s2">Return ONLY a JSON object: {{"score": &lt;1-5 integer&gt;, "explanation": "brief reason"}}"""</span>
+
+
+<span class="n">CONTEXT_RECALL_PROMPT</span> <span class="o">=</span> <span class="s2">"""You are a Context Evaluation Expert. Your job is to assess how well a retrieved context contains the essential information present in a ground truth answer (GT answer).</span>
+
+<span class="s2">TASK DESCRIPTION:</span>
+<span class="s2">You will be presented with three pieces of information: a user query, its ground truth answer, and a retrieved context (that will be used to create an AI response from). Determine how well the essential information from the GT answer appears in the retrieved context. Additional information in the retrieved context should not affect the scoring.</span>
+
+<span class="s2">EVALUATION CRITERIA:</span>
+<span class="s2">5: Complete Match - All essential information from the GT answer is present in the retrieved context. The context fully enables answering the user's question.</span>
+<span class="s2">4: Strong Match - All essential information is present, but some minor details are missing. The context still effectively answers the user's question.</span>
+<span class="s2">3: Partial Match - Most essential information is present, but some important details are missing. The context partially answers the user's question.</span>
+<span class="s2">2: Weak Match - Only basic or limited essential information is present. The context provides insufficient information to properly answer the user's question.</span>
+<span class="s2">1: No Match - Essential information is missing or incorrect. The context cannot be used to answer the user's question.</span>
+
+<span class="s2">INSTRUCTIONS:</span>
+<span class="s2">1. Read the question to understand what the user asks for</span>
+<span class="s2">2. Break down the GT answer into essential information (key facts, main concepts, direct answers)</span>
+<span class="s2">3. Check if these information pieces appear in the retrieved context</span>
+<span class="s2">4. Focus only on finding the ground truth information in the context - ignore extra information</span>
+<span class="s2">5. Assign a rating (1-5) based on information coverage and relevance</span>
+
+<span class="s2">## Question</span>
+<span class="si">{question}</span>
+
+<span class="s2">## GT Answer</span>
+<span class="si">{gold_answer}</span>
+
+<span class="s2">## Retrieved Context</span>
+<span class="si">{context}</span>
+
+<span class="s2">Return ONLY a JSON object: {{"score": &lt;1-5 integer&gt;, "explanation": "brief reason"}}"""</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_llm_judge</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Call LLM judge, parse JSON response, normalize score to 0-1."""</span>
+    <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">max_tokens</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}],</span>
+            <span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"{"</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">rindex</span><span class="p">(</span><span class="s2">"}"</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
+            <span class="n">raw_score</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"score"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">"raw_score"</span><span class="p">:</span> <span class="n">raw_score</span><span class="p">,</span>
+                <span class="s2">"score_01"</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">raw_score</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="s2">"explanation"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"explanation"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s2">"429"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"rate_limit"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+                <span class="n">delay</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">attempt</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"raw_score"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"score_01"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"explanation"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Judge error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="judge_factuality">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_factuality">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">judge_factuality</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">predicted</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">gold</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Judge how well the predicted answer captures the gold answer's essential info."""</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">FACTUALITY_PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">question</span><span class="o">=</span><span class="n">question</span><span class="p">,</span>
+        <span class="n">gold_answer</span><span class="o">=</span><span class="n">gold</span><span class="p">[:</span><span class="mi">4000</span><span class="p">],</span>
+        <span class="n">predicted_answer</span><span class="o">=</span><span class="n">predicted</span><span class="p">[:</span><span class="mi">4000</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_llm_judge</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="judge_context_recall">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_context_recall">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">judge_context_recall</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">gold</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Judge how well the retrieved context covers the gold answer."""</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">CONTEXT_RECALL_PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">question</span><span class="o">=</span><span class="n">question</span><span class="p">,</span>
+        <span class="n">gold_answer</span><span class="o">=</span><span class="n">gold</span><span class="p">[:</span><span class="mi">4000</span><span class="p">],</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">[:</span><span class="mi">8000</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_llm_judge</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># BERTScore (semantic F1) — embedding-based similarity to the gold answer.</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="n">_BERTSCORE_MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"BERTSCORE_MODEL"</span><span class="p">,</span> <span class="s2">"roberta-large"</span><span class="p">)</span>
+<span class="n">_BERTSCORE_LANG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"BERTSCORE_LANG"</span><span class="p">,</span> <span class="s2">"en"</span><span class="p">)</span>
+<span class="n">_bertscorer</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># lazy-init singleton</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_bertscorer</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">_bertscorer</span>
+    <span class="k">if</span> <span class="n">_bertscorer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">bert_score</span><span class="w"> </span><span class="kn">import</span> <span class="n">BERTScorer</span>  <span class="c1"># type: ignore</span>
+
+        <span class="n">device</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"BERTSCORE_DEVICE"</span><span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="n">_BERTSCORE_MODEL</span><span class="p">,</span>
+            <span class="n">lang</span><span class="o">=</span><span class="n">_BERTSCORE_LANG</span><span class="p">,</span>
+            <span class="n">rescale_with_baseline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">idf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">"device"</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="n">_bertscorer</span> <span class="o">=</span> <span class="n">BERTScorer</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_bertscorer</span>
+
+
+<div class="viewcode-block" id="compute_bertscore_f1">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bertscore_f1">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_bertscore_f1</span><span class="p">(</span><span class="n">prediction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reference</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Single-pair BERTScore-F1. Returns 0.0 on empty input / model error."""</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">prediction</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">reference</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">scorer</span> <span class="o">=</span> <span class="n">_get_bertscorer</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">F1</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">score</span><span class="p">([</span><span class="n">prediction</span><span class="p">],</span> <span class="p">[</span><span class="n">reference</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">F1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  [bertscore] error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="compute_bertscore_batch">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.compute_bertscore_batch">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_bertscore_batch</span><span class="p">(</span>
+    <span class="n">predictions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">references</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Batched BERTScore for efficiency. Returns F1 per pair."""</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">predictions</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">scorer</span> <span class="o">=</span> <span class="n">_get_bertscorer</span><span class="p">()</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="ow">or</span> <span class="s2">"(empty)"</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]</span>
+        <span class="n">refs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="ow">or</span> <span class="s2">"(empty)"</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">references</span><span class="p">]</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">F1</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">refs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">F1</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  [bertscore-batch] error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># LLM-as-judge: Faithfulness (context-grounded)</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="n">FAITHFULNESS_GROUNDED_PROMPT</span> <span class="o">=</span> <span class="s2">"""You are a Faithfulness Evaluation Expert. Your job is to determine whether the claims in an AI-generated answer are supported by the retrieved context that was given to the model.</span>
+
+<span class="s2">This is different from comparing the answer to a gold answer. We are specifically asking: does every claim in the AI response have explicit support in the retrieved context? Unsupported claims indicate the model is using training-data knowledge to fill gaps or fabricating information ("hallucination").</span>
+
+<span class="s2">EVALUATION CRITERIA (1-5 scale):</span>
+<span class="s2">5: Fully Grounded — Every claim in the AI response is directly supported by the retrieved context. No unsupported assertions.</span>
+<span class="s2">4: Mostly Grounded — Almost all claims are supported; one or two minor details may not be explicitly in the context but are reasonable extrapolations.</span>
+<span class="s2">3: Partially Grounded — Roughly half of the claims are supported by the context; the rest appear to come from training knowledge or are unsupported elaborations.</span>
+<span class="s2">2: Weakly Grounded — Only a minority of claims are supported. Most of the answer comes from outside the retrieved context.</span>
+<span class="s2">1: Not Grounded — Essentially none of the claims are supported by the retrieved context. The answer ignores the context or fabricates details.</span>
+
+<span class="s2">INSTRUCTIONS:</span>
+<span class="s2">1. Read the question to understand the user's intent.</span>
+<span class="s2">2. Identify the discrete claims / factual statements in the AI response.</span>
+<span class="s2">3. For each claim, check whether it can be verified from the retrieved context (verbatim or by clear paraphrase).</span>
+<span class="s2">4. Penalize for unsupported claims, fabricated specifics (numbers, names, URLs), and citations not present in the context.</span>
+<span class="s2">5. Do NOT penalize for missing information — that's a recall problem, not a faithfulness problem.</span>
+
+<span class="s2">## Question</span>
+<span class="si">{question}</span>
+
+<span class="s2">## Retrieved Context</span>
+<span class="si">{context}</span>
+
+<span class="s2">## AI Response</span>
+<span class="si">{predicted_answer}</span>
+
+<span class="s2">Return ONLY a JSON object: {{"score": &lt;1-5 integer&gt;, "explanation": "brief reason naming any unsupported claims"}}"""</span>
+
+
+<div class="viewcode-block" id="judge_faithfulness_grounded">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_faithfulness_grounded">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">judge_faithfulness_grounded</span><span class="p">(</span>
+    <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">predicted</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">client</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Judge whether the claims in ``predicted`` are supported by ``context``."""</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">FAITHFULNESS_GROUNDED_PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">question</span><span class="o">=</span><span class="n">question</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">[:</span><span class="mi">12000</span><span class="p">],</span>
+        <span class="n">predicted_answer</span><span class="o">=</span><span class="n">predicted</span><span class="p">[:</span><span class="mi">4000</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_llm_judge</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># LLM-as-judge: Answer Relevance</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="n">ANSWER_RELEVANCE_PROMPT</span> <span class="o">=</span> <span class="s2">"""You are an Answer Relevance Evaluation Expert. Your job is to assess whether an AI response actually addresses the user's question — independent of whether the answer is factually correct.</span>
+
+<span class="s2">A response can be perfectly grounded in the retrieved context and still be irrelevant (e.g., it answers a related but different question, drowns the user in tangential background, or fails to commit to an answer).</span>
+
+<span class="s2">EVALUATION CRITERIA (1-5 scale):</span>
+<span class="s2">5: Directly On-Point — The response directly answers the question with no unnecessary digression.</span>
+<span class="s2">4: Mostly On-Point — The response answers the question; some extra context is included but doesn't dilute the answer.</span>
+<span class="s2">3: Partially Relevant — The response addresses part of the question but misses other aspects, or pads heavily with tangential content.</span>
+<span class="s2">2: Mostly Off-Topic — The response touches on the topic but does not actually answer what was asked.</span>
+<span class="s2">1: Off-Topic / Non-Answer — The response does not answer the question (e.g., refusal, ignores the question, asks a counter-question).</span>
+
+<span class="s2">INSTRUCTIONS:</span>
+<span class="s2">1. Parse the question to identify what is being asked (intent, specifics requested).</span>
+<span class="s2">2. Read the AI response and check whether it directly addresses those specifics.</span>
+<span class="s2">3. Penalize for padding, tangents, or non-committal hedging that does not deliver an answer.</span>
+<span class="s2">4. Ignore factual correctness for this metric — only judge whether the question is addressed.</span>
+
+<span class="s2">## Question</span>
+<span class="si">{question}</span>
+
+<span class="s2">## AI Response</span>
+<span class="si">{predicted_answer}</span>
+
+<span class="s2">Return ONLY a JSON object: {{"score": &lt;1-5 integer&gt;, "explanation": "brief reason"}}"""</span>
+
+
+<div class="viewcode-block" id="judge_answer_relevance">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_answer_relevance">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">judge_answer_relevance</span><span class="p">(</span>
+    <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">predicted</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">client</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Judge whether ``predicted`` actually answers ``question``."""</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">ANSWER_RELEVANCE_PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">question</span><span class="o">=</span><span class="n">question</span><span class="p">,</span>
+        <span class="n">predicted_answer</span><span class="o">=</span><span class="n">predicted</span><span class="p">[:</span><span class="mi">4000</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_llm_judge</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># LLM-as-judge: Context Precision (holistic)</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="n">CONTEXT_PRECISION_PROMPT</span> <span class="o">=</span> <span class="s2">"""You are a Context Precision Evaluation Expert. Your job is to estimate what fraction of the retrieved context is relevant to answering the user's question.</span>
+
+<span class="s2">This complements Context Recall (which asks whether the answer is *present* in the context). Context Precision asks whether the retrieved context is *focused* — high precision means the retrieved documents are about the question; low precision means the retriever brought back a lot of noise that the model has to ignore.</span>
+
+<span class="s2">EVALUATION CRITERIA (1-5 scale):</span>
+<span class="s2">5: Highly Precise — Almost all of the retrieved context is directly relevant to the question.</span>
+<span class="s2">4: Mostly Precise — The majority is relevant; some unrelated paragraphs are present but minor.</span>
+<span class="s2">3: Mixed — Roughly half of the retrieved content is relevant; the rest is noise / tangential.</span>
+<span class="s2">2: Mostly Noisy — Only a minority of the retrieved content is relevant to the question.</span>
+<span class="s2">1: Off-Target — Essentially none of the retrieved context is relevant.</span>
+
+<span class="s2">INSTRUCTIONS:</span>
+<span class="s2">1. Parse the question to identify the topic and what kind of evidence would help answer it.</span>
+<span class="s2">2. Read the retrieved context and estimate what fraction of it is directly useful for answering this question.</span>
+<span class="s2">3. Do NOT penalize for missing content — that's Context Recall. Penalize for irrelevant content occupying the model's context window.</span>
+<span class="s2">4. Ignore Markdown structure / formatting noise — focus on substantive content.</span>
+
+<span class="s2">## Question</span>
+<span class="si">{question}</span>
+
+<span class="s2">## Retrieved Context</span>
+<span class="si">{context}</span>
+
+<span class="s2">Return ONLY a JSON object: {{"score": &lt;1-5 integer&gt;, "explanation": "brief reason"}}"""</span>
+
+
+<div class="viewcode-block" id="judge_context_precision">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.judge_context_precision">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">judge_context_precision</span><span class="p">(</span>
+    <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">client</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Judge what fraction of ``context`` is relevant to ``question``."""</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">CONTEXT_PRECISION_PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">question</span><span class="o">=</span><span class="n">question</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">[:</span><span class="mi">12000</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_llm_judge</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Aggregate helper: hallucination rate (no extra LLM call).</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="hallucination_rate">
+<a class="viewcode-back" href="../../../../../../../resources/cmdbox.app.features.cli.Corpus2Skill.corpus2skill.html#cmdbox.app.features.cli.Corpus2Skill.corpus2skill.metrics.hallucination_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hallucination_rate</span><span class="p">(</span>
+    <span class="n">per_q</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"faithfulness_grounded"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Fraction of queries where ``key`` &lt; ``threshold``.</span>
+
+<span class="sd">    Defaults to faithfulness_grounded &lt; 0.6 (raw 1-5 score ≤ 3), matching</span>
+<span class="sd">    common production thresholds (target ≥ 0.8 / 4-of-5). Queries with a</span>
+<span class="sd">    None / missing score are skipped.</span>
+<span class="sd">    """</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">[</span><span class="n">q</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">per_q</span> <span class="k">if</span> <span class="s2">"error_detail"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">q</span><span class="p">]</span>
+    <span class="n">scored</span> <span class="o">=</span> <span class="p">[</span><span class="n">q</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">valid</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">scored</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="n">halluc</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">scored</span> <span class="k">if</span> <span class="n">q</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">halluc</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">scored</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

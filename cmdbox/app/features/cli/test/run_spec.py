@@ -3,7 +3,8 @@
 cmdboxを拡張して作成したコマンドでも利用できるよう、
 入力JSONパスやフィルタ条件をパラメータとして受け取ります。
 
-使い方 (Python API):
+使い方 (Python API)::
+
     from cmdbox.app.features.cli.test import run_spec
     result = run_spec.run(
         input_json=Path("path/to/Specifications_forUnitTest/cli-unit-test-specifications.json"),

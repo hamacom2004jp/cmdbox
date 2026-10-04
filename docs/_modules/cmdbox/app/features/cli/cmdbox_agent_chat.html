@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.cmdbox_agent_chat &mdash; cmdbox 2026/09/27 documentation</title>
+  <title>cmdbox.app.features.cli.cmdbox_agent_chat &mdash; cmdbox 2026/10/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=a248f298"></script>
+      <script src="../../../../../_static/documentation_options.js?v=25a83bf6"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -83,15 +83,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">signin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">limiter</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">,</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdbox_tts_say</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli.agent</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">agant_base</span><span class="p">,</span>
-    <span class="n">SQLInjectionDetectionPlugin</span><span class="p">,</span>
-    <span class="n">JavaScriptInjectionPlugin</span><span class="p">,</span>
-    <span class="n">TemplateInjectionDetectionPlugin</span><span class="p">,</span>
-    <span class="n">MaliciousKeywordDetectionPlugin</span><span class="p">,</span>
-    <span class="n">DangerousSequencePlugin</span><span class="p">,</span>
-    <span class="n">PromptInjectionException</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">agant_base</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">aclosing</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -928,6 +920,13 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            List[Any]: 作成したプラグインのリスト</span>
 <span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli.agent</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">SQLInjectionDetectionPlugin</span><span class="p">,</span>
+            <span class="n">JavaScriptInjectionPlugin</span><span class="p">,</span>
+            <span class="n">TemplateInjectionDetectionPlugin</span><span class="p">,</span>
+            <span class="n">MaliciousKeywordDetectionPlugin</span><span class="p">,</span>
+            <span class="n">DangerousSequencePlugin</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">plugins</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">SQLInjectionDetectionPlugin</span><span class="p">(</span><span class="n">logger</span><span class="p">),</span>
             <span class="n">JavaScriptInjectionPlugin</span><span class="p">(</span><span class="n">logger</span><span class="p">),</span>
@@ -1017,6 +1016,7 @@
 <span class="sd">            int: ステータス</span>
 <span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptInjectionException</span>
             <span class="c1"># プロンプトインジェクション検知エラーの場合は特別なメッセージを返す</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">PromptInjectionException</span><span class="p">):</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>

@@ -5,7 +5,8 @@ docs_src/docs/ 配下のコマンドリファレンスRSTファイルを新規�
 
 既存のRSTファイルがある場合は上書きします。
 
-使い方 (Python API):
+使い方 (Python API)::
+
     from cmdbox.app.features.cli.test import gen_cli_docs
     result = gen_cli_docs.generate(
         specs_dir=Path("Specifications"),

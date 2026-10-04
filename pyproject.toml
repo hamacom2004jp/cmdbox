@@ -101,7 +101,8 @@ rag = [
     "tabulate2>=1.10.2,<2.0",
     "langchain_community",
     "markdown",
-    "pdfplumber"
+    "pdfplumber",
+    "scikit-learn"
 ]
 omni = [
     "accelerate>=1.12.0",

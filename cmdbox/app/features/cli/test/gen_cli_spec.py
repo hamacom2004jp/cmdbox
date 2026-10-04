@@ -3,13 +3,15 @@
 cmdboxを拡張して作成したコマンドでも利用できるよう、
 フィーチャーパッケージ名や出力先をパラメータとして受け取ります。
 
-使い方 (コマンドライン):
+使い方 (コマンドライン)::
+
     python -m cmdbox.tools.test.generate_cli_specifications \\
         --feature-package myapp.app.features.cli \\
         --output-dir path/to/Specifications \\
         --root-dir path/to/project
 
-使い方 (Python API):
+使い方 (Python API)::
+
     from cmdbox.tools.test.generate_cli_specifications import generate
     generate(
         feature_package="myapp.app.features.cli",
@@ -86,13 +88,13 @@ def generate(
 
     Args:
         feature_package: フィーチャーを含むPythonパッケージ名
-                         (例: "cmdbox.app.features.cli", "myapp.app.features.cli")
+                         (例: ``cmdbox.app.features.cli``, ``myapp.app.features.cli``)
         output_dir: 仕様書の出力先ディレクトリ
         root_dir: プロジェクトルートディレクトリ (ソースファイルの相対パス計算に使用)
-        prefix: フィーチャーモジュールのファイル名プレフィックス (デフォルト: "cmdbox_")
+        prefix: フィーチャーモジュールのファイル名プレフィックス (デフォルト: ``cmdbox_``)
         appcls: アプリケーションクラス (省略時はCmdBoxAppを使用)
-        ver: バージョンモジュール (省略時はcmdbox.versionを使用)
-        language: 言語設定 (デフォルト: "ja_JP")
+        ver: バージョンモジュール (省略時は``cmdbox.version``を使用)
+        language: 言語設定 (デフォルト: ``ja_JP``)
 
     Returns:
         生成された仕様書の辞書リスト

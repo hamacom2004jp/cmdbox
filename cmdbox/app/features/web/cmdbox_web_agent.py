@@ -229,7 +229,8 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
         Returns:
             Dict[str, Any]: ツールメニュー情報
         
-        Sample:
+        Sample::
+
             {
                 'filer': {
                     'html': 'Filer',

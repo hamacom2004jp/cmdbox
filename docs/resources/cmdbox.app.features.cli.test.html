@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.test package &mdash; cmdbox 2026/09/27 documentation</title>
+  <title>cmdbox.app.features.cli.test package &mdash; cmdbox 2026/10/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a248f298"></script>
+      <script src="../_static/documentation_options.js?v=25a83bf6"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -90,19 +90,17 @@
 <p>gen_cli_spec.py が生成した cli-command-specifications.json を元に、
 docs_src/docs/ 配下のコマンドリファレンスRSTファイルを新規生成します。</p>
 <p>既存のRSTファイルがある場合は上書きします。</p>
-<dl>
-<dt>使い方 (Python API):</dt><dd><p>from cmdbox.app.features.cli.test import gen_cli_docs
-result = gen_cli_docs.generate(</p>
-<blockquote>
-<div><p>specs_dir=Path(&quot;Specifications&quot;),
-docs_dir=Path(&quot;docs_src/docs&quot;),
-mode_filter=None,   # None で全モード
-cmd_filter=None,    # None で全コマンド
-dry_run=False,</p>
-</div></blockquote>
-<p>)</p>
-</dd>
-</dl>
+<p>使い方 (Python API):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">gen_cli_docs</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">gen_cli_docs</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">specs_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"Specifications"</span><span class="p">),</span>
+    <span class="n">docs_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"docs_src/docs"</span><span class="p">),</span>
+    <span class="n">mode_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="c1"># None で全モード</span>
+    <span class="n">cmd_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>    <span class="c1"># None で全コマンド</span>
+    <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_docs.generate">
 <span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_docs.</span></span><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docs_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_docs.html#generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_docs.generate" title="Link to this definition"></a></dt>
@@ -129,24 +127,24 @@ dry_run=False,</p>
 <p>CLIコマンド詳細設計書生成ツール。</p>
 <p>cmdboxを拡張して作成したコマンドでも利用できるよう、
 フィーチャーパッケージ名や出力先をパラメータとして受け取ります。</p>
-<dl>
-<dt>使い方 (コマンドライン):</dt><dd><dl class="simple">
-<dt>python -m cmdbox.tools.test.generate_cli_specifications </dt><dd><p>--feature-package myapp.app.features.cli --output-dir path/to/Specifications --root-dir path/to/project</p>
-</dd>
-</dl>
-</dd>
-<dt>使い方 (Python API):</dt><dd><p>from cmdbox.tools.test.generate_cli_specifications import generate
-generate(</p>
-<blockquote>
-<div><p>feature_package=&quot;myapp.app.features.cli&quot;,
-output_dir=Path(&quot;path/to/Specifications&quot;),
-root_dir=Path(&quot;path/to/project&quot;),
-appcls=MyApp,
-ver=my_version_module,</p>
-</div></blockquote>
-<p>)</p>
-</dd>
-</dl>
+<p>使い方 (コマンドライン):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">cmdbox</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">generate_cli_specifications</span> \
+    <span class="o">--</span><span class="n">feature</span><span class="o">-</span><span class="n">package</span> <span class="n">myapp</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">cli</span> \
+    <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">Specifications</span> \
+    <span class="o">--</span><span class="n">root</span><span class="o">-</span><span class="nb">dir</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">project</span>
+</pre></div>
+</div>
+<p>使い方 (Python API):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.tools.test.generate_cli_specifications</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate</span>
+<span class="n">generate</span><span class="p">(</span>
+    <span class="n">feature_package</span><span class="o">=</span><span class="s2">"myapp.app.features.cli"</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/Specifications"</span><span class="p">),</span>
+    <span class="n">root_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/project"</span><span class="p">),</span>
+    <span class="n">appcls</span><span class="o">=</span><span class="n">MyApp</span><span class="p">,</span>
+    <span class="n">ver</span><span class="o">=</span><span class="n">my_version_module</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">MethodInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defining_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docstring</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[str]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[str]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statuses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[str]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#MethodInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo" title="Link to this definition"></a></dt>
@@ -247,13 +245,13 @@ ver=my_version_module,</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>feature_package</strong> -- フィーチャーを含むPythonパッケージ名
-(例: &quot;cmdbox.app.features.cli&quot;, &quot;myapp.app.features.cli&quot;)</p></li>
+(例: <code class="docutils literal notranslate"><span class="pre">cmdbox.app.features.cli</span></code>, <code class="docutils literal notranslate"><span class="pre">myapp.app.features.cli</span></code>)</p></li>
 <li><p><strong>output_dir</strong> -- 仕様書の出力先ディレクトリ</p></li>
 <li><p><strong>root_dir</strong> -- プロジェクトルートディレクトリ (ソースファイルの相対パス計算に使用)</p></li>
-<li><p><strong>prefix</strong> -- フィーチャーモジュールのファイル名プレフィックス (デフォルト: &quot;<a href="#id1"><span class="problematic" id="id2">cmdbox_</span></a>&quot;)</p></li>
+<li><p><strong>prefix</strong> -- フィーチャーモジュールのファイル名プレフィックス (デフォルト: <code class="docutils literal notranslate"><span class="pre">cmdbox_</span></code>)</p></li>
 <li><p><strong>appcls</strong> -- アプリケーションクラス (省略時はCmdBoxAppを使用)</p></li>
-<li><p><strong>ver</strong> -- バージョンモジュール (省略時はcmdbox.versionを使用)</p></li>
-<li><p><strong>language</strong> -- 言語設定 (デフォルト: &quot;ja_JP&quot;)</p></li>
+<li><p><strong>ver</strong> -- バージョンモジュール (省略時は``cmdbox.version``を使用)</p></li>
+<li><p><strong>language</strong> -- 言語設定 (デフォルト: <code class="docutils literal notranslate"><span class="pre">ja_JP</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -276,22 +274,22 @@ ver=my_version_module,</p>
 <p>ユニットテスト仕様書生成ツール。</p>
 <p>cmdboxを拡張して作成したコマンドでも利用できるよう、
 入力JSONパスや出力先をパラメータとして受け取ります。</p>
-<dl>
-<dt>使い方 (コマンドライン):</dt><dd><dl class="simple">
-<dt>python -m cmdbox.tools.test.generate_unit_test_specifications </dt><dd><p>--input-json path/to/Specifications/cli-command-specifications.json --output-dir path/to/Specifications_forUnitTest --root-dir path/to/project</p>
-</dd>
-</dl>
-</dd>
-<dt>使い方 (Python API):</dt><dd><p>from cmdbox.tools.test.generate_unit_test_specifications import generate
-generate(</p>
-<blockquote>
-<div><p>input_json=Path(&quot;path/to/Specifications/cli-command-specifications.json&quot;),
-output_dir=Path(&quot;path/to/Specifications_forUnitTest&quot;),
-root_dir=Path(&quot;path/to/project&quot;),</p>
-</div></blockquote>
-<p>)</p>
-</dd>
-</dl>
+<p>使い方 (コマンドライン):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">cmdbox</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">generate_unit_test_specifications</span> \
+    <span class="o">--</span><span class="nb">input</span><span class="o">-</span><span class="n">json</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">Specifications</span><span class="o">/</span><span class="n">cli</span><span class="o">-</span><span class="n">command</span><span class="o">-</span><span class="n">specifications</span><span class="o">.</span><span class="n">json</span> \
+    <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">Specifications_forUnitTest</span> \
+    <span class="o">--</span><span class="n">root</span><span class="o">-</span><span class="nb">dir</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">project</span>
+</pre></div>
+</div>
+<p>使い方 (Python API):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.tools.test.generate_unit_test_specifications</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate</span>
+<span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_json</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/Specifications/cli-command-specifications.json"</span><span class="p">),</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/Specifications_forUnitTest"</span><span class="p">),</span>
+    <span class="n">root_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/project"</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_test_spec.</span></span><span class="sig-name descname"><span class="pre">TestCase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">focus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_checks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'dict[str,</span> <span class="pre">Any]</span> <span class="pre">|</span> <span class="pre">None'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_create_tests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_tests_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str</span> <span class="pre">|</span> <span class="pre">None'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_test_spec.html#TestCase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase" title="Link to this definition"></a></dt>
@@ -408,19 +406,17 @@ root_dir=Path(&quot;path/to/project&quot;),</p>
 <p>テスト仕様JSONに基づいてテストを実行するライブラリ。</p>
 <p>cmdboxを拡張して作成したコマンドでも利用できるよう、
 入力JSONパスやフィルタ条件をパラメータとして受け取ります。</p>
-<dl>
-<dt>使い方 (Python API):</dt><dd><p>from cmdbox.app.features.cli.test import run_spec
-result = run_spec.run(</p>
-<blockquote>
-<div><p>input_json=Path(&quot;path/to/Specifications_forUnitTest/cli-unit-test-specifications.json&quot;),
-mode_filter=&quot;server&quot;,
-cmd_filter=&quot;list&quot;,
-appcls=MyApp,
-ver=my_version_module,</p>
-</div></blockquote>
-<p>)</p>
-</dd>
-</dl>
+<p>使い方 (Python API):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_spec</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">run_spec</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">input_json</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/Specifications_forUnitTest/cli-unit-test-specifications.json"</span><span class="p">),</span>
+    <span class="n">mode_filter</span><span class="o">=</span><span class="s2">"server"</span><span class="p">,</span>
+    <span class="n">cmd_filter</span><span class="o">=</span><span class="s2">"list"</span><span class="p">,</span>
+    <span class="n">appcls</span><span class="o">=</span><span class="n">MyApp</span><span class="p">,</span>
+    <span class="n">ver</span><span class="o">=</span><span class="n">my_version_module</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="cmdbox.app.features.cli.test.run_spec.run">
 <span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.run_spec.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">appcls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tempdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_existing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/run_spec.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.run_spec.run" title="Link to this definition"></a></dt>

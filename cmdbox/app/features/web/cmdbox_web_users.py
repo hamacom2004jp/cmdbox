@@ -263,7 +263,8 @@ class Users(feature.WebFeature):
         Returns:
             Dict[str, Any]: ツールメニュー情報
         
-        Sample:
+        Sample::
+
             {
                 'filer': {
                     'html': 'Filer',

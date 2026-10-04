@@ -38,6 +38,7 @@ Cecil Curry <leycec@gmail.com>	MIT License	beartype	UNKNOWN	0.22.9	cmdbox\licens
 Leonard Richardson <leonardr@segfault.org>	MIT License	beautifulsoup4	https://www.crummy.com/software/BeautifulSoup/bs4/	4.15.0	cmdbox\licenses\LICENSE_beautifulsoup4_4_15_0_MIT_License.txt
 Amazon Web Services	Apache-2.0	boto3	https://github.com/boto/boto3	1.43.105	cmdbox\licenses\LICENSE_boto3_1_43_105_Apache-2_0.txt
 Amazon Web Services	Apache-2.0	botocore	https://github.com/boto/botocore	1.43.105	cmdbox\licenses\LICENSE_botocore_1_43_105_Apache-2_0.txt
+Filipe Laíns <lains@riseup.net>, Bernát Gábor <gaborjbernat@gmail.com>, layday <layday@protonmail.com>, Henry Schreiner <henryschreineriii@gmail.com>	MIT	build	https://build.pypa.io	1.6.1	cmdbox\licenses\LICENSE_build_1_6_1_MIT.txt
 Thomas Kemmer <tkemmer@computer.org>	MIT	cachetools	https://github.com/tkem/cachetools/	7.2.0	cmdbox\licenses\LICENSE_cachetools_7_2_0_MIT.txt
 Dmitry Orlov <me@mosquito.su>	Apache-2.0	caio	UNKNOWN	0.12.9	cmdbox\licenses\LICENSE_caio_0_12_9_Apache-2_0.txt
 Kenneth Reitz	Mozilla Public License 2.0 (MPL 2.0)	certifi	https://github.com/certifi/python-certifi	2026.7.22	cmdbox\licenses\LICENSE_certifi_2026_7_22_Mozilla_Public_License_2_0-MPL_2_0.txt
@@ -45,7 +46,7 @@ Armin Rigo, Maciej Fijalkowski	MIT-0	cffi	https://cffi.readthedocs.io/en/latest/
 "Ahmed R. TAHRI" <tahri.ahmed@proton.me>	MIT	charset-normalizer	https://github.com/jawah/charset_normalizer/blob/master/CHANGELOG.md	3.5.2	cmdbox\licenses\LICENSE_charset-normalizer_3_5_2_MIT.txt
 speedyk_005 <speedy40115719@gmail.com>	MIT	chunklet-py	https://github.com/speedyk-005/chunklet-py	2.4.3	cmdbox\licenses\LICENSE_chunklet-py_2_4_3_MIT.txt
 UNKNOWN	BSD-3-Clause	click	https://github.com/pallets/click/	8.5.0	cmdbox\licenses\LICENSE_click_8_5_0_BSD-3-Clause.txt
-hamacom2004jp <hamacom2004jp@gmail.com>	MIT	cmdbox	https://github.com/hamacom2004jp/cmdbox	0.8.5.2	cmdbox\licenses\LICENSE_cmdbox_0_8_5_2_MIT.txt
+The cloudpickle developer team	BSD License	cloudpickle	https://github.com/cloudpipe/cloudpickle	3.1.2	cmdbox\licenses\LICENSE_cloudpickle_3_1_2_BSD_License.txt
 Michael Williamson	BSD License	cobble	http://github.com/mwilliamson/python-cobble	0.1.4	cmdbox\licenses\LICENSE_cobble_0_1_4_BSD_License.txt
 Jonathan Hartley <tartley@tartley.com>	BSD License	colorama	https://github.com/tartley/colorama	0.4.6	cmdbox\licenses\LICENSE_colorama_0_4_6_BSD_License.txt
 Matsumoto Taichi <taichino@gmail.com>, kiorky <kiorky@cryptelium.net>, Ash Berlin-Taylor <ash@apache.org>, Jarek Potiuk <jarek@potiuk.com>	MIT	croniter	https://github.com/pallets-eco/croniter	6.2.4	cmdbox\licenses\LICENSE_croniter_6_2_4_MIT.txt
@@ -89,11 +90,14 @@ Tom Christie <tom@tomchristie.com>	BSD License	httpx	https://github.com/encode/h
 Florimond Manca <florimond.manca@protonmail.com>	MIT	httpx-sse	https://github.com/florimondmanca/httpx-sse	0.4.3	cmdbox\licenses\LICENSE_httpx-sse_0_4_3_MIT.txt
 Tom Christie <tom@tomchristie.com>	BSD-3-Clause	httpx2	https://github.com/pydantic/httpx2	2.13.1	cmdbox\licenses\LICENSE_httpx2_2_13_1_BSD-3-Clause.txt
 Hugging Face, Inc.	Apache Software License	huggingface_hub	https://github.com/huggingface/huggingface_hub	1.33.0	cmdbox\licenses\LICENSE_huggingface_hub_1_33_0_Apache_Software_License.txt
+UNKNOWN	Apache Software License	id	https://pypi.org/project/id/	1.6.1	cmdbox\licenses\LICENSE_id_1_6_1_Apache_Software_License.txt
 Kim Davies <kim+pypi@gumleaf.org>	BSD-3-Clause	idna	https://github.com/kjd/idna	3.20	cmdbox\licenses\LICENSE_idna_3_20_BSD-3-Clause.txt
 Yoshiki Shibukawa <yoshiki@shibu.jp>	MIT	imagesize	https://github.com/shibukawa/imagesize_py	2.0.1	cmdbox\licenses\LICENSE_imagesize_2_0_1_MIT.txt
 "Jason R. Coombs" <jaraco@jaraco.com>	Apache-2.0	importlib_metadata	https://github.com/python/importlib_metadata	8.9.0	cmdbox\licenses\LICENSE_importlib_metadata_8_9_0_Apache-2_0.txt
 Anoop Kunchukuttan	MIT License	indic-nlp-library	https://github.com/anoopkunchukuttan/indic_nlp_library	0.92	cmdbox\licenses\LICENSE_indic-nlp-library_0_92_MIT_License.txt
+Ronny Pfannschmidt <opensource@ronnypfannschmidt.de>, Holger Krekel <holger.krekel@gmail.com>	MIT	iniconfig	https://github.com/pytest-dev/iniconfig	2.3.0	cmdbox\licenses\LICENSE_iniconfig_2_3_0_MIT.txt
 Kevin Zhuang	MIT License	inquirerpy	https://github.com/kazhala/InquirerPy	0.3.4	cmdbox\licenses\LICENSE_inquirerpy_0_3_4_MIT_License.txt
+Pradyun Gedam <pradyunsg@gmail.com>	MIT	installer	UNKNOWN	1.0.1	cmdbox\licenses\LICENSE_installer_1_0_1_MIT.txt
 Gerhard Weis	BSD License	isodate	https://github.com/gweis/isodate/	0.7.2	cmdbox\licenses\LICENSE_isodate_0_7_2_BSD_License.txt
 UNKNOWN	BSD License	itsdangerous	https://github.com/pallets/itsdangerous/	2.2.0	cmdbox\licenses\LICENSE_itsdangerous_2_2_0_BSD_License.txt
 Jason R. Coombs	MIT License	jaraco.classes	https://github.com/jaraco/jaraco.classes	3.4.0	cmdbox\licenses\LICENSE_jaraco_classes_3_4_0_MIT_License.txt
@@ -101,6 +105,7 @@ Jason R. Coombs	MIT License	jaraco.classes	https://github.com/jaraco/jaraco.clas
 "Jason R. Coombs" <jaraco@jaraco.com>	MIT	jaraco.functools	https://github.com/jaraco/jaraco.functools	4.6.0	cmdbox\licenses\LICENSE_jaraco_functools_4_6_0_MIT.txt
 Samuel Colvin <s@muelcolvin.com>	MIT	jiter	https://github.com/pydantic/jiter/	0.17.0	cmdbox\licenses\LICENSE_jiter_0_17_0_MIT.txt
 James Saryerwinnie	MIT License	jmespath	https://github.com/jmespath/jmespath.py	1.1.0	cmdbox\licenses\LICENSE_jmespath_1_1_0_MIT_License.txt
+Gael Varoquaux <gael.varoquaux@normalesup.org>	BSD-3-Clause	joblib	https://joblib.readthedocs.io	1.6.0	cmdbox\licenses\LICENSE_joblib_1_6_0_BSD-3-Clause.txt
 Hsiaoming Yang <me@lepture.com>	BSD License	joserfc	https://github.com/authlib/joserfc	1.7.5	cmdbox\licenses\LICENSE_joserfc_1_7_5_BSD_License.txt
 Kirill Pavlov	MIT License	json-rpc	https://github.com/pavlov99/json-rpc	1.15.0	cmdbox\licenses\LICENSE_json-rpc_1_15_0_MIT_License.txt
 Stefan Kögl	BSD License	jsonpatch	https://github.com/stefankoegl/python-json-patch	1.33	cmdbox\licenses\LICENSE_jsonpatch_1_33_BSD_License.txt
@@ -131,6 +136,14 @@ Sybren Jansen	MIT License	mpire	https://github.com/sybrenjansen/mpire	2.10.2	cmd
 Microsoft Corporation	MIT License	msal	https://github.com/AzureAD/microsoft-authentication-library-for-python	1.39.0	cmdbox\licenses\LICENSE_msal_1_39_0_MIT_License.txt
 UNKNOWN	MIT License	msal-extensions	https://github.com/AzureAD/microsoft-authentication-extensions-for-python/releases	1.3.1	cmdbox\licenses\LICENSE_msal-extensions_1_3_1_MIT_License.txt
 Andrew Svetlov	Apache License 2.0	multidict	https://github.com/aio-libs/multidict	6.9.1	cmdbox\licenses\LICENSE_multidict_6_9_1_Apache_License_2_0.txt
+Damian Shaw <damian.peter.shaw@gmail.com>	MIT	nab	https://github.com/notatallshaw/nab	0.0.18	cmdbox\licenses\LICENSE_nab_0_0_18_MIT.txt
+Damian Shaw <damian.peter.shaw@gmail.com>	MIT	nab-index	https://github.com/notatallshaw/nab	0.0.18	cmdbox\licenses\LICENSE_nab-index_0_0_18_MIT.txt
+Damian Shaw <damian.peter.shaw@gmail.com>	MIT	nab-markersets	https://github.com/notatallshaw/nab	0.0.18	cmdbox\licenses\LICENSE_nab-markersets_0_0_18_MIT.txt
+Damian Shaw <damian.peter.shaw@gmail.com>	MIT	nab-project	https://github.com/notatallshaw/nab	0.0.18	cmdbox\licenses\LICENSE_nab-project_0_0_18_MIT.txt
+Damian Shaw <damian.peter.shaw@gmail.com>	MIT	nab-provider	https://github.com/notatallshaw/nab	0.0.18	cmdbox\licenses\LICENSE_nab-provider_0_0_18_MIT.txt
+Damian Shaw <damian.peter.shaw@gmail.com>	MIT	nab-resolver	https://github.com/notatallshaw/nab	0.0.18	cmdbox\licenses\LICENSE_nab-resolver_0_0_18_MIT.txt
+Marco Gorelli	MIT	narwhals	https://github.com/narwhals-dev/narwhals	2.26.0	cmdbox\licenses\LICENSE_narwhals_2_26_0_MIT.txt
+messense <messense@icloud.com>	MIT	nh3	UNKNOWN	0.3.7	cmdbox\licenses\LICENSE_nh3_0_3_7_MIT.txt
 Travis E. Oliphant et al.	BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0	numpy	https://numpy.org	2.4.6	cmdbox\licenses\LICENSE_numpy_2_4_6_BSD-3-Clause_AND_0BSD_AND_MIT_AND_Zlib_AND_CC0-1_0.txt
 The OAuthlib Community	BSD-3-Clause	oauthlib	https://github.com/oauthlib/oauthlib	4.0.0	cmdbox\licenses\LICENSE_oauthlib_4_0_0_BSD-3-Clause.txt
 OpenAI <support@openai.com>	Apache Software License	openai	https://github.com/openai/openai-python	2.54.0	cmdbox\licenses\LICENSE_openai_2_54_0_Apache_Software_License.txt
@@ -148,7 +161,9 @@ Jeremy Singer-Vine	MIT License	pdfplumber	https://github.com/jsvine/pdfplumber	0
 Kevin Zhuang	MIT License	pfzy	https://github.com/kazhala/pfzy	0.3.4	cmdbox\licenses\LICENSE_pfzy_0_3_4_MIT_License.txt
 Jeffrey 'Alex' Clark <aclark@aclark.net>	MIT-CMU	pillow	https://python-pillow.github.io	12.3.0	cmdbox\licenses\LICENSE_pillow_12_3_0_MIT-CMU.txt
 The pip developers <distutils-sig@python.org>	MIT License	pip	https://pip.pypa.io/	24.0	cmdbox\licenses\LICENSE_pip_24_0_MIT_License.txt
+UNKNOWN	MIT	pipdeptree	https://github.com/tox-dev/pipdeptree	4.2.5	cmdbox\licenses\LICENSE_pipdeptree_4_2_5_MIT.txt
 UNKNOWN	MIT	platformdirs	https://github.com/tox-dev/platformdirs	4.12.2	cmdbox\licenses\LICENSE_platformdirs_4_12_2_MIT.txt
+Holger Krekel <holger@merlinux.eu>	MIT License	pluggy	UNKNOWN	1.6.0	cmdbox\licenses\LICENSE_pluggy_1_6_0_MIT_License.txt
 Kivy team	MIT License	plyer	https://plyer.readthedocs.org/en/latest/	2.1.0	cmdbox\licenses\LICENSE_plyer_2_1_0_MIT_License.txt
 Ritchie Vink <ritchie46@gmail.com>	MIT License	polars	https://www.pola.rs/	1.44.2	cmdbox\licenses\LICENSE_polars_1_44_2_MIT_License.txt
 Ritchie Vink <ritchie46@gmail.com>	MIT License	polars-runtime-32	https://www.pola.rs/	1.44.2	cmdbox\licenses\LICENSE_polars-runtime-32_1_44_2_MIT_License.txt
@@ -173,6 +188,8 @@ Samuel Colvin <s@muelcolvin.com>, Adrian Garcia Badaracco <1755071+adriangb@user
 Philippe Faist	MIT License	pylatexenc	https://github.com/phfaist/pylatexenc	2.11	cmdbox\licenses\LICENSE_pylatexenc_2_11_MIT_License.txt
 pypdfium2-team	BSD-3-Clause, Apache-2.0, dependency licenses	pypdfium2	https://github.com/pypdfium2-team/pypdfium2	5.13.0	cmdbox\licenses\LICENSE_pypdfium2_5_13_0_BSD-3-Clause-Apache-2_0-dependency_licenses.txt
 Al Sweigart <al@inventwithpython.com>	BSD License	pyperclip	https://github.com/asweigart/pyperclip	1.11.0	cmdbox\licenses\LICENSE_pyperclip_1_11_0_BSD_License.txt
+Thomas Kluyver <thomas@kluyver.me.uk>	MIT	pyproject_hooks	https://github.com/pypa/pyproject-hooks	1.3.3	cmdbox\licenses\LICENSE_pyproject_hooks_1_3_3_MIT.txt
+Brianna Laugher, Bruno Oliveira, Floris Bruynooghe, Freya Bruhin, Holger Krekel, Others (See AUTHORS), Ronny Pfannschmidt	MIT	pytest	https://docs.pytest.org/en/latest/	9.1.1	cmdbox\licenses\LICENSE_pytest_9_1_1_MIT.txt
 Gustavo Niemeyer	Apache Software License; BSD License	python-dateutil	https://github.com/dateutil/dateutil	2.9.0.post0	cmdbox\licenses\LICENSE_python-dateutil_2_9_0_post0_Apache_Software_License-BSD_License.txt
 Steve Canny <stcanny@gmail.com>	MIT License	python-docx	https://github.com/python-openxml/python-docx	1.2.0	cmdbox\licenses\LICENSE_python-docx_1_2_0_MIT_License.txt
 Saurabh Kumar <me+github@saurabh-kumar.com>	BSD-3-Clause	python-dotenv	https://github.com/theskumar/python-dotenv	1.2.3	cmdbox\licenses\LICENSE_python-dotenv_1_2_3_BSD-3-Clause.txt
@@ -181,18 +198,22 @@ Mark Hammond (et al)	Python Software Foundation License	pywin32	https://github.c
 Enthought Inc.	BSD-3-Clause	pywin32-ctypes	https://github.com/enthought/pywin32-ctypes	0.2.3	cmdbox\licenses\LICENSE_pywin32-ctypes_0_2_3_BSD-3-Clause.txt
 Tom Bocklisch	MIT License	questionary	https://github.com/tmbo/questionary	2.1.1	cmdbox\licenses\LICENSE_questionary_2_1_1_MIT_License.txt
 Explosion	MIT License	radicli	https://github.com/explosion/radicli	0.0.26	cmdbox\licenses\LICENSE_radicli_0_0_26_MIT_License.txt
+The Python Packaging Authority <admin@mail.pypi.org>	Apache-2.0	readme_renderer	https://github.com/pypa/readme_renderer	46.0	cmdbox\licenses\LICENSE_readme_renderer_46_0_Apache-2_0.txt
 "Redis Inc." <oss@redis.com>	MIT	redis	https://github.com/redis/redis-py	8.1.0	cmdbox\licenses\LICENSE_redis_8_1_0_MIT.txt
 Julian Berman <Julian+referencing@GrayVines.com>	MIT	referencing	https://github.com/python-jsonschema/referencing	0.37.0	cmdbox\licenses\LICENSE_referencing_0_37_0_MIT.txt
 Matthew Barnett <regex@mrabarnett.plus.com>	Apache-2.0 AND CNRI-Python	regex	https://github.com/mrabarnett/mrab-regex	2026.9.29	cmdbox\licenses\LICENSE_regex_2026_9_29_Apache-2_0_AND_CNRI-Python.txt
 Kenneth Reitz <me@kennethreitz.org>	Apache Software License	requests	https://github.com/psf/requests	2.34.2	cmdbox\licenses\LICENSE_requests_2_34_2_Apache_Software_License.txt
 Ian Cordasco, Cory Benfield	Apache Software License	requests-toolbelt	https://toolbelt.readthedocs.io/	1.0.0	cmdbox\licenses\LICENSE_requests-toolbelt_1_0_0_Apache_Software_License.txt
 ddelange	MIT License	retrie	https://github.com/ddelange/retrie	0.3.1	cmdbox\licenses\LICENSE_retrie_0_3_1_MIT_License.txt
+Ian Stapleton Cordasco	Apache Software License	rfc3986	http://rfc3986.readthedocs.io	2.0.0	cmdbox\licenses\LICENSE_rfc3986_2_0_0_Apache_Software_License.txt
 Will McGugan	MIT License	rich	https://github.com/Textualize/rich	13.9.4	cmdbox\licenses\LICENSE_rich_13_9_4_MIT_License.txt
 Wasi Master <arianmollik323@gmail.com>	MIT	rich-rst	https://wasi-master.github.io/rich-rst	2.2.0	cmdbox\licenses\LICENSE_rich-rst_2_2_0_MIT.txt
 Adam Turner	0BSD OR CC0-1.0	roman-numerals	https://github.com/AA-Turner/roman-numerals/blob/master/CHANGES.rst	4.1.0	cmdbox\licenses\LICENSE_roman-numerals_4_1_0_0BSD_OR_CC0-1_0.txt
 Julian Berman <Julian+rpds@GrayVines.com>	MIT	rpds-py	https://github.com/crate-py/rpds	2026.6.3	cmdbox\licenses\LICENSE_rpds-py_2026_6_3_MIT.txt
 Selwin Ong <selwin.ong@gmail.com>, Vincent Driessen <vincent@3rdcloud.com>	BSD-2-Clause	rq	https://python-rq.org/	2.12.0	cmdbox\licenses\LICENSE_rq_2_12_0_BSD-2-Clause.txt
 Amazon Web Services	Apache Software License	s3transfer	https://github.com/boto/s3transfer	0.19.2	cmdbox\licenses\LICENSE_s3transfer_0_19_2_Apache_Software_License.txt
+UNKNOWN	BSD-3-Clause	scikit-learn	https://scikit-learn.org	1.9.1	cmdbox\licenses\LICENSE_scikit-learn_1_9_1_BSD-3-Clause.txt
+UNKNOWN	BSD License	scipy	https://scipy.org/	1.17.1	cmdbox\licenses\LICENSE_scipy_1_17_1_BSD_License.txt
 Santhosh Thottingal <santhosh.thottingal@gmail.com>	MIT	sentencex	https://github.com/wikimedia/sentencex	1.0.32	cmdbox\licenses\LICENSE_sentencex_1_0_32_MIT.txt
 Python Packaging Authority	MIT License	setuptools	https://github.com/pypa/setuptools	65.5.0	cmdbox\licenses\LICENSE_setuptools_65_5_0_MIT_License.txt
 Tzu-ping Chung	ISC License (ISCL)	shellingham	https://github.com/sarugaku/shellingham	1.5.4	cmdbox\licenses\LICENSE_shellingham_1_5_4_ISC_License-ISCL.txt
@@ -202,6 +223,10 @@ Snowball Developers	BSD-3-Clause	snowballstemmer	https://github.com/snowballstem
 Bastian Bechtold	BSD License	soundfile	https://github.com/bastibe/python-soundfile	0.14.0	cmdbox\licenses\LICENSE_soundfile_0_14_0_BSD_License.txt
 Isaac Muse <Isaac.Muse@gmail.com>	MIT	soupsieve	https://github.com/facelessuser/soupsieve	2.10	cmdbox\licenses\LICENSE_soupsieve_2_10_MIT.txt
 Ash Berlin-Taylor <ash_github@firemirror.com>	MIT	sphinx-argparse	https://sphinx-argparse.readthedocs.io/	0.6.1	cmdbox\licenses\LICENSE_sphinx-argparse_0_6_1_MIT.txt
+Frﾃｩdﾃｩric Aoustin	GNU General Public License v2 (GPLv2)	sphinx-fontawesome	https://github.com/fraoustin/sphinx_fontawesome	0.0.6	cmdbox\licenses\LICENSE_sphinx-fontawesome_0_0_6_GNU_General_Public_License_v2-GPLv2.txt
+Takayuki SHIMIZUKAWA <shimizukawa@gmail.com>	BSD-2-Clause	sphinx-intl	https://github.com/sphinx-doc/sphinx-intl	2.4.0	cmdbox\licenses\LICENSE_sphinx-intl_2_4_0_BSD-2-Clause.txt
+Matthias Geier	BSD License	sphinx-last-updated-by-git	https://github.com/mgeier/sphinx-last-updated-by-git/	0.3.8	cmdbox\licenses\LICENSE_sphinx-last-updated-by-git_0_3_8_BSD_License.txt
+Jared Dillard <jared.dillard@gmail.com>	MIT	sphinx-sitemap	https://github.com/jdillard/sphinx-sitemap	2.9.0	cmdbox\licenses\LICENSE_sphinx-sitemap_2_9_0_MIT.txt
 Dave Snider, Read the Docs, Inc. & contributors	MIT License	sphinx_rtd_theme	https://sphinx-rtd-theme.readthedocs.io/	3.1.0	cmdbox\licenses\LICENSE_sphinx_rtd_theme_3_1_0_MIT_License.txt
 Georg Brandl <georg@python.org>	BSD License	sphinxcontrib-applehelp	https://www.sphinx-doc.org/	2.0.0	cmdbox\licenses\LICENSE_sphinxcontrib-applehelp_2_0_0_BSD_License.txt
 Georg Brandl <georg@python.org>	BSD License	sphinxcontrib-devhelp	https://www.sphinx-doc.org/	2.0.0	cmdbox\licenses\LICENSE_sphinxcontrib-devhelp_2_0_0_BSD_License.txt
@@ -218,6 +243,7 @@ Joshy Cyriac <joshy@posteo.ch>	BSD-3-Clause	striprtf	https://github.com/joshy/st
 Sergey Astanin <s.astanin@gmail.com>	MIT	tabulate	https://github.com/astanin/python-tabulate	0.10.0	cmdbox\licenses\LICENSE_tabulate_0_10_0_MIT.txt
 Sergey Astanin <s.astanin@gmail.com>	MIT License	tabulate2	https://github.com/RaSan147/python-tabulate	1.10.2	cmdbox\licenses\LICENSE_tabulate2_1_10_2_MIT_License.txt
 Julien Danjou	Apache Software License	tenacity	https://github.com/jd/tenacity	9.1.4	cmdbox\licenses\LICENSE_tenacity_9_1_4_Apache_Software_License.txt
+Thomas Moreau <thomas.moreau.2010@gmail.com>	BSD-3-Clause	threadpoolctl	https://github.com/joblib/threadpoolctl	3.7.0	cmdbox\licenses\LICENSE_threadpoolctl_3_7_0_BSD-3-Clause.txt
 Shantanu Jain	MIT License
 
 Copyright (c) 2022 OpenAI, Shantanu Jain
@@ -241,9 +267,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 	tiktoken	https://github.com/openai/tiktoken	0.14.0	cmdbox\licenses\LICENSE_tiktoken_0_14_0_MIT_License-Copyright-c-2022_OpenAI-Shantanu_Jain-Permission_is_hereby_granted-free_of_charge-to_any_per.txt
 Nicolas Patry <patry.nicolas@protonmail.com>, Anthony Moi <anthony@huggingface.co>	Apache Software License	tokenizers	https://github.com/huggingface/tokenizers	0.23.2	cmdbox\licenses\LICENSE_tokenizers_0_23_2_Apache_Software_License.txt
+Taneli Hukkinen <hukkin@users.noreply.github.com>	MIT	tomli	https://github.com/hukkin/tomli	2.4.1	cmdbox\licenses\LICENSE_tomli_2_4_1_MIT.txt
+Taneli Hukkinen <hukkin@users.noreply.github.com>	MIT License	tomli_w	https://github.com/hukkin/tomli-w	1.2.0	cmdbox\licenses\LICENSE_tomli_w_1_2_0_MIT_License.txt
 Sébastien Eustace	MIT License	tomlkit	https://github.com/python-poetry/tomlkit	0.15.1	cmdbox\licenses\LICENSE_tomlkit_0_15_1_MIT_License.txt
 UNKNOWN	MPL-2.0 AND MIT	tqdm	https://tqdm.github.io	4.70.1	cmdbox\licenses\LICENSE_tqdm_4_70_1_MPL-2_0_AND_MIT.txt
 Seth Michael Larson <sethmichaellarson@gmail.com>, David Glick <david@glicksoftware.com>	MIT	truststore	https://github.com/sethmlarson/truststore	0.10.4	cmdbox\licenses\LICENSE_truststore_0_10_4_MIT.txt
+Donald Stufft and individual contributors <donald@stufft.io>	Apache-2.0	twine	https://twine.readthedocs.io/	6.2.0	cmdbox\licenses\LICENSE_twine_6_2_0_Apache-2_0.txt
 =?utf-8?q?Sebasti=C3=A1n_Ram=C3=ADrez?= <tiangolo@gmail.com>	MIT	typer	https://github.com/fastapi/typer	0.27.2	cmdbox\licenses\LICENSE_typer_0_27_2_MIT.txt
 Victorien Plot <contact@vctrn.dev>	MIT	typing-inspection	https://github.com/pydantic/typing-inspection	0.4.4	cmdbox\licenses\LICENSE_typing-inspection_0_4_4_MIT.txt
 "Guido van Rossum, Jukka Lehtosalo, Łukasz Langa, Michael Lee" <levkivskyi@gmail.com>	PSF-2.0	typing_extensions	https://github.com/python/typing_extensions	4.16.0	cmdbox\licenses\LICENSE_typing_extensions_4_16_0_PSF-2_0.txt
