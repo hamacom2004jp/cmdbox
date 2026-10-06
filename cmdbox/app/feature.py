@@ -21,16 +21,15 @@ class Feature(object):
     RESP_WARN:int = 1
     RESP_ERROR:int = 2
     DEFAULT_CAPTURE_MAXSIZE:int = 1024 * 1024 * 10
-    default_host:str = os.environ.get('REDIS_HOST', 'localhost')
-    default_port:int = int(os.environ.get('REDIS_PORT', '6379'))
-    default_pass:str = os.environ.get('REDIS_PASSWORD', 'password')
-    default_svname:str = os.environ.get('SVNAME', 'server')
 
     def __init__(self, appcls, ver, language:str=None):
         self.ver = ver
         self.appcls = appcls
         self.language = language
-        self.default_svname:str = ver.__appid__
+        self.default_host:str = os.environ.get('REDIS_HOST', 'localhost')
+        self.default_port:int = int(os.environ.get('REDIS_PORT', '6379'))
+        self.default_pass:str = os.environ.get('REDIS_PASSWORD', 'password')
+        self.default_svname:str = os.environ.get('SVNAME', ver.__appid__)
         self.default_data:Path = os.environ.get('DATA_DIR', common.HOME_DIR / f".{self.ver.__appid__}")
 
     def get_mode(self) -> Union[str, List[str]]:

@@ -368,7 +368,7 @@ class ToolList(object):
             # ユーザーコマンドもfeatures.ymlの定義に従って実行許可するかどうか。
             #if not options.get_cmd_attr(mode, cmd, 'use_agent'):
             #    continue
-            choices = options.get_cmd_choices(mode, cmd, False)
+            choices = options.get_cmd_choices(mode, cmd, False, opt, skip_choice_fn=True)
             description += '\n' + str(options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en'))
             # 関数の定義を生成
             if func_name:
@@ -494,7 +494,7 @@ class ToolList(object):
 
     def _create_func_txt(self, func_name:str, mode:str, cmd:str, is_japan:bool, options:Options, title:str='', params={}) -> str:
         description = options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
-        choices = options.get_cmd_choices(mode, cmd, False)
+        choices = options.get_cmd_choices(mode, cmd, False, {}, skip_choice_fn=True)
         if len(choices) <= 1:
             return None
         for o in choices:

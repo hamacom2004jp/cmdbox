@@ -188,10 +188,15 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         appcls = app.CmdBoxApp if appcls is None else appcls
         web.container['cmdbox_app'] = ap = appcls.getInstance(appcls=appcls, ver=self.ver)
         if 'mode' in opt and 'cmd' in opt:
+            # webモードで特定のオプションを自動的にセットする
+            opt['host'] = web.redis_host
+            opt['port'] = web.redis_port
+            opt['password'] = web.redis_password
+            opt['svname'] = web.svname
             if not web.signin.check_cmd(req, res, opt['mode'], opt['cmd'], opt):
                 return dict(warn=f'Execute command denyed. mode={opt["mode"]}, cmd={opt["cmd"]}, title={title}')
             _options = options.Options.getInstance()
-            schema = _options.get_cmd_choices(opt['mode'], opt['cmd'], False)
+            schema = _options.get_cmd_choices(opt['mode'], opt['cmd'], False, opt, skip_choice_fn=True)
             try:
                 opt_path = web.cmds_path / f"cmd-{title}.json"
                 feat = _options.get_cmd_feature(opt['mode'], opt['cmd'])

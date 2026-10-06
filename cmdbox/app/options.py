@@ -129,7 +129,7 @@ class Options:
             return None
         return self._options["svcmd"][svcmd]
 
-    def get_cmd_choices(self, mode:str, cmd:str, webmode:bool=False, opt:Dict[str, Any]={}) -> List[Dict[str, Any]]:
+    def get_cmd_choices(self, mode:str, cmd:str, webmode:bool=False, opt:Dict[str, Any]={}, skip_choice_fn:bool=False) -> List[Dict[str, Any]]:
         """
         コマンドのオプション一覧を取得します。
         Args:
@@ -137,13 +137,14 @@ class Options:
             cmd: コマンド
             webmode (bool, optional): Webモードからの呼び出し. Defaults to False
             opt (Dict[str, Any], optional): オプション値. Defaults to {}
+            skip_choice_fn (bool, optional): choice_fnの実行をスキップする場合True. Defaults to False
         Returns:
             List[Dict[str, Any]]: オプションの選択肢
         """
         opts = self.get_cmd_attr(mode, cmd, "choice")
         ret = []
         for o in opts:
-            if 'choice_fn' in o and o['choice_fn'] is not None:
+            if not skip_choice_fn and 'choice_fn' in o and o['choice_fn'] is not None:
                 o['choice'] = o['choice_fn'](o, webmode, opt)
             if not webmode or type(o) is not dict:
                 ret.append(o)
@@ -234,7 +235,7 @@ class Options:
         return ret
 
     def mk_opt_list(self, opt:dict, webmode:bool=False) -> List[str]:
-        opt_schema = self.get_cmd_choices(opt['mode'], opt['cmd'], webmode)
+        opt_schema = self.get_cmd_choices(opt['mode'], opt['cmd'], webmode, opt, skip_choice_fn=True)
         opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
         file_dict = dict()
         for key, val in opt.items():
@@ -948,7 +949,7 @@ class Options:
                     if not opt.get('clmsg_tag',[]): opt['clmsg_tag'] = []
                     if cmd_tag not in opt['clmsg_tag']:
                         opt['clmsg_tag'].append(cmd_tag)
-                    opt_schema = self.get_cmd_choices(mode, cmd, True)
+                    opt_schema = self.get_cmd_choices(mode, cmd, True, opt, skip_choice_fn=True)
                     for key, val in arg.__dict__.items():
                         if key in ['capture_stdout', 'capture_maxsize']:
                             continue

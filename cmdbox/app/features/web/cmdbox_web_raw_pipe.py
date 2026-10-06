@@ -51,7 +51,8 @@ class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
             if cmd_title == '':
                 continue
             cmd_opt = self.load_cmd(web, cmd_title)
-            cmd_ref = web.options.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'], True)
+            cmd_ref = web.options.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'], True,
+                                                  opt, skip_choice_fn=True)
             chk_stdin = len([ref for ref in cmd_ref if ref['opt'] == 'stdin']) > 0
 
             if 'debug' in cmd_opt and cmd_opt['debug']:

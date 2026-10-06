@@ -52,7 +52,8 @@ class Edge(object):
         common.print_format(v, False, tm, None, False, pf=pf)
 
         import questionary
-        ref_opts = self.options.get_cmd_choices(edge_mode, edge_cmd)
+        ref_opts = self.options.get_cmd_choices(edge_mode, edge_cmd, False,
+                                                args.__dict__, skip_choice_fn=True)
         edge_dir = Path(self.data) / '.edge'
         common.mkdirs(edge_dir)
         conf_file = edge_dir / 'edge.conf'

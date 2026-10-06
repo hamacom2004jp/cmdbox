@@ -556,7 +556,8 @@ def saveopt(opt:dict, opt_path:Path, webmode:bool=False) -> None:
     if opt_path is None:
         return
     if webmode and 'mode' in opt and 'cmd' in opt:
-        refs = options.Options.getInstance().get_cmd_choices(opt['mode'], opt['cmd'])
+        refs = options.Options.getInstance().get_cmd_choices(opt['mode'], opt['cmd'],
+                                                             webmode, opt, skip_choice_fn=True)
         lopts = loadopt(opt_path)
         for r in refs:
             if 'opt' not in r or 'web' not in r:
@@ -597,7 +598,8 @@ def loadopt(opt_path:str, webmode:bool=False) -> dict:
         if webmode:
             if 'mode' not in opt or 'cmd' not in opt:
                 return opt
-            refs = options.Options.getInstance().get_cmd_choices(opt['mode'], opt['cmd'], webmode, opt)
+            refs = options.Options.getInstance().get_cmd_choices(opt['mode'], opt['cmd'],
+                                                                 webmode, opt, skip_choice_fn=True)
             for r in refs:
                 if 'opt' not in r:
                     continue
