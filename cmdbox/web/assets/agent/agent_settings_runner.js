@@ -29,21 +29,25 @@ agentView.list_runner = async () => {
             $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#runner_edit_modal'));
             $('#runner_edit_modal').modal('show');
-            // Agentリストをロード
-            await cmdbox.callcmd('agent','agent_list',{},(res)=>{
-                $("[name='agent']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'agent');
-            // Session Datasourceリストをロード
-            await cmdbox.callcmd('datasource','list',{},(res)=>{
-                $("[name='session_datasource']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="session_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'session_datasource');
-            // RAGリストをロード
-            await cmdbox.callcmd('rag','list',{},(res)=>{
-                $("[name='rag']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'rag');
+            
+            // 複数のリストロードを並行実行（大幅な高速化）
+            await Promise.all([
+                // Agentリストをロード
+                cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                    $("[name='agent']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'agent'),
+                // Session Datasourceリストをロード
+                cmdbox.callcmd('datasource','list',{},(res)=>{
+                    $("[name='session_datasource']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="session_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'session_datasource'),
+                // RAGリストをロード
+                cmdbox.callcmd('rag','list',{},(res)=>{
+                    $("[name='rag']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'rag')
+            ]);
         } finally {
             cmdbox.hide_loading();
         }

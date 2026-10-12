@@ -30,20 +30,24 @@ agentView.list_llm = async () => {
             $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#llm_edit_modal'));
             $('#llm_edit_modal').modal('show');
-            // owner_groupsリストをロード
-            await cmdbox.callcmd('web','group_list',{},(res)=>{
-                const val = $("[name='owner_groups']").val();
-                $("[name='owner_groups']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="owner_groups"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                $("[name='owner_groups']").val(val);
-            },$('[name="title"]').val(),'owner_groups');
-            // user_groupsリストをロード
-            await cmdbox.callcmd('web','group_list',{},(res)=>{
-                const val = $("[name='user_groups']").val();
-                $("[name='user_groups']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="user_groups"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                $("[name='user_groups']").val(val);
-            },$('[name="title"]').val(),'user_groups');
+            
+            // 複数のリストロードを並行実行（大幅な高速化）
+            await Promise.all([
+                // owner_groupsリストをロード
+                cmdbox.callcmd('web','group_list',{},(res)=>{
+                    const val = $("[name='owner_groups']").val();
+                    $("[name='owner_groups']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="owner_groups"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    $("[name='owner_groups']").val(val);
+                },$('[name="title"]').val(),'owner_groups'),
+                // user_groupsリストをロード
+                cmdbox.callcmd('web','group_list',{},(res)=>{
+                    const val = $("[name='user_groups']").val();
+                    $("[name='user_groups']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="user_groups"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    $("[name='user_groups']").val(val);
+                },$('[name="title"]').val(),'user_groups')
+            ]);
         } finally {
             cmdbox.hide_loading();
         }

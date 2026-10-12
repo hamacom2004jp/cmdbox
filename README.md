@@ -115,6 +115,31 @@ The tutorial content has moved to the following documentation:
 - Full documentation: https://hamacom2004jp.github.io/cmdbox/
 
 
-# License
+## Support and Sponsorship
+
+If you find cmdbox useful and would like to support its development, consider becoming a sponsor!
+
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor%20cmdbox-white?logo=github&style=flat-square&link=https://github.com/sponsors/hamacom2004jp)](https://github.com/sponsors/hamacom2004jp)
+
+### 👤 Individual Sponsorship
+- **$5/month** - Recognition in README and SPONSORS list
+
+### 🏢 Corporate Sponsorship
+- **$100/month (Bronze)** - README and SPONSORS list recognition
+- **$500/month (Silver)** - Priority issue resolution
+- **$1000/month (Gold)** - Custom feature consultation
+
+See [SPONSORS.md](SPONSORS.md) for details.
+
+Your sponsorship helps us continue developing and maintaining cmdbox!
+
+## Contributing
+
+We welcome contributions! Please feel free to:
+- Report bugs via [GitHub Issues](https://github.com/hamacom2004jp/cmdbox/issues)
+- Submit pull requests with improvements
+- Share your use cases and feedback
+
+## License
 
 This project is licensed under the MIT License, see the LICENSE file for details

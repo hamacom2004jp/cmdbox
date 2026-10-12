@@ -31,26 +31,30 @@ agentView.list_agent = async () => {
             $('[name="agent_type"]').trigger('change');
             cmdbox.process_i18n($('#agent_edit_modal'));
             $('#agent_edit_modal').modal('show');
-            // LLMリストをロード
-            await cmdbox.callcmd('llm','list',{},(res)=>{
-                $("[name='llm']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'llm');
-            // MCPサーバーリストをロード
-            await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
-                $("[name='mcpservers']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'mcpservers');
-            // SubAgentリストをロード
-            await cmdbox.callcmd('agent','agent_list',{},(res)=>{
-                $("[name='subagents']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'subagents');
-            // Skillリストをロード
-            await cmdbox.callcmd('skill','list',{},(res)=>{
-                $("[name='skill_names']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="skill_names"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'skill_names');
+            
+            // 複数のリストロードを並行実行（大幅な高速化）
+            await Promise.all([
+                // LLMリストをロード
+                cmdbox.callcmd('llm','list',{},(res)=>{
+                    $("[name='llm']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'llm'),
+                // MCPサーバーリストをロード
+                cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
+                    $("[name='mcpservers']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'mcpservers'),
+                // SubAgentリストをロード
+                cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                    $("[name='subagents']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'subagents'),
+                // Skillリストをロード
+                cmdbox.callcmd('skill','list',{},(res)=>{
+                    $("[name='skill_names']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="skill_names"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'skill_names')
+            ]);
         } finally {
             cmdbox.hide_loading();
         }
@@ -146,44 +150,48 @@ agentView.list_agent = async () => {
                     });
                     cmdbox.process_i18n($('#agent_edit_modal'));
                     $('#agent_edit_modal').modal('show');
-                    // LLMリストをロード
-                    await cmdbox.callcmd('llm','list',{},(res)=>{
-                        const val = $("[name='llm']").val();
-                        $("[name='llm']").empty().append('<option></option>');
-                        res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                        form.find('[name="llm"]').val(config.llm);
-                    },$('[name="title"]').val(),'llm');
-                    // MCPサーバーリストをロード
-                    await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
-                        const val = $("[name='mcpservers']").val();
-                        $("[name='mcpservers']").empty().append('<option></option>');
-                        res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                        config.mcpservers && config.mcpservers.forEach((v, i) => {
-                            const e = form.find('[name="mcpservers"]')[i];
-                            $(e).val(v);
-                        });
-                    },$('[name="title"]').val(),'mcpservers');
-                    // SubAgentリストをロード
-                    await cmdbox.callcmd('agent','agent_list',{},(res)=>{
-                        $("[name='subagents']").empty().append('<option></option>');
-                        res['data'].map(elm=>{
-                            if (elm["name"] === $('[name="agent_name"]').val()) return;
-                            $('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');
-                        });
-                        config.subagents && config.subagents.forEach((v, i) => {
-                            const e = form.find('[name="subagents"]')[i];
-                            $(e).val(v);
-                        });
-                    },$('[name="title"]').val(),'subagents');
-                    // Skillリストをロード
-                    await cmdbox.callcmd('skill','list',{},(res)=>{
-                        $("[name='skill_names']").empty().append('<option></option>');
-                        res['data'].map(elm=>{$('[name="skill_names"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                        config.skill_names && config.skill_names.forEach((v, i) => {
-                            const e = form.find('[name="skill_names"]')[i];
-                            $(e).val(v);
-                        });
-                    },$('[name="title"]').val(),'skill_names');
+                    
+                    // 複数のリストロードを並行実行（大幅な高速化）
+                    await Promise.all([
+                        // LLMリストをロード
+                        cmdbox.callcmd('llm','list',{},(res)=>{
+                            const val = $("[name='llm']").val();
+                            $("[name='llm']").empty().append('<option></option>');
+                            res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                            form.find('[name="llm"]').val(config.llm);
+                        },$('[name="title"]').val(),'llm'),
+                        // MCPサーバーリストをロード
+                        cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
+                            const val = $("[name='mcpservers']").val();
+                            $("[name='mcpservers']").empty().append('<option></option>');
+                            res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                            config.mcpservers && config.mcpservers.forEach((v, i) => {
+                                const e = form.find('[name="mcpservers"]')[i];
+                                $(e).val(v);
+                            });
+                        },$('[name="title"]').val(),'mcpservers'),
+                        // SubAgentリストをロード
+                        cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                            $("[name='subagents']").empty().append('<option></option>');
+                            res['data'].map(elm=>{
+                                if (elm["name"] === $('[name="agent_name"]').val()) return;
+                                $('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');
+                            });
+                            config.subagents && config.subagents.forEach((v, i) => {
+                                const e = form.find('[name="subagents"]')[i];
+                                $(e).val(v);
+                            });
+                        },$('[name="title"]').val(),'subagents'),
+                        // Skillリストをロード
+                        cmdbox.callcmd('skill','list',{},(res)=>{
+                            $("[name='skill_names']").empty().append('<option></option>');
+                            res['data'].map(elm=>{$('[name="skill_names"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                            config.skill_names && config.skill_names.forEach((v, i) => {
+                                const e = form.find('[name="skill_names"]')[i];
+                                $(e).val(v);
+                            });
+                        },$('[name="title"]').val(),'skill_names')
+                    ]);
                     $('[name="save_mode"]').val('update');
                 } finally {
                     cmdbox.hide_loading();

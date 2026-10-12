@@ -29,21 +29,25 @@ agentView.list_rag = async () => {
             $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#rag_edit_modal'));
             $('#rag_edit_modal').modal('show');
-            // LLM（embedding）リストをロード
-            await cmdbox.callcmd('llm','list',{},(res)=>{
-                $('[name=\'llm_name\']').empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="llm_name"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'llm_name');
-            // RAG Datasourceリストをロード
-            await cmdbox.callcmd('datasource','list',{},(res)=>{
-                $("[name='rag_datasource']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'rag_datasource');
-            // Extractリストをロード
-            await cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
-                $("[name='extract']").empty().append('<option></option>');
-                res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'extract');
+            
+            // 複数のリストロードを並行実行（大幅な高速化）
+            await Promise.all([
+                // LLM（embedding）リストをロード
+                cmdbox.callcmd('llm','list',{},(res)=>{
+                    $('[name=\'llm_name\']').empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="llm_name"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'llm_name'),
+                // RAG Datasourceリストをロード
+                cmdbox.callcmd('datasource','list',{},(res)=>{
+                    $("[name='rag_datasource']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'rag_datasource'),
+                // Extractリストをロード
+                cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
+                    $("[name='extract']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                },$('[name="title"]').val(),'extract')
+            ]);
         } finally {
             cmdbox.hide_loading();
         }

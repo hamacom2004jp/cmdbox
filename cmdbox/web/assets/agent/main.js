@@ -1,44 +1,41 @@
 $(() => {
     fetch('assets/agent/agent_sidebar_content.html').then(res => res.text()).then(async html => {
         try {
-            // 設定画面の読込み
-            const setting_html = await fetch('assets/agent/agent_settings.html').then(res => res.text());
+            // 全HTMLファイルを並行読込み（大幅な高速化）
+            const htmlPromises = {
+                setting_html: fetch('assets/agent/agent_settings.html').then(res => res.text()),
+                llm_edit_html: fetch('assets/agent/agent_settings_llm.html').then(res => res.text()),
+                mcpsv_edit_html: fetch('assets/agent/agent_settings_mcpsv.html').then(res => res.text()),
+                agent_edit_html: fetch('assets/agent/agent_settings_agent.html').then(res => res.text()),
+                rag_edit_html: fetch('assets/agent/agent_settings_rag.html').then(res => res.text()),
+                extract_edit_html: fetch('assets/agent/agent_settings_extract.html').then(res => res.text()),
+                runner_edit_html: fetch('assets/agent/agent_settings_runner.html').then(res => res.text()),
+                datasource_edit_html: fetch('assets/agent/agent_settings_datasource.html').then(res => res.text()),
+                skill_edit_html: fetch('assets/agent/agent_settings_skill.html').then(res => res.text()),
+                files_html: fetch('assets/agent/agent_files.html').then(res => res.text()),
+                chat_input_html: fetch('assets/agent/agent_chat_input.html').then(res => res.text()),
+                navbar_html: fetch('assets/agent/agent_navbar.html').then(res => res.text())
+            };
+            
+            // すべてのfetchを並行実行し完了を待機
+            const htmlContents = await Promise.all(Object.values(htmlPromises));
+            const htmlKeys = Object.keys(htmlPromises);
+            
+            // 取得したHTMLを元の変数名で割り当て
+            const [setting_html, llm_edit_html, mcpsv_edit_html, agent_edit_html, rag_edit_html, 
+                    extract_edit_html, runner_edit_html, datasource_edit_html, skill_edit_html, 
+                    files_html, chat_input_html, navbar_html] = htmlContents;
+            
+            // DOMへの追加
             $('.layout-grid').append(setting_html);
-
-            // LLM追加/編集モーダルの読込み
-            const llm_edit_html = await fetch('assets/agent/agent_settings_llm.html').then(res => res.text());
             $('.layout-grid').append(llm_edit_html);
-
-            // MCPSV追加/編集モーダルの読込み
-            const mcpsv_edit_html = await fetch('assets/agent/agent_settings_mcpsv.html').then(res => res.text());
             $('.layout-grid').append(mcpsv_edit_html);
-
-            // agent追加/編集モーダルの読込み
-            const agent_edit_html = await fetch('assets/agent/agent_settings_agent.html').then(res => res.text());
             $('.layout-grid').append(agent_edit_html);
-
-            // rag追加/編集モーダルの読込み
-            const rag_edit_html = await fetch('assets/agent/agent_settings_rag.html').then(res => res.text());
             $('.layout-grid').append(rag_edit_html);
-
-            // extract追加/編集モーダルの読込み
-            const extract_edit_html = await fetch('assets/agent/agent_settings_extract.html').then(res => res.text());
             $('.layout-grid').append(extract_edit_html);
-
-            // runner追加/編集モーダルの読込み
-            const runner_edit_html = await fetch('assets/agent/agent_settings_runner.html').then(res => res.text());
             $('.layout-grid').append(runner_edit_html);
-
-            // datasource追加/編集モーダルの読込み
-            const datasource_edit_html = await fetch('assets/agent/agent_settings_datasource.html').then(res => res.text());
             $('.layout-grid').append(datasource_edit_html);
-
-            // skill追加/編集モーダルの読込み
-            const skill_edit_html = await fetch('assets/agent/agent_settings_skill.html').then(res => res.text());
             $('.layout-grid').append(skill_edit_html);
-
-            // ファイラー画面の読込み
-            const files_html = await fetch('assets/agent/agent_files.html').then(res => res.text());
             $('.layout-grid').append(files_html);
             fsapi.left = $('#left_container');
             fsapi.right = $('#right_container');
@@ -48,11 +45,9 @@ $(() => {
             $('.split-pane').splitPane();
 
             // チャット入力エリアの読込み
-            const chat_input_html = await fetch('assets/agent/agent_chat_input.html').then(res => res.text());
             $('#chatInputArea').append(chat_input_html);
 
             // ナビゲーションバーの読込み
-            const navbar_html = await fetch('assets/agent/agent_navbar.html').then(res => res.text());
             $('#navHeadbar').append(navbar_html);
             cmdbox.set_logoicon('.navbar-brand');
             cmdbox.appid('.navbar-brand');
