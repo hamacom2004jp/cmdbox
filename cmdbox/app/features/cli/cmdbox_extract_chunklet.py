@@ -109,9 +109,9 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator, lim
         from tiktoken import model
         return [""] + sorted([k for k in model.MODEL_TO_ENCODING.keys()])
 
-    @limiter.apprun_check_limit
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @limiter.async_apprun_check_limit
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -174,8 +174,8 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator, lim
                     chunk_overlap_percent=args.chunk_overlap_percent,
                 )
                 payload_b64 = convert.str2b64str(common.to_str(payload))
-                res = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
-                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+                res = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
+                                                   retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 if 'success' not in res:
                     return self.RESP_WARN, res, None

@@ -992,7 +992,7 @@ class Options:
             opt['clmsg_title'] = title
         audit_write_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
         if func_feature is None or func_feature is not None and func_feature.audited_by(logger, audit_write_args):
-            self.audit_write.apprun(logger, audit_write_args, tm=0.0, pf=[])
+            common.exec_sync(self.audit_write.apprun, logger, audit_write_args, tm=0.0, pf=[])
         ret = self.audit_write_args.copy()
         del ret['mode']
         del ret['cmd']

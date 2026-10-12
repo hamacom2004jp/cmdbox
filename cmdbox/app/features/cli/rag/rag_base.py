@@ -27,7 +27,7 @@ class RAGBase(feature.ResultEdgeFeature):
         self.client_file_list = cmdbox_client_file_list.ClientFileList(appcls, ver, language)
         self.ds_load = cmdbox_datasource_load.DatasourceLoad(appcls, ver, language)
 
-    def load_rag_config(self, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
+    async def load_rag_config(self, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
         """
         RAG設定の読込みを行います
 
@@ -42,7 +42,7 @@ class RAGBase(feature.ResultEdgeFeature):
         """
         ragload_payload = dict(rag_name=args.rag_name)
         ragload_payload_b64 = convert.str2b64str(common.to_str(ragload_payload))
-        ragload_res = cl.redis_cli.send_cmd(self.ragload.get_svcmd(), [ragload_payload_b64],
+        ragload_res = await cl.redis_cli.asend_cmd(self.ragload.get_svcmd(), [ragload_payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         if 'success' not in ragload_res:
             common.print_format(ragload_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -104,7 +104,7 @@ class RAGBase(feature.ResultEdgeFeature):
         msg = dict(success=dict(user_name=user_name, scope=scope, signin_data=signin_data))
         return self.RESP_SUCCESS, msg, None
 
-    def embedding(self, rag_config:Dict, original_data:List[Any], args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
+    async def embedding(self, rag_config:Dict, original_data:List[Any], args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
         """
         LLM embedを利用したEmbedding処理を行います
 
@@ -129,14 +129,14 @@ class RAGBase(feature.ResultEdgeFeature):
             return self.RESP_WARN, msg, cl
         embedding_payload = dict(llmname=rag_config.get('llm_name'), input_text=original_data)
         embedding_payload_b64 = convert.str2b64str(common.to_str(embedding_payload))
-        embedding_res = cl.redis_cli.send_cmd(self.llmembed.get_svcmd(), [embedding_payload_b64],
+        embedding_res = await cl.redis_cli.asend_cmd(self.llmembed.get_svcmd(), [embedding_payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         if 'success' not in embedding_res:
             common.print_format(embedding_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, embedding_res, cl
         return self.RESP_SUCCESS, embedding_res['success'], cl
 
-    def load_extract_config(self, extract_name:str, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
+    async def load_extract_config(self, extract_name:str, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
         """
         Extract設定の読込みを行います
 
@@ -152,7 +152,7 @@ class RAGBase(feature.ResultEdgeFeature):
         """
         extractload_payload = dict(extract_name=extract_name)
         extractload_payload_b64 = convert.str2b64str(common.to_str(extractload_payload))
-        extractload_res = cl.redis_cli.send_cmd(self.extractload.get_svcmd(), [extractload_payload_b64],
+        extractload_res =  await cl.redis_cli.asend_cmd(self.extractload.get_svcmd(), [extractload_payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         if 'success' not in extractload_res:
             common.print_format(extractload_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)

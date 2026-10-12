@@ -103,15 +103,15 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
             ]
         )
 
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
         options = Options.getInstance(appcls=self.appcls, ver=self.ver)
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         try:
             # RAG設定の読込み
-            st, rag_config, cl = self.load_rag_config(args, cl, tm, pf, logger)
+            st, rag_config, cl = await self.load_rag_config(args, cl, tm, pf, logger)
             if st != self.RESP_SUCCESS:
                 return st, rag_config, cl
 
@@ -143,7 +143,7 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
                 vec_data = None
                 if args.query is not None:
                     # Embeddingの実行
-                    st, embed_res, _ = self.embedding(rag_config, [args.query], args, cl, tm, pf, logger)
+                    st, embed_res, _ = await self.embedding(rag_config, [args.query], args, cl, tm, pf, logger)
                     if st != self.RESP_SUCCESS:
                         msg = dict(warn=f"Failed to execute embedding for query '{args.query}'.", res=embed_res)
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

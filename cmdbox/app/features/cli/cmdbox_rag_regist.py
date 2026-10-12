@@ -78,9 +78,9 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
             ]
         )
 
-    @limiter.apprun_check_limit
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+    @limiter.async_apprun_check_limit
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
         options = Options.getInstance(appcls=self.appcls, ver=self.ver)
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -88,7 +88,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
         try:
             # RAG設定の読込み
             self.put_resqueue(args, dict(process=dict(message="Loading RAG configuration...")))
-            st, rag_config, cl = self.load_rag_config(args, cl, tm, pf, logger)
+            st, rag_config, cl = await self.load_rag_config(args, cl, tm, pf, logger)
             if st != self.RESP_SUCCESS:
                 return st, rag_config, cl
             
@@ -130,7 +130,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
                 for extract_name in extract_names:
                     # Extract設定の取得
                     self.put_resqueue(args, dict(process=dict(message=f"Loading extract configuration...extract_name={extract_name}")))
-                    st, extract_conf, cl = self.load_extract_config(extract_name, args, cl, tm, pf, logger)
+                    st, extract_conf, cl = await self.load_extract_config(extract_name, args, cl, tm, pf, logger)
                     if st != self.RESP_SUCCESS:
                         msg = dict(warn=f"Failed to load extract configuration for '{extract_name}'.", res=extract_conf)
                         self.put_resqueue(args, msg)
@@ -217,7 +217,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
                                 # Embeddingの実行
                                 self.put_resqueue(args, dict(process=dict(message=f"({doc_index}/{doc_count}) Executing embedding for extracted document...file={marge_opt['loadpath']}",
                                                                           count=doc_count, index=doc_index, filename=Path(marge_opt['loadpath']).name)))
-                                st, embed_res, _ = self.embedding(rag_config, [doc['content'] for doc in docs], args, cl, tm, pf, logger)
+                                st, embed_res, _ = await self.embedding(rag_config, [doc['content'] for doc in docs], args, cl, tm, pf, logger)
                                 if st != self.RESP_SUCCESS:
                                     msg = dict(warn=f"Failed to execute embedding for extracted document from file '{kv['path']}'.", res=embed_res)
                                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

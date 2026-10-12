@@ -1,4 +1,6 @@
 {
+    "chat.editing.autoAcceptDelay": 0,
+    "chat.checkpoints.showFileChanges": true,
     "python.testing.pytestArgs": [
     ],
     "python.testing.unittestEnabled": false,

@@ -1,6 +1,3 @@
-from cmdbox import version
-from cmdbox.app import feature, options
-from cmdbox.app.commons import convert, module, loghandler
 from cryptography.fernet import Fernet
 from fastapi.responses import RedirectResponse
 from importlib import resources
@@ -11,6 +8,7 @@ from typing import List, Tuple, Dict, Any, Union
 import argparse
 import asyncio
 import datetime
+import functools
 import logging
 import logging.config
 import locale
@@ -33,39 +31,21 @@ import sys
 import threading
 import types
 import uuid
+import warnings
 
 
-HOME_DIR = Path(os.path.expanduser("~"))
-def copy_sample(data:Path, ver=version):
-    """
-    サンプルデータをコピーします。
-
-    Args:
-        data (Path): データディレクトリ
-        ver (version, optional): バージョン. Defaults to version
-    """
-    # サンプルデータをコピー
-    dst_sample = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
-    src = Path(ver.__file__).parent / 'extensions'
-    src_sample = src / 'sample_project'
-    def copy(src:str, dst:str):
-        p = Path(dst)
-        if not p.exists():
-            shutil.copy2(src, dst)
-    if src_sample.exists() and not dst_sample.exists():
-        shutil.copytree(src_sample, dst_sample, dirs_exist_ok=True, copy_function=copy)
-    # 設定ファイルをコピー
-    dst_config = Path(data) / f'.{ver.__appid__}' if data is not None else HOME_DIR / f'.{ver.__appid__}'
-    dst_config.mkdir(parents=True, exist_ok=True)
-    if not (dst_config / 'features.yml').exists():
-        shutil.copy2(src / 'features.yml', dst_config / 'features.yml')
-    if not (dst_config / 'user_list.yml').exists():
-        shutil.copy2(src / 'user_list.yml', dst_config / 'user_list.yml')
-    # 初期データをコピー
-    dst_initdata = Path(data) / f'.{ver.__appid__}_initdata' if data is not None else HOME_DIR / f'.{ver.__appid__}_initdata'
-    src_initdata = src / f'{ver.__appid__}_initdata'
-    if src_initdata.exists() and not dst_initdata.exists():
-        shutil.copytree(src_initdata, dst_initdata, dirs_exist_ok=True, copy_function=copy)
+def deprecated(message="この関数は非推奨です。"):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            warnings.warn(
+                f"{func.__name__} は非推奨です: {message}",
+                category=DeprecationWarning,
+                stacklevel=2
+            )
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 def gen_uuid() -> str:
     """
@@ -415,6 +395,192 @@ def console_log(console:Console, message:Any, highlight:bool=True, **kwargs) -> 
     dtstr = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')
     console.print(f"{dtstr} {message}", highlight=highlight, crop=False, soft_wrap=True, **kwargs)
 
+def set_debug(logger:logging.Logger, debug:bool=False) -> None:
+    """
+    ロガーのデバッグモードを設定します。
+
+    Args:
+        logger (logging.Logger): ロガー
+        debug (bool, optional): デバッグモード. Defaults to False.
+    """
+    if debug:
+        logger.setLevel(logging.DEBUG)
+        for handler in logger.handlers:
+            handler.setLevel(logging.DEBUG)
+        logger.info("Use debug mode logging.")
+    else:
+        logger.setLevel(logging.INFO)
+        for handler in logger.handlers:
+            handler.setLevel(logging.INFO)
+
+def safe_fname(fname:str) -> str:
+    """
+    ファイル名に使えない文字を置換します。
+
+    Args:
+        fname (str): ファイル名
+
+    Returns:
+        str: 置換後のファイル名
+    """
+    fname = re.sub('[_]', '-_-',str(fname))
+    return re.sub(r'[\s:;\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]', '_',str(fname))
+
+def check_fname(fname:str) -> bool:
+    """
+    ファイル名に使えない文字が含まれているかどうかをチェックします。
+
+    Args:
+        fname (str): ファイル名
+
+    Returns:
+        bool: Trueの場合は使えない文字が含まれている
+    """
+    return re.search(r'[\s:;\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
+
+def mkdirs(dir_path:Path):
+    """
+    ディレクトリを中間パスも含めて作成します。
+
+    Args:
+        dir_path (Path): 作成するディレクトリのパス
+
+    Returns:
+        Path: 作成したディレクトリのパス
+    """
+    if not dir_path.exists():
+        dir_path.mkdir(parents=True, exist_ok=True)
+    if not dir_path.is_dir():
+        raise BaseException(f"Don't make diredtory.({str(dir_path)})")
+    return dir_path
+
+def rmdirs(dir_path:Path, ignore_errors:bool=True):
+    """
+    ディレクトリをサブディレクトリ含めて削除します。
+
+    Args:
+        dir_path (Path): 削除するディレクトリのパス
+    """
+    shutil.rmtree(dir_path, ignore_errors=ignore_errors)
+
+def random_string(size:int=16, chars=string.ascii_uppercase + string.digits) -> str:
+    """
+    ランダムな文字列を生成します。
+
+    Args:
+        size (int, optional): 文字列の長さ. Defaults to 16.
+        chars ([type], optional): 使用する文字. Defaults to string.ascii_uppercase + string.digits.
+
+    Returns:
+        str: 生成された文字列
+    """
+    return ''.join(random.choices(chars, k=size))
+
+def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_json_append:bool=False, stdout:bool=True,
+                 tablefmt:str='github', pf:List[Dict[str, float]]=[]):
+    """
+    データを指定されたフォーマットで出力します。
+
+    Args:
+        data (dict): 出力するデータ
+        format (bool): フォーマットするかどうか
+        tm (float): 処理時間
+        output_json (str, optional): JSON形式で出力するファイルパス. Defaults to None.
+        output_json_append (bool, optional): JSON形式で出力するファイルパス. Defaults to False.
+        stdout (bool, optional): 標準出力に出力するかどうか. Defaults to True.
+        tablefmt (str, optional): テーブルのフォーマット. Defaults to 'github'.
+        pf (List[Dict[str, float]], optional): パフォーマンス情報. Defaults to [].
+    Returns:
+        str: 生成された文字列
+    """
+    is_data_dict = isinstance(data, dict)
+    in_data_success = is_data_dict and 'success' in data
+    is_success_dict = in_data_success and isinstance(data['success'], dict)
+    is_data_list = isinstance(data, list)
+    if is_success_dict and "performance" in data["success"] and isinstance(data["success"]["performance"], list) and pf is not None:
+        data["success"]["performance"] += pf
+    txt = ''
+    if format:
+        if is_success_dict:
+            _data = data['success']['data'] if 'data' in data['success'] else data['success']
+            if isinstance(_data, list):
+                txt = tabulate(_data, headers='keys', tablefmt=tablefmt)
+            elif isinstance(_data, dict):
+                txt = tabulate([_data], headers='keys', tablefmt=tablefmt)
+            else:
+                txt = str(_data)
+        elif is_data_list:
+            txt = tabulate(data, headers='keys', tablefmt=tablefmt)
+        else:
+            txt = tabulate([data], headers='keys', tablefmt=tablefmt)
+        if stdout:
+            try:
+                print(txt)
+                print(f"{perf_counter() - tm:.03f}s.")
+            except BrokenPipeError:
+                pass
+    else:
+        update_performance("total", tm, data)
+        try:
+            if is_data_dict or is_data_list:
+                txt = json.dumps(data, default=default_json_enc, ensure_ascii=False)
+            else:
+                txt = data
+        except:
+            txt = data
+        if stdout:
+            try:
+                print(txt)
+            except BrokenPipeError:
+                pass
+    if output_json is not None:
+        try:
+            def _w(f):
+                json.dump(data, f, default=default_json_enc, ensure_ascii=False)
+                print('', file=f)
+            save_file(Path(output_json), _w, mode='a' if output_json_append else 'w', nolock=True)
+        except Exception as e:
+            pass
+    return txt
+
+
+from cmdbox import version
+from cmdbox.app import feature, options
+from cmdbox.app.commons import convert, module, loghandler
+
+
+HOME_DIR = Path(os.path.expanduser("~"))
+def copy_sample(data:Path, ver=version):
+    """
+    サンプルデータをコピーします。
+
+    Args:
+        data (Path): データディレクトリ
+        ver (version, optional): バージョン. Defaults to version
+    """
+    # サンプルデータをコピー
+    dst_sample = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
+    src = Path(ver.__file__).parent / 'extensions'
+    src_sample = src / 'sample_project'
+    def copy(src:str, dst:str):
+        p = Path(dst)
+        if not p.exists():
+            shutil.copy2(src, dst)
+    if src_sample.exists() and not dst_sample.exists():
+        shutil.copytree(src_sample, dst_sample, dirs_exist_ok=True, copy_function=copy)
+    # 設定ファイルをコピー
+    dst_config = Path(data) / f'.{ver.__appid__}' if data is not None else HOME_DIR / f'.{ver.__appid__}'
+    dst_config.mkdir(parents=True, exist_ok=True)
+    if not (dst_config / 'features.yml').exists():
+        shutil.copy2(src / 'features.yml', dst_config / 'features.yml')
+    if not (dst_config / 'user_list.yml').exists():
+        shutil.copy2(src / 'user_list.yml', dst_config / 'user_list.yml')
+    # 初期データをコピー
+    dst_initdata = Path(data) / f'.{ver.__appid__}_initdata' if data is not None else HOME_DIR / f'.{ver.__appid__}_initdata'
+    src_initdata = src / f'{ver.__appid__}_initdata'
+    if src_initdata.exists() and not dst_initdata.exists():
+        shutil.copytree(src_initdata, dst_initdata, dirs_exist_ok=True, copy_function=copy)
+
 def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging.Logger:
     """
     デフォルトのロガーを生成します。
@@ -498,24 +664,6 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
     logger = logging.getLogger(log_name)
     set_debug(logger, debug)
     return logger, {}
-
-def set_debug(logger:logging.Logger, debug:bool=False) -> None:
-    """
-    ロガーのデバッグモードを設定します。
-
-    Args:
-        logger (logging.Logger): ロガー
-        debug (bool, optional): デバッグモード. Defaults to False.
-    """
-    if debug:
-        logger.setLevel(logging.DEBUG)
-        for handler in logger.handlers:
-            handler.setLevel(logging.DEBUG)
-        logger.info("Use debug mode logging.")
-    else:
-        logger.setLevel(logging.INFO)
-        for handler in logger.handlers:
-            handler.setLevel(logging.INFO)
 
 def default_json_enc(o) -> Any:
     if isinstance(o, Path):
@@ -650,136 +798,6 @@ def getopt(opt:dict, key:str, preval=None, defval=None, withset=False) -> any:
         if withset:
             opt[key] = defval
         return defval
-
-def safe_fname(fname:str) -> str:
-    """
-    ファイル名に使えない文字を置換します。
-
-    Args:
-        fname (str): ファイル名
-
-    Returns:
-        str: 置換後のファイル名
-    """
-    fname = re.sub('[_]', '-_-',str(fname))
-    return re.sub(r'[\s:;\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]', '_',str(fname))
-
-def check_fname(fname:str) -> bool:
-    """
-    ファイル名に使えない文字が含まれているかどうかをチェックします。
-
-    Args:
-        fname (str): ファイル名
-
-    Returns:
-        bool: Trueの場合は使えない文字が含まれている
-    """
-    return re.search(r'[\s:;\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
-
-def mkdirs(dir_path:Path):
-    """
-    ディレクトリを中間パスも含めて作成します。
-
-    Args:
-        dir_path (Path): 作成するディレクトリのパス
-
-    Returns:
-        Path: 作成したディレクトリのパス
-    """
-    if not dir_path.exists():
-        dir_path.mkdir(parents=True, exist_ok=True)
-    if not dir_path.is_dir():
-        raise BaseException(f"Don't make diredtory.({str(dir_path)})")
-    return dir_path
-
-def rmdirs(dir_path:Path, ignore_errors:bool=True):
-    """
-    ディレクトリをサブディレクトリ含めて削除します。
-
-    Args:
-        dir_path (Path): 削除するディレクトリのパス
-    """
-    shutil.rmtree(dir_path, ignore_errors=ignore_errors)
-
-def random_string(size:int=16, chars=string.ascii_uppercase + string.digits) -> str:
-    """
-    ランダムな文字列を生成します。
-
-    Args:
-        size (int, optional): 文字列の長さ. Defaults to 16.
-        chars ([type], optional): 使用する文字. Defaults to string.ascii_uppercase + string.digits.
-
-    Returns:
-        str: 生成された文字列
-    """
-    return ''.join(random.choices(chars, k=size))
-
-def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_json_append:bool=False, stdout:bool=True,
-                 tablefmt:str='github', pf:List[Dict[str, float]]=[]):
-    """
-    データを指定されたフォーマットで出力します。
-
-    Args:
-        data (dict): 出力するデータ
-        format (bool): フォーマットするかどうか
-        tm (float): 処理時間
-        output_json (str, optional): JSON形式で出力するファイルパス. Defaults to None.
-        output_json_append (bool, optional): JSON形式で出力するファイルパス. Defaults to False.
-        stdout (bool, optional): 標準出力に出力するかどうか. Defaults to True.
-        tablefmt (str, optional): テーブルのフォーマット. Defaults to 'github'.
-        pf (List[Dict[str, float]], optional): パフォーマンス情報. Defaults to [].
-    Returns:
-        str: 生成された文字列
-    """
-    is_data_dict = isinstance(data, dict)
-    in_data_success = is_data_dict and 'success' in data
-    is_success_dict = in_data_success and isinstance(data['success'], dict)
-    is_data_list = isinstance(data, list)
-    if is_success_dict and "performance" in data["success"] and isinstance(data["success"]["performance"], list) and pf is not None:
-        data["success"]["performance"] += pf
-    txt = ''
-    if format:
-        if is_success_dict:
-            _data = data['success']['data'] if 'data' in data['success'] else data['success']
-            if isinstance(_data, list):
-                txt = tabulate(_data, headers='keys', tablefmt=tablefmt)
-            elif isinstance(_data, dict):
-                txt = tabulate([_data], headers='keys', tablefmt=tablefmt)
-            else:
-                txt = str(_data)
-        elif is_data_list:
-            txt = tabulate(data, headers='keys', tablefmt=tablefmt)
-        else:
-            txt = tabulate([data], headers='keys', tablefmt=tablefmt)
-        if stdout:
-            try:
-                print(txt)
-                print(f"{perf_counter() - tm:.03f}s.")
-            except BrokenPipeError:
-                pass
-    else:
-        update_performance("total", tm, data)
-        try:
-            if is_data_dict or is_data_list:
-                txt = json.dumps(data, default=default_json_enc, ensure_ascii=False)
-            else:
-                txt = data
-        except:
-            txt = data
-        if stdout:
-            try:
-                print(txt)
-            except BrokenPipeError:
-                pass
-    if output_json is not None:
-        try:
-            def _w(f):
-                json.dump(data, f, default=default_json_enc, ensure_ascii=False)
-                print('', file=f)
-            save_file(Path(output_json), _w, mode='a' if output_json_append else 'w', nolock=True)
-        except Exception as e:
-            pass
-    return txt
 
 def to_str(o, slise=-1):
     ret = ""
@@ -1059,7 +1077,12 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
         ctx = []
         from cmdbox.app.auth import signin
         scope = signin.get_request_scope()
-        if not webcall:
+        try:
+            asyncio.get_running_loop()
+            event_loop_running = True
+        except RuntimeError:
+            event_loop_running = False
+        if not webcall and not event_loop_running:
             st, res, o = asyncio.run(apprun(logger, args, tm, pf))
             res = result_format(res, logger, pf)
             update_performance("apprun", apprun_tm, res)

@@ -83,8 +83,8 @@ class DatasourceTblDrop(datasource_base.DatasourceBase, validator.Validator):
                 except Exception:
                     pass
 
-    @validator.apprun_check
-    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(
             dsname=args.dsname,
             schema=args.schema if hasattr(args, 'schema') else None,
@@ -92,7 +92,7 @@ class DatasourceTblDrop(datasource_base.DatasourceBase, validator.Validator):
             if_exists=args.if_exists if hasattr(args, 'if_exists') else False,
         )
         try:
-            return self.route_apprun(args, payload, logger, tm, pf)
+            return await self.route_apprun(args, payload, logger, tm, pf)
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             ret = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")

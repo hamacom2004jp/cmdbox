@@ -974,7 +974,7 @@ class Web:
               session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=900, outputs_key:List[str]=[],
               gunicorn_workers:int=-1, gunicorn_timeout:int=30,
               x_content_type_options:bool=False, x_frame_options:bool=False, strict_transport_security:bool=False,
-              cache_control_max_age:int=600):
+              cache_control_max_age:int=3600):
         """
         Webサーバを起動する
 
@@ -996,7 +996,7 @@ class Web:
             x_content_type_options (bool, optional): X-Content-Type-Options ヘッダーを有効にするか. Defaults to False.
             x_frame_options (bool, optional): X-Frame-Options ヘッダーを有効にするか. Defaults to False.
             strict_transport_security (bool, optional): Strict-Transport-Security ヘッダーを有効にするか. Defaults to False.
-            cache_control_max_age (int, optional): Cache-Control ヘッダーの max-age. Defaults to 600.
+            cache_control_max_age (int, optional): Cache-Control ヘッダーの max-age. Defaults to 3600.
         """
         self.allow_host = allow_host
         self.listen_port = listen_port

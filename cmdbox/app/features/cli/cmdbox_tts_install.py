@@ -131,8 +131,8 @@ class TtsInstall(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -200,7 +200,7 @@ class TtsInstall(feature.UnsupportEdgeFeature, validator.Validator):
             onnxruntime_lib_b64 = convert.str2b64str(onnxruntime_lib)
             force_install_b64 = convert.str2b64str(str(force_install))
             cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-            ret = cl.redis_cli.send_cmd(self.get_svcmd(),
+            ret = await cl.redis_cli.asend_cmd(self.get_svcmd(),
                                         [tts_engine_b64, voicevox_ver_b64, voicevox_whl_b64, openjtalk_ver_b64, openjtalk_dic_b64, onnxruntime_ver_b64, onnxruntime_lib_b64, force_install_b64],
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         common.print_format(ret, False, tm, None, False, pf=pf)

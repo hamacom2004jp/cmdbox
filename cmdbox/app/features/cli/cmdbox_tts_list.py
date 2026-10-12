@@ -69,9 +69,9 @@ class TtsList(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
-    @cache.apprun_cache
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @cache.async_apprun_cache
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -86,8 +86,8 @@ class TtsList(feature.UnsupportEdgeFeature, validator.Validator):
         """
         tts_engine_b64 = convert.str2b64str(args.tts_engine)
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(), [tts_engine_b64],
-                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+        ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [tts_engine_b64],
+                                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         common.print_format(ret, False, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, None

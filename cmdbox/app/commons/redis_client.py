@@ -2,6 +2,7 @@ from cmdbox.app import common
 from cmdbox.app.commons import convert
 from PIL import Image
 from typing import List, Dict, Any
+import asyncio
 import datetime
 import logging
 import json
@@ -145,6 +146,7 @@ class RedisClient(object):
         self.logger.warning(f"Server check failed. svname={self.svname.split('-')[1]}")
         return False
 
+    @common.deprecated("send_cmdは非推奨です。asend_cmdを使用してください。")
     def send_cmd(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5,
                  outstatus:bool=False, timeout:int=60, nowait:bool=False):
         """
@@ -167,6 +169,32 @@ class RedisClient(object):
         return next(self.send_cmd_sse(cmd, params, retry_count, retry_interval,
                                       outstatus, timeout, nowait, sse=False))
 
+    async def asend_cmd(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5,
+                        outstatus:bool=False, timeout:int=60, nowait:bool=False):
+        """
+        コマンドをRedisサーバーに送信し、応答を取得します。
+        nowait=Trueの場合は、応答を待たずにスレッドで実行します。
+        その場合、応答は受信できません。
+
+        Args:
+            cmd (str): コマンド
+            params (List[str]): コマンドのパラメータ
+            retry_count (int, optional): リトライ回数. Defaults to 20.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            outstatus (bool, optional): ステータスを出力する. Defaults to False.
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+            nowait (bool, optional): 応答を待たない. Defaults to False.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        result = None
+        async for result in self.asend_cmd_sse(cmd, params, retry_count, retry_interval,
+                                               outstatus, timeout, nowait, sse=False):
+            pass
+        return result
+
+    @common.deprecated("send_cmd_sseは非推奨です。asend_cmd_sseを使用してください。")
     def send_cmd_sse(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5,
                  outstatus:bool=False, timeout:int=60, nowait:bool=False, sse:bool=True):
         """
@@ -237,6 +265,77 @@ class RedisClient(object):
                     pass
             thread = threading.Thread(target=run_send, args=(nowait, timeout))
             thread.start()
+            yield dict(success=f"Command sent. cmd={cmd}, nowait={nowait}")
+
+    async def asend_cmd_sse(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5,
+                 outstatus:bool=False, timeout:int=60, nowait:bool=False, sse:bool=True):
+        """
+        コマンドをRedisサーバーに送信し、応答を取得します（非同期版）。
+        nowait=Trueの場合は、応答を待たずに実行します。
+        その場合、応答は受信できません。
+
+        Args:
+            cmd (str): コマンド
+            params (List[str]): コマンドのパラメータ
+            retry_count (int, optional): リトライ回数. Defaults to 20.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            outstatus (bool, optional): ステータスを出力する. Defaults to False.
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+            nowait (bool, optional): 応答を待たない. Defaults to False.
+            sse (bool, optional): サーバーサイドからの終了メッセージを受けるまで連続してレスポンスを受け取る. Defaults to False.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        async def send(nowait:bool=False, timeout:int=60):
+            try:
+                if isinstance(timeout, str):
+                    timeout = int(timeout)
+                if timeout <= 0:
+                    raise ValueError(f"timeout must be greater than 0. timeout={timeout}")
+                if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
+                    yield dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
+                    return
+                reskey = common.random_string()
+                reskey = f"cl-{reskey}-{int(time.time())}"
+                self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
+                if nowait: return
+                self.is_running = True
+                stime = time.time()
+                while self.is_running:
+                    ctime = time.time()
+                    if ctime - stime > timeout:
+                        raise Exception(f"Response timed out.")
+                    res = self.redis_cli.lpop(reskey)
+                    if res is None or len(res) <= 0:
+                        await asyncio.sleep(0.001)
+                        continue
+                    stime = time.time()
+                    if sse:
+                        msg = self._res_cmd(reskey, res, True)
+                        yield msg
+                        if 'end' in msg: return
+                    else:
+                        yield self._res_cmd(reskey, res)
+                        return
+                raise KeyboardInterrupt(f"Stop command.")
+            except KeyboardInterrupt as e:
+                self.logger.warning(f"Stop command. cmd={cmd}", exc_info=True)
+                yield dict(error=f"Stop command. cmd={cmd}")
+                return
+            except Exception as e:
+                self.logger.warning(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
+                yield dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
+                return
+        if not nowait:
+            async for msg in send(nowait, timeout):
+                yield msg
+            return
+        else:
+            async def run_send(nowait:bool=False, timeout:int=60):
+                async for _ in send(nowait, timeout):
+                    pass
+            asyncio.create_task(run_send(nowait, timeout))
             yield dict(success=f"Command sent. cmd={cmd}, nowait={nowait}")
 
     def _res_cmd(self, reskey:str, res_msg:bytes, sse:bool=False) -> dict:

@@ -306,7 +306,7 @@ class DatasourceBase(feature.ResultEdgeFeature):
             return f"{self.validate_identifier(schema)}.{name}"
         return name
 
-    def route_apprun(self, args: argparse.Namespace, payload: Dict[str, Any],
+    async def route_apprun(self, args: argparse.Namespace, payload: Dict[str, Any],
                      logger: logging.Logger, tm: float, pf: List[Dict[str, float]]) -> Tuple[int, Dict[str, Any], Any]:
         """
         データソース設定の scope に基づいて apprun 処理をルーティングします。
@@ -325,7 +325,7 @@ class DatasourceBase(feature.ResultEdgeFeature):
             payload_b64 = _convert.str2b64str(common.to_str(payload))
             cl = _cli_client.Client(logger, redis_host=args.host, redis_port=args.port,
                                     redis_password=args.password, svname=args.svname)
-            ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
+            ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                         retry_count=args.retry_count, retry_interval=args.retry_interval,
                                         timeout=args.timeout, nowait=False)
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)

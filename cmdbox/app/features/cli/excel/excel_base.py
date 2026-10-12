@@ -70,8 +70,8 @@ class ExcelBase(feature.ResultEdgeFeature, validator.Validator):
         "e": "error",
     }
 
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -117,7 +117,7 @@ class ExcelBase(feature.ResultEdgeFeature, validator.Validator):
                 return self.RESP_SUCCESS, res, None
             elif args.scope == "server":
                 cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-                res = cl.redis_cli.send_cmd(self.get_svcmd(), self.get_svparam(args),
+                res = await cl.redis_cli.asend_cmd(self.get_svcmd(), self.get_svparam(args),
                                                 retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 if 'success' not in res:
                     common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -126,7 +126,7 @@ class ExcelBase(feature.ResultEdgeFeature, validator.Validator):
                 return self.RESP_SUCCESS, res, None
             else:
                 logger.warning(f"scope is invalid. {args.scope}")
-                return dict(warn=f"scope is invalid. {args.scope}")
+                return self.RESP_WARN, dict(warn=f"scope is invalid. {args.scope}"), None
         except Exception as e:
             logger.warning(f"Exception occurred. {e}", exc_info=True)
             return self.RESP_WARN, dict(warn=f"Exception occurred. {e}"), None

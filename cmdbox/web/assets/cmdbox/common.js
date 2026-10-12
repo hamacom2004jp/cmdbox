@@ -2564,7 +2564,8 @@ cmdbox.translation = async (words, nosave, llmname) => {
         llmname: llmname?llmname:'',
         words: words,
         target_lang: targetLang,
-        nosave: nosave ? true : false
+        nosave: nosave ? true : false,
+        timeout: 60
     }, undefined, undefined, undefined, false, true, false);
     if (!res) return words;
     if (Array.isArray(res) && res.length > 0) res = res[0];

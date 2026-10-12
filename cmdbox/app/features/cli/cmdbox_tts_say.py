@@ -196,9 +196,9 @@ class TtsSay(feature.ResultEdgeFeature, validator.Validator, limiter.LimitedFeat
             ]
         )
 
-    @limiter.apprun_check_limit
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @limiter.async_apprun_check_limit
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -222,9 +222,9 @@ class TtsSay(feature.ResultEdgeFeature, validator.Validator, limiter.LimitedFeat
         tts_text_b64 = convert.str2b64str(args.tts_text)
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(),
-                                    [tts_engine_b64, voicevox_model_b64, tts_text_b64],
-                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+        ret =  await cl.redis_cli.asend_cmd(self.get_svcmd(),
+                                            [tts_engine_b64, voicevox_model_b64, tts_text_b64],
+                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         if args.tts_output:
             if 'success' in ret and 'data' in ret['success']:
                 wav_b64 = ret['success']['data']

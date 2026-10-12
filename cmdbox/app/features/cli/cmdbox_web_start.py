@@ -155,7 +155,7 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="strict_transport_security", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=None,
                      description_ja="Strict-Transport-Security ヘッダーを有効にするかを指定します。有効にするとブラウザに対しこのサイトへの通信を常にHTTPSで行うよう通知します。",
                      description_en="Specifies whether to enable the Strict-Transport-Security header. If enabled, it instructs browsers to always use HTTPS when communicating with this site."),
-                dict(opt="cache_control_max_age", type=Options.T_INT, default=600, required=False, multi=False, hide=True, choice=None,
+                dict(opt="cache_control_max_age", type=Options.T_INT, default=3600, required=False, multi=False, hide=True, choice=None,
                      description_ja="Cache-Control ヘッダーの max-age を指定します。単位は秒です。静的コンテンツを中心にブラウザに対してキャッシュするように通知します。",
                      description_en="Specifies the `max-age` value for the `Cache-Control` header. The unit is seconds. This instructs the browser to cache the content, primarily static content.")
             ]
