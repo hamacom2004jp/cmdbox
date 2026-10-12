@@ -1155,6 +1155,23 @@ return cjson.encode(c)
             if not self.matches(config, command_options):
                 continue
 
+            # 制限設定の有効期間チェック（制限自体が有効か確認）
+            limiter_start = config.get('limiter_start')
+            if limiter_start:
+                try:
+                    if now < datetime.fromisoformat(limiter_start):
+                        continue  # この制限はまだ有効でない
+                except (ValueError, TypeError):
+                    logger.warning(f"Limiter '{limiter_name}': invalid limiter_start value: {limiter_start}")
+
+            limiter_end = config.get('limiter_end')
+            if limiter_end:
+                try:
+                    if now > datetime.fromisoformat(limiter_end):
+                        continue  # この制限はもう有効でない
+                except (ValueError, TypeError):
+                    logger.warning(f"Limiter '{limiter_name}': invalid limiter_end value: {limiter_end}")
+
             matched_configs.append(limiter_name)
             counter = self.load_counter(data_dir, limiter_name, scope=scope)
             if self.needs_reset(config, counter):

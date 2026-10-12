@@ -100,6 +100,12 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="service_credits", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="サービスクレジット数を指定します。",
                      description_en="Specify the number of service credits."),
+                dict(opt="limiter_start", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="この制限の開始日時を指定します（例: 2024-01-01T00:00:00）。省略時は即時有効になります。",
+                     description_en="Specify the start datetime of this restriction (e.g. 2024-01-01T00:00:00). If omitted, it takes effect immediately."),
+                dict(opt="limiter_end", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="この制限の終了日時を指定します（例: 2024-12-31T23:59:59）。省略時は即時有効になります。",
+                     description_en="Specify the end datetime of this restriction (e.g. 2024-12-31T23:59:59). If omitted, it takes effect immediately."),
                 dict(opt="exec_period_start", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="コマンドの実行可能期間の開始日時を指定します（例: 2024-01-01T00:00:00）。省略時は制限しません。",
                      description_en="Specify the start datetime of the executable period for the command (e.g. 2024-01-01T00:00:00). If omitted, no limit is applied."),
@@ -168,6 +174,16 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, result, None
 
+        # Validate limiter_start and limiter_end
+        limiter_start = args.limiter_start if hasattr(args, 'limiter_start') and args.limiter_start is not None else None
+        limiter_end = args.limiter_end if hasattr(args, 'limiter_end') and args.limiter_end is not None else None
+        if limiter_start and limiter_end:
+            if str(limiter_start) >= str(limiter_end):
+                result = dict(warn=f"limiter_start ({limiter_start}) must be earlier than limiter_end ({limiter_end}).")
+                logger.warning(result['warn'])
+                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, result, None
+
         configure = dict(
             scope=args.scope,
             limiter_name=args.limiter_name,
@@ -183,6 +199,8 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             max_total_output=args.max_total_output if hasattr(args, 'max_total_output') else None,
             max_total_credits=args.max_total_credits if hasattr(args, 'max_total_credits') else None,
             service_credits=args.service_credits if hasattr(args, 'service_credits') else None,
+            limiter_start=str(args.limiter_start) if hasattr(args, 'limiter_start') and args.limiter_start is not None else None,
+            limiter_end=str(args.limiter_end) if hasattr(args, 'limiter_end') and args.limiter_end is not None else None,
             exec_period_start=str(args.exec_period_start) if hasattr(args, 'exec_period_start') and args.exec_period_start is not None else None,
             exec_period_end=str(args.exec_period_end) if hasattr(args, 'exec_period_end') and args.exec_period_end is not None else None,
             reset_datetime=str(args.reset_datetime) if hasattr(args, 'reset_datetime') and args.reset_datetime is not None else None,
@@ -262,6 +280,15 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
 
+            # Validate limiter_start and limiter_end
+            limiter_start = configure.get('limiter_start')
+            limiter_end = configure.get('limiter_end')
+            if limiter_start and limiter_end:
+                if limiter_start >= limiter_end:
+                    out = dict(warn=f"limiter_start ({limiter_start}) must be earlier than limiter_end ({limiter_end}).")
+                    redis_cli.rpush(reskey, out)
+                    return self.RESP_WARN
+
             configure_path = data_dir / ".limiter" / f"limiter-{limiter_name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
             chk, msg = self.check_save_mode(limiter_name, configure, configure_path)
@@ -281,6 +308,8 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 enable_plan_check = _pc(org_configure, configure, 'target_mode', enable_plan_check)
                 enable_plan_check = _pc(org_configure, configure, 'target_cmd', enable_plan_check)
                 enable_plan_check = _pc(org_configure, configure, 'target_option', enable_plan_check)
+                #enable_plan_check = _pc(org_configure, configure, 'limiter_start', enable_plan_check)
+                #enable_plan_check = _pc(org_configure, configure, 'limiter_end', enable_plan_check)
                 #enable_plan_check = _pc(org_configure, configure, 'exec_period_start', enable_plan_check)
                 #enable_plan_check = _pc(org_configure, configure, 'exec_period_end', enable_plan_check)
                 enable_plan_check = _pc(org_configure, configure, 'reset_datetime', enable_plan_check)

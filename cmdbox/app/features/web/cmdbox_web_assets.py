@@ -76,6 +76,7 @@ class Assets(feature.WebFeature):
 
     regs_force_cache_path = [re.compile(r"assets/apexcharts"),
                              re.compile(r"assets/bootstrap"),
+                             re.compile(r"assets/cmdbox/[A-z0-9\.\-_]*(png|ico|jpg|jpeg|gif|svg)"),
                              re.compile(r"assets/dompurify"),
                              re.compile(r"assets/encodingjs"),
                              re.compile(r"assets/highlight"),

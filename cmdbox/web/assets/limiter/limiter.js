@@ -9,6 +9,7 @@ limiter_page.get_limiter_form_def = async () => {
         'max_registrations', 'max_total_count', 'max_total_time',
         'max_total_input', 'max_total_process', 'max_total_output',
         'max_total_credits', 'service_credits',
+        'limiter_start', 'limiter_end',
         'exec_period_start', 'exec_period_end',
         'reset_datetime', 'reset_period_unit', 'reset_period_qty', 'max_history_interval', 'history_end'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
@@ -291,6 +292,11 @@ limiter_page._render_limiter_item = (parent, lm, show_counter, is_limiter_save) 
     if (lm.target_option) {
         item.append(`<div class="mb-1"><small class="i18n me-1">Conditions:</small>${limiter_page.fmt_target_opt(lm.target_option)}</div>`);
     }
+    // 有効期間
+    // 制限設定の開始日時と終了日時
+    if (lm.limiter_start || lm.limiter_end) {
+        item.append(`<div class="mb-1"><small class="i18n me-1">Effective Period: </small><small>${limiter_page.fmt_val(lm.limiter_start)} ~ ${limiter_page.fmt_val(lm.limiter_end)}</small></div>`);
+    }
     // 期間
     if (lm.exec_period_start || lm.exec_period_end) {
         item.append(`<div class="mb-1"><small class="i18n me-1">Period: </small><small>${limiter_page.fmt_val(lm.exec_period_start)} ~ ${limiter_page.fmt_val(lm.exec_period_end)}</small></div>`);
@@ -426,7 +432,8 @@ limiter_page.open_edit_modal = async (name, defaults) => {
         }
         const input = form.find(`[name="${key}"]`);
         if (input.length > 0) {
-            if (key === 'exec_period_start' || key === 'exec_period_end' || key === 'reset_datetime') {
+            if (key === 'exec_period_start' || key === 'exec_period_end' ||
+                key === 'limiter_start' || key === 'limiter_end' || key === 'reset_datetime') {
                 // datetime 型は変換が必要
                 input.val(limiter_page.to_dt_local(cfg[key]));
             } else {

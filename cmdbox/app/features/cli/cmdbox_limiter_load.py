@@ -108,6 +108,8 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             max_total_output: Union[int, None] = pydantic.Field(default=None, description="出力総バイト数の上限")
             max_total_credits: Union[int, None] = pydantic.Field(default=None, description="コマンドの最大クレジット数")
             service_credits: Union[int, None] = pydantic.Field(default=None, description="サービスクレジット数")
+            limiter_start: Union[str, None] = pydantic.Field(default=None, description="制限設定の開始日時")
+            limiter_end: Union[str, None] = pydantic.Field(default=None, description="制限設定の終了日時")
             exec_period_start: Union[str, None] = pydantic.Field(default=None, description="実行可能期間の開始日時")
             exec_period_end: Union[str, None] = pydantic.Field(default=None, description="実行可能期間の終了日時")
             reset_datetime: Union[str, None] = pydantic.Field(default=None, description="カウンタリセット日時")

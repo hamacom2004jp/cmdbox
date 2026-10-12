@@ -91,7 +91,7 @@ class RagCorpus2skillQuery(feature.OneshotResultEdgeFeature, validator.Validator
                 dict(opt="query", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="実行するクエリ（質問）を指定します。",
                      description_en="Specify the query (question) to execute."),
-                dict(opt="llmname", type=Options.T_STR, default="claude-3-5-sonnet-20241022", required=False, multi=False, hide=False, choice=None,
+                dict(opt="llmname", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="回答生成に使用するLLMモデル名を指定します。",
                      description_en="Specify the LLM model name for answer generation."),
                 dict(opt="max_turns", type=Options.T_INT, default=10, required=False, multi=False, hide=False, choice=None,

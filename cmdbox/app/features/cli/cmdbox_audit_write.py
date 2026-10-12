@@ -117,8 +117,8 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
         ]
         return opt
 
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 

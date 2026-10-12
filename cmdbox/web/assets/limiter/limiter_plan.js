@@ -419,6 +419,16 @@ limiter_plan_page._render_limiter_item_in_plan = (parent, lm) => {
     limiter_plan_page.make_progress('Output', counter.total_output, lm.max_total_output, limiter_plan_page.fmt_bytes).appendTo(limits_area);
     limiter_plan_page.make_progress('Credits', counter.total_credits, lm.max_total_credits, limiter_plan_page.fmt_num, lm.service_credits).appendTo(limits_area);
     limiter_plan_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, limiter_plan_page.fmt_num).appendTo(limits_area);
+    if (lm.limiter_start || lm.limiter_end) {
+        const start_time = limiter_plan_page.fmt_datetime(lm.limiter_start);
+        const end_time = limiter_plan_page.fmt_datetime(lm.limiter_end);
+        limiter_plan_page.make_progress('Effective Period', `${start_time} ~ ${end_time}`, null).appendTo(limits_area);
+    }
+    if (lm.exec_period_start || lm.exec_period_end) {
+        const start_time = limiter_plan_page.fmt_datetime(lm.exec_period_start);
+        const end_time = limiter_plan_page.fmt_datetime(lm.exec_period_end);
+        limiter_plan_page.make_progress('Execution Period', `${start_time} ~ ${end_time}`, null).appendTo(limits_area);
+    }
     if (counter.last_reset) {
         const time_ago = limiter_plan_page.fmt_time_ago(counter.last_reset);
         const formatted_datetime = limiter_plan_page.fmt_datetime(counter.last_reset);
