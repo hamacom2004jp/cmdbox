@@ -117,7 +117,7 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
 
             # データソース設定の読込み
             args.dsname = rag_config.get('rag_datasource')
-            st, ds_config, _ = self.load_datasource_config(args, cl, tm, pf, logger)
+            st, ds_config, _ = await self.load_datasource_config(args, cl, tm, pf, logger)
 
             # サインイン情報を取得
             st, signin_res, _ = self.check_signin(args, tm, pf, logger)

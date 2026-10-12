@@ -115,7 +115,7 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
     def choice_mcvpservers(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
         logger = common.default_logger(False, ver=self.ver, webcall=webmode)
         args = argparse.Namespace(**opt)
-        st, res, _ = self.mcpsv_list.apprun(logger, args, 0.0, [])
+        st, res, _ = common.exec_sync(self.mcpsv_list.apprun, logger, args, 0.0, [])
         if st != self.RESP_SUCCESS:
             return []
         ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
@@ -124,7 +124,7 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
     def choice_subagents(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
         logger = common.default_logger(False, ver=self.ver, webcall=webmode)
         args = argparse.Namespace(**opt)
-        st, res, _ = self.agent_list.apprun(logger, args, 0.0, [])
+        st, res, _ = common.exec_sync(self.agent_list.apprun, logger, args, 0.0, [])
         if st != self.RESP_SUCCESS:
             return []
         ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
@@ -133,7 +133,7 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
     def choice_llms(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
         logger = common.default_logger(False, ver=self.ver, webcall=webmode)
         args = argparse.Namespace(**opt)
-        st, res, _ = self.llm_list.apprun(logger, args, 0.0, [])
+        st, res, _ = common.exec_sync(self.llm_list.apprun, logger, args, 0.0, [])
         if st != self.RESP_SUCCESS:
             return []
         ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
@@ -142,7 +142,7 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
     def choice_skills(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
         logger = common.default_logger(False, ver=self.ver, webcall=webmode)
         args = argparse.Namespace(**opt)
-        st, res, _ = self.skill_list.apprun(logger, args, 0.0, [])
+        st, res, _ = common.exec_sync(self.skill_list.apprun, logger, args, 0.0, [])
         if st != self.RESP_SUCCESS:
             return []
         ret = [k.get('name') for k in res.get('success', {}).get('data', [])]

@@ -95,7 +95,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
             # RAGデータソース設定の読込み
             self.put_resqueue(args, dict(process=dict(message="Loading datasource configuration...")))
             args.dsname = rag_config.get('rag_datasource', None)
-            st, ds_config, cl = self.load_datasource_config(args, cl, tm, pf, logger)
+            st, ds_config, cl = await self.load_datasource_config(args, cl, tm, pf, logger)
             if st != self.RESP_SUCCESS:
                 return st, ds_config, cl
 

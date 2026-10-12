@@ -64,7 +64,7 @@ def apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None
     else:
         return decorator
 
-async def async_apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None) -> Callable:
+def async_apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None) -> Callable:
     """
     list系コマンドの実行結果をキャッシュするデコレーター。
     list系コマンド実行関数に適用することで、コマンドの実行前にキャッシュを確認し、実行後にキャッシュを更新します。
@@ -77,7 +77,7 @@ async def async_apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:C
         Callable: デコレーターでラップされた関数
     """
     def decorator(f: Callable) -> Callable:
-        @functools.wraps(f)
+        #@functools.wraps(f)
         async def wrapper(self:feature.Feature, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
             if not hasattr(self, '_apprun_cache'):
                 self._apprun_cache = MemoryCache()

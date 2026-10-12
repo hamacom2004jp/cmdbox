@@ -54,7 +54,7 @@ class RAGBase(feature.ResultEdgeFeature):
             return self.RESP_WARN, msg, cl
         return self.RESP_SUCCESS, rag_config, cl
 
-    def load_datasource_config(self, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
+    async def load_datasource_config(self, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
         """
         データソース接続設定の読込みを行います
 
@@ -67,7 +67,7 @@ class RAGBase(feature.ResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], client.Client]: 終了コード, データソース接続設定, クライアント
         """
-        st, res, _ = self.ds_load.apprun(logger, args, tm, pf)
+        st, res, _ = await self.ds_load.apprun(logger, args, tm, pf)
         if st != self.RESP_SUCCESS:
             common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return st, res, cl

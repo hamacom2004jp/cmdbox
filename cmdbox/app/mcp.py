@@ -570,7 +570,7 @@ class ToolList(object):
         func_txt += f'    try:\n'
         func_txt += f'        args = argparse.Namespace(**opt)\n'
         func_txt +=  '        logger.info(f"MCP Call mode='+mode+', cmd='+cmd+', {feat.__class__.__name__}#apprun, args={args.__dict__}")\n'
-        func_txt += f'        st, ret, _ = feat.apprun(logger, args, common.perf_counter(), [])\n'
+        func_txt += f'        st, ret, _ = common.exec_sync(feat.apprun, logger, args, common.perf_counter(), [])\n'
         func_txt += f'        return ret\n'
         func_txt += f'    except Exception as e:\n'
         func_txt += f'        logger.error("Error occurs when tool is executed:", exc_info=True)\n'

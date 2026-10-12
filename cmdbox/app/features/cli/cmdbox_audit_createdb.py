@@ -83,8 +83,8 @@ class AuditCreatedb(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -105,9 +105,9 @@ class AuditCreatedb(feature.UnsupportEdgeFeature, validator.Validator):
         new_pg_dbname_b64 = convert.str2b64str(args.new_pg_dbname)
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(),
-                                    [pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64, new_pg_dbname_b64],
-                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+        ret = await cl.redis_cli.asend_cmd(self.get_svcmd(),
+                                           [pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64, new_pg_dbname_b64],
+                                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, False, tm, None, False, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

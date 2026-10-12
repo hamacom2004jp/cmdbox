@@ -111,8 +111,8 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
         ]
         return opt
 
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -164,7 +164,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
         pg_dbname_b64 = convert.str2b64str(getattr(args, 'pg_dbname', None))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(),
+        ret = await cl.redis_cli.asend_cmd(self.get_svcmd(),
                                     [select_b64, select_date_format_b64, groupby_b64, groupby_date_format_b64,
                                      sort_b64, str(offset), str(limit),
                                      filter_audit_type_b64, filter_clmsg_id_b64, filter_clmsg_sdate_b64, filter_clmsg_edate_b64,

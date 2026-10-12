@@ -595,7 +595,7 @@ class Signin(object):
                            output_pkey=yml['apikey']['gen_cert']['publickey'], output_pkey_format='PEM',
                            output_key=yml['apikey']['gen_cert']['privatekey'], output_key_format='PEM',)
                 args = argparse.Namespace(**opt)
-                status, res, _ = gencert.apprun(self.logger if hasattr(self, 'logger') else logger, args, 0, [])
+                status, res, _ = common.exec_sync(gencert.apprun, self.logger if hasattr(self, 'logger') else logger, args, 0.0, [])
                 if status != 0:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "gen_cert" generate error in "apikey.gen_cert". ({signin_file}) {res}')
         if 'gen_jwt' not in yml['apikey']:

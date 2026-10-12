@@ -61,7 +61,7 @@ class Audit(feature.WebFeature):
             opt['password'] = web.redis_password
             opt['svname'] = web.svname
             args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
-            status, ret_main, _ = web.options.audit_search.apprun(web.logger, args, common.perf_counter(), [])
+            status, ret_main, _ = await web.options.audit_search.apprun(web.logger, args, common.perf_counter(), [])
             if status != 0:
                 return dict(error=ret_main)
             return ret_main

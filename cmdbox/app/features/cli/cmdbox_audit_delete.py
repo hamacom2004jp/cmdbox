@@ -81,8 +81,8 @@ class AuditDelete(audit_base.AuditBase, validator.Validator):
         ]
         return opt
 
-    @validator.apprun_check
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -119,7 +119,7 @@ class AuditDelete(audit_base.AuditBase, validator.Validator):
         pg_dbname_b64 = convert.str2b64str(args.pg_dbname)
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(),
+        ret = await cl.redis_cli.asend_cmd(self.get_svcmd(),
                                     [delete_audit_type_b64, delete_clmsg_id_b64, delete_clmsg_sdate_b64, delete_clmsg_edate_b64,
                                      delete_clmsg_src_b64, delete_clmsg_title_b64, delete_clmsg_user_b64, delete_clmsg_body_b64,
                                      delete_clmsg_tag_b64, delete_svmsg_id_b64, delete_svmsg_sdate_b64, delete_svmsg_edate_b64,

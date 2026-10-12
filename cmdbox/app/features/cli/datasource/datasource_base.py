@@ -315,7 +315,7 @@ class DatasourceBase(feature.ResultEdgeFeature):
         """
         from cmdbox.app.features.cli import cmdbox_datasource_load
         ds_load = cmdbox_datasource_load.DatasourceLoad(self.appcls, self.ver, self.language)
-        st, _ds_conf, _ = ds_load.apprun(logger, args, tm, pf)
+        st, _ds_conf, _ = await ds_load.apprun(logger, args, tm, pf)
         if st != self.RESP_SUCCESS:
             return st, _ds_conf, None
         dsconfig = _ds_conf.get('success', {}).get('data', {})

@@ -213,8 +213,8 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             chunk = self.buffer[0:max_count]
             chunk_b64 = convert.str2b64str(json.dumps(chunk, default=common.default_json_enc, ensure_ascii=False))
             del self.buffer[0:max_count]
-            cl.redis_cli.send_cmd(self.get_svcmd(), [chunk_b64],
-                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=True)
+            await cl.redis_cli.asend_cmd(self.get_svcmd(), [chunk_b64],
+                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=True)
 
         self.last_write_time = lt
         ret = dict(success=True)
