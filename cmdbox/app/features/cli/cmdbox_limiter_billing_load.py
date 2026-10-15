@@ -54,15 +54,15 @@ class LimiterBillingLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
-    @validator.apprun_check
-    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         plan_name = args.plan_name
         last_reset = getattr(args, 'last_reset', None)
         payload = dict(plan_name=plan_name, last_reset=last_reset)
         payload_b64 = convert.str2b64str(common.to_str(payload))
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
-                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+        ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
+                                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

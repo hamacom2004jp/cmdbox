@@ -85,7 +85,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
     def choice_agents(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
         logger = common.default_logger(False, ver=self.ver, webcall=webmode)
         args = argparse.Namespace(**opt)
-        st, res, _ = self.agent_list.apprun(logger, args, 0.0, [])
+        st, res, _ = common.exec_sync(self.agent_list.apprun, logger, args, 0.0, [])
         if st != self.RESP_SUCCESS:
             return []
         ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
@@ -94,7 +94,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
     def choice_ds(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
         logger = common.default_logger(False, ver=self.ver, webcall=webmode)
         args = argparse.Namespace(**opt)
-        st, res, _ = self.ds_list.apprun(logger, args, 0.0, [])
+        st, res, _ = common.exec_sync(self.ds_list.apprun, logger, args, 0.0, [])
         if st != self.RESP_SUCCESS:
             return []
         ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
@@ -103,7 +103,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
     def choice_rags(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
         logger = common.default_logger(False, ver=self.ver, webcall=webmode)
         args = argparse.Namespace(**opt)
-        st, res, _ = self.rag_list.apprun(logger, args, 0.0, [])
+        st, res, _ = common.exec_sync(self.rag_list.apprun, logger, args, 0.0, [])
         if st != self.RESP_SUCCESS:
             return []
         ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
@@ -123,9 +123,9 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
             ret.append(svname)
         return ret
 
-    @limiter.apprun_check_limit
-    @validator.apprun_check
-    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+    @limiter.async_apprun_check_limit
+    @validator.async_apprun_check
+    async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
         configure = dict(
             runner_name=args.runner_name,
@@ -141,8 +141,8 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
         payload_b64 = convert.str2b64str(common.to_str(configure))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
-                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+        ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
+                                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

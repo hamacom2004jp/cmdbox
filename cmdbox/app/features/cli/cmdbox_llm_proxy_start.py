@@ -312,7 +312,7 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
             output_json=None,
             output_json_append=False,
         )
-        st, ret, _ = self.llm_loader.apprun(logger, load_args, tm=0.0, pf=[])
+        st, ret, _ = common.exec_sync(self.llm_loader.apprun, logger, load_args, tm=0.0, pf=[])
         if st != self.RESP_SUCCESS or 'success' not in ret:
             warn = ret.get('warn', f"Failed to load llm configuration by llm load command. llm={llm_name}")
             raise RuntimeError(str(warn))

@@ -1,5 +1,5 @@
 from cmdbox import version
-from cmdbox.app import common, client, feature
+from cmdbox.app import common, client, feature, validator
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -91,7 +91,8 @@ class VisionStart(feature.UnsupportEdgeFeature):
             ]
         )
 
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -117,9 +118,9 @@ class VisionStart(feature.UnsupportEdgeFeature):
             vision_engine_b64 = convert.str2b64str(args.vision_engine)
             sam2_model_b64 = convert.str2b64str(args.sam2_model)
             cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-            ret = cl.redis_cli.send_cmd(self.get_svcmd(),
-                                        [vision_engine_b64, sam2_model_b64],
-                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+            ret = await cl.redis_cli.asend_cmd(self.get_svcmd(),
+                                               [vision_engine_b64, sam2_model_b64],
+                                               retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
             common.print_format(ret, False, tm, None, False, pf=pf)
             if 'success' not in ret:
                     return self.RESP_WARN, ret, cl

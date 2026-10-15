@@ -153,7 +153,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         load_args = copy.copy(args)
         load_args.limiter_name = entry['name']
         # 制限設定をロード
-        st_l, res_l, _ = self.limiter_load.apprun(logger, load_args, tm, pf)
+        st_l, res_l, _ = common.exec_sync(self.limiter_load.apprun, logger, load_args, tm, pf)
         if st_l == self.RESP_SUCCESS:
             cfg = res_l.get('success', {}).get('data', {})
         else:
@@ -161,7 +161,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         cfg = {k: v for k, v in cfg.items() if v}
 
         # Counter を取得
-        st_c, res_c, _ = self.limiter_counter.apprun(logger, load_args, tm, pf)
+        st_c, res_c, _ = common.exec_sync(self.limiter_counter.apprun, logger, load_args, tm, pf)
         if st_c != self.RESP_SUCCESS:
             cfg['counter'] = {}
         else:
@@ -171,15 +171,15 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         ev_args = copy.copy(args)
         ev_args.limiter_name = entry['name']
         ev_args.include_history = getattr(args, 'include_history', False)
-        st_e, res_e, _ = self.limiter_evidences.apprun(logger, ev_args, tm, pf)
+        st_e, res_e, _ = common.exec_sync(self.limiter_evidences.apprun, logger, ev_args, tm, pf)
         if st_e == self.RESP_SUCCESS:
             cfg['evidences'] = res_e.get('success', {}).get('data', [])
         else:
             cfg['evidences'] = []
         return cfg
 
-    @validator.apprun_check
-    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+    @validator.async_apprun_check
+    async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         scope = getattr(args, 'scope', 'server')
 
         if scope == 'server':
@@ -192,15 +192,15 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
             )
             payload_b64 = convert.str2b64str(common.to_str(payload))
             cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-            ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
-                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+            ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
+                                               retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, cl
             return self.RESP_SUCCESS, ret, cl
 
         options = Options.getInstance()
-        st, res, _ = self.limiter_list.apprun(logger, args, tm, pf)
+        st, res, _ = await self.limiter_list.apprun(logger, args, tm, pf)
         if st != self.RESP_SUCCESS:
             common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return st, res, None

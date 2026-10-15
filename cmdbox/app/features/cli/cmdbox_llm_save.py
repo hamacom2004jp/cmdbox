@@ -118,9 +118,9 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             ]
         )
 
-    @limiter.apprun_check_limit
-    @validator.apprun_check
-    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+    @limiter.async_apprun_check_limit
+    @validator.async_apprun_check
+    async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         owner_groups = [g for g in args.owner_groups if g] if hasattr(args, 'owner_groups') and isinstance(args.owner_groups, list) else args.owner_groups if hasattr(args, 'owner_groups') else None
         user_groups = [g for g in args.user_groups if g] if hasattr(args, 'user_groups') and isinstance(args.user_groups, list) else args.user_groups if hasattr(args, 'user_groups') else None
         groups = [g for g in args.groups if g] if hasattr(args, 'groups') and isinstance(args.groups, list) else args.groups if hasattr(args, 'groups') else None
@@ -174,8 +174,8 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
         configure_b64 = convert.str2b64str(common.to_str(configure))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(), [configure_b64],
-                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+        ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [configure_b64],
+                                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
                 return self.RESP_WARN, ret, cl
