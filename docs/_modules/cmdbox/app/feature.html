@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.feature &mdash; cmdbox 2026/09/27 documentation</title>
+  <title>cmdbox.app.feature &mdash; cmdbox 2026/10/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=a248f298"></script>
+      <script src="../../../_static/documentation_options.js?v=769f61d8"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -104,16 +104,15 @@
     <span class="n">RESP_WARN</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">RESP_ERROR</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">DEFAULT_CAPTURE_MAXSIZE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">10</span>
-    <span class="n">default_host</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'REDIS_HOST'</span><span class="p">,</span> <span class="s1">'localhost'</span><span class="p">)</span>
-    <span class="n">default_port</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'REDIS_PORT'</span><span class="p">,</span> <span class="s1">'6379'</span><span class="p">))</span>
-    <span class="n">default_pass</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'REDIS_PASSWORD'</span><span class="p">,</span> <span class="s1">'password'</span><span class="p">)</span>
-    <span class="n">default_svname</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'SVNAME'</span><span class="p">,</span> <span class="s1">'server'</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span> <span class="o">=</span> <span class="n">appcls</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default_svname</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_host</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'REDIS_HOST'</span><span class="p">,</span> <span class="s1">'localhost'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_port</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'REDIS_PORT'</span><span class="p">,</span> <span class="s1">'6379'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_pass</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'REDIS_PASSWORD'</span><span class="p">,</span> <span class="s1">'password'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_svname</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'SVNAME'</span><span class="p">,</span> <span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_data</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'DATA_DIR'</span><span class="p">,</span> <span class="n">common</span><span class="o">.</span><span class="n">HOME_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Feature.get_mode">

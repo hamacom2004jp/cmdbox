@@ -192,7 +192,7 @@ rag ( corpus2skill_query ) : ``cmdbox -m rag -c corpus2skill_query <Option>``
     "--timeout <timeout>","int","","","600","","Specify the maximum waiting time until the server responds."
     "--ragcorpus_name <ragcorpus_name>","str","","required","","","Specify the RAG corpus name to query. The skill hierarchy will be loaded from data_dir/.ragcorpus/<ragcorpus_name>."
     "--query <query>","str","","required","","","Specify the query (question) to execute."
-    "--llmname <llmname>","str","","","claude-3-5-sonnet-20241022","","Specify the LLM model name for answer generation."
+    "--llmname <llmname>","str","","","","","Specify the LLM model name for answer generation."
     "--max_turns <max_turns>","int","","","10","","Specify the maximum number of agent turns."
 
 **Output Schema**

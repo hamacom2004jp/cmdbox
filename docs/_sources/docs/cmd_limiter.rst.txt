@@ -438,6 +438,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "target_option": [
               {}
             ],
+            "limiter_start": "string",
+            "limiter_end": "string",
             "history_end": "string"
           }
         ]
@@ -462,6 +464,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data.target_mode","str | null","no","null","対象コマンドのモード名"
     "success.data.target_cmd","str | null","no","null","対象コマンドのコマンド名"
     "success.data.target_option","list[dict[str, any]] | dict[str, any] | null","no","null","対象コマンドの条件"
+    "success.data.limiter_start","str | null","no","null","制限設定の開始日時"
+    "success.data.limiter_end","str | null","no","null","制限設定の終了日時"
     "success.data.history_end","str | null","no","null","カウンター記録の最終日時"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
@@ -525,6 +529,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
           "max_total_output": 0,
           "max_total_credits": 0,
           "service_credits": 0,
+          "limiter_start": "string",
+          "limiter_end": "string",
           "exec_period_start": "string",
           "exec_period_end": "string",
           "reset_datetime": "string",
@@ -563,6 +569,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data.max_total_output","int | null","no","null","出力総バイト数の上限"
     "success.data.max_total_credits","int | null","no","null","コマンドの最大クレジット数"
     "success.data.service_credits","int | null","no","null","サービスクレジット数"
+    "success.data.limiter_start","str | null","no","null","制限設定の開始日時"
+    "success.data.limiter_end","str | null","no","null","制限設定の終了日時"
     "success.data.exec_period_start","str | null","no","null","実行可能期間の開始日時"
     "success.data.exec_period_end","str | null","no","null","実行可能期間の終了日時"
     "success.data.reset_datetime","str | null","no","null","カウンタリセット日時"
@@ -777,6 +785,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
               "max_total_output": 0,
               "max_total_credits": 0,
               "service_credits": 0,
+              "limiter_start": "string",
+              "limiter_end": "string",
               "exec_period_start": "string",
               "exec_period_end": "string",
               "reset_datetime": "string",
@@ -977,6 +987,8 @@ limiter ( save ) : ``cmdbox -m limiter -c save <Option>``
     "--max_total_output <max_total_output>","int","","","","","Specify the maximum total number of output bytes. If omitted, no limit is applied."
     "--max_total_credits <max_total_credits>","int","","","","","Specify the maximum number of credits. If omitted, no limit is applied."
     "--service_credits <service_credits>","int","","","","","Specify the number of service credits."
+    "--limiter_start <limiter_start>","datetime","","","","","Specify the start datetime of this restriction (e.g. 2024-01-01T00:00:00). If omitted, it takes effect immediately."
+    "--limiter_end <limiter_end>","datetime","","","","","Specify the end datetime of this restriction (e.g. 2024-12-31T23:59:59). If omitted, it takes effect immediately."
     "--exec_period_start <exec_period_start>","datetime","","","","","Specify the start datetime of the executable period for the command (e.g. 2024-01-01T00:00:00). If omitted, no limit is applied."
     "--exec_period_end <exec_period_end>","datetime","","","","","Specify the end datetime of the executable period for the command (e.g. 2024-12-31T23:59:59). If omitted, no limit is applied."
     "--reset_datetime <reset_datetime>","datetime","","required","","","Specify the date and time from which this restriction takes effect (e.g., 2024-06-01T00:00:00). The restriction counter will be reset based on the specified date and time."

@@ -25,17 +25,29 @@ To install the project, follow these steps:
 
 3. Create a virtual environment for your project:
 
+    .. code-block:: cmd
+
+        winget install astral-sh.uv
+        uv python install 3.11
+        uv venv -p 3.11 --seed
+        .venv/Scripts/activate
+
     .. code-block:: bash
 
-        python -m venv .venv
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        uv python install 3.11
+        uv venv -p 3.11 --seed
         . .venv/bin/activate
 
 4. Install project dependencies:
 
     .. code-block:: bash
 
-        python.exe -m pip install --upgrade pip
-        pip install -r requirements.txt
+        uv sync --extra app
+        uv sync --extra dev
+        uv pip uninstall cmdbox
+        uv pip install --upgrade pip
+        uv pip install collectlicense
 
 5. Build the project:
 

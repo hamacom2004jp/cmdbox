@@ -25,6 +25,7 @@ cmdbox
    Text-to-Speech (TTS) <docs/tts.rst>
    Developer Information <docs/developer.rst>
    Common Errors <docs/errors.rst>
+   API Reference <resources/index.rst>
    License <docs/license.rst>
 
 Indices and tables

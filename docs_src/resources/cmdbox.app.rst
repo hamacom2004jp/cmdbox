@@ -8,6 +8,8 @@ Subpackages
    :maxdepth: 4
 
    cmdbox.app.auth
+   cmdbox.app.commons
+   cmdbox.app.features
 
 Submodules
 ----------

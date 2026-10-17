@@ -290,7 +290,7 @@ class Options:
             description_ja="指定しているオプションを `-u` で指定したファイルに保存します。",
             description_en="Save the specified options to the file specified by `-u`.")
         self._options["debug"] = dict(
-            short="d", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+            short="d", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False], web="readonly",
             description_ja="デバックモードで起動します。",
             description_en="Starts in debug mode.")
         self._options["debug_attach"] = dict(
