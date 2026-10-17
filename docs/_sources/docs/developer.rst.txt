@@ -30,7 +30,7 @@ To install the project, follow these steps:
         winget install astral-sh.uv
         uv python install 3.11
         uv venv -p 3.11 --seed
-        .venv/Scripts/activate
+        .venv\\Scripts\\activate
 
     .. code-block:: bash
 
