@@ -250,6 +250,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 opt['clmsg_user'] = req.session['signin']['name'] # 監査ログ用のユーザー名を強制上書き
         opt['meta'].update(dict(last_access_date=datetime.now().isoformat()))
         opt = self.coercion_param(req.session, opt.copy())
+        opt['debug'] = web.debug
         ap.sv = None
         ap.cl = None
         ap.web = None

@@ -109,6 +109,7 @@ class Web:
         """
         super().__init__()
         self.logger = logger
+        self.debug = self.logger.level == logging.DEBUG
         self.data = data
         self.appcls = appcls
         self.ver = ver
@@ -785,6 +786,14 @@ class Web:
         signin_data['groups'].append(group)
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
+        # cmdruleへの適用
+        for rule in signin_data['cmdrule']['rules']:
+            groups_correct = self.signin.__class__.correct_group(signin_data, rule['groups'], signin_data['groups'])
+            rule['groups_correct'] = list(set(copy.deepcopy(groups_correct)))
+        # pathruleへの適用
+        for rule in signin_data['pathrule']['rules']:
+            groups_correct = self.signin.__class__.correct_group(signin_data, rule['groups'], signin_data['groups'])
+            rule['groups_correct'] = list(set(copy.deepcopy(groups_correct)))
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_add: {self.signin_file}")
         self.signin.signin_file_data = signin_data
@@ -839,6 +848,14 @@ class Web:
                     del g['parent']
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
+        # cmdruleへの適用
+        for rule in signin_data['cmdrule']['rules']:
+            groups_correct = self.signin.__class__.correct_group(signin_data, rule['groups'], signin_data['groups'])
+            rule['groups_correct'] = list(set(copy.deepcopy(groups_correct)))
+        # pathruleへの適用
+        for rule in signin_data['pathrule']['rules']:
+            groups_correct = self.signin.__class__.correct_group(signin_data, rule['groups'], signin_data['groups'])
+            rule['groups_correct'] = list(set(copy.deepcopy(groups_correct)))
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_edit: {self.signin_file}")
         self.signin.signin_file_data = signin_data
@@ -862,28 +879,28 @@ class Web:
             for group in user['groups']:
                 user_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in user_group_ids:
-            raise ValueError(f"Group gid is used by user.")
+            raise ValueError(f"Group gid({gid}) is used by user.")
         # グループが親グループに使用されているかチェック
         parent_group_ids = []
         for group in signin_data['groups']:
             if 'parent' in group:
                 parent_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group['parent']]
         if gid in parent_group_ids:
-            raise ValueError(f"Group gid is used by parent group.")
+            raise ValueError(f"Group gid({gid}) is used by parent group.")
         # グループがcmdruleグループに使用されているかチェック
         cmdrule_group_ids = []
         for rule in signin_data['cmdrule']['rules']:
             for group in rule['groups']:
                 cmdrule_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in cmdrule_group_ids:
-            raise ValueError(f"Group gid is used by cmdrule group.")
+            raise ValueError(f"Group gid({gid}) is used by cmdrule group.")
         # グループがpathruleグループに使用されているかチェック
         pathrule_group_ids = []
         for rule in signin_data['pathrule']['rules']:
             for group in rule['groups']:
                 pathrule_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in pathrule_group_ids:
-            raise ValueError(f"Group gid is used by pathrule group.")
+            raise ValueError(f"Group gid({gid}) is used by pathrule group.")
         # グループの各設定が有効でないことをチェック
         for g in signin_data['groups']:
             if g['gid'] == gid:
@@ -900,8 +917,16 @@ class Web:
         # グループ削除
         groups = [g for g in signin_data['groups'] if g['gid'] != gid]
         if len(groups) == len(signin_data['groups']):
-            raise ValueError(f"Group gid is not found.")
+            raise ValueError(f"Group gid({gid}) is not found.")
         signin_data['groups'] = groups
+        # cmdruleへの適用
+        for rule in signin_data['cmdrule']['rules']:
+            groups_correct = self.signin.__class__.correct_group(signin_data, rule['groups'], signin_data['groups'])
+            rule['groups_correct'] = list(set(copy.deepcopy(groups_correct)))
+        # pathruleへの適用
+        for rule in signin_data['pathrule']['rules']:
+            groups_correct = self.signin.__class__.correct_group(signin_data, rule['groups'], signin_data['groups'])
+            rule['groups_correct'] = list(set(copy.deepcopy(groups_correct)))
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_del: {self.signin_file}")
         self.signin.signin_file_data = signin_data

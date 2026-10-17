@@ -23,6 +23,8 @@
     --item-bg-danger-color-hover: rgba(255, 0, 230, 0.15);
     --item-bg-warning-color: rgba(255, 140, 0, 0.05);
     --item-bg-warning-color-hover: rgba(255, 140, 0, 0.15);
+    --bs-secondary-color-75: rgba(33, 37, 41, 0.75);
+    --bs-secondary-bg-75: rgba(233,236,239, 0.75);
     --bs-warning: #ffd700; /* ゴールド */
     --bs-warning-text-emphasis: var(--bg-slate-950);
     --bs-warning-border-subtle: var(--accent-orange);
@@ -290,7 +292,7 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     border: 1px solid transparent;
 }
 .message-agent {
-    background: var(--bs-secondary-bg);
+    background: var(--bs-secondary-color-75);
     border-left: 3px solid var(--bs-emphasis-color);
     color: var(--bs-body-color);
 }
@@ -299,15 +301,31 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     border-left: 3px solid var(--accent-cyan);
     color: var(--text-primary);
 }
+[data-bs-theme="light"] .message-agent {
+    background: var(--bs-secondary-bg-75);
+}
+[data-bs-theme="peach"] .message-agent {
+    background: var(--bs-secondary-bg-75);
+}
+[data-bs-theme="hydrangea"] .message-agent {
+    background: var(--bs-secondary-bg-75);
+}
+[data-bs-theme="darkheroine"] .message-agent {
+    background: var(--bs-secondary-bg-75);
+}
 .message-user {
-    background: var(--item-bg-danger-color);
-    border-right: 3px solid var(--bs-success);
+    background: linear-gradient(270deg, var(--area-bg-color-50), transparent);
+    border-right: 3px solid var(--area-border-color);
     text-align: right;
     color: var(--bs-body-color);
 }
 [data-bs-theme="spaceship"] .message-user {
     border-right: 3px solid var(--accent-magenta);
     color: var(--text-primary);
+}
+[data-bs-theme="darkheroine"] .message-user {
+    background: linear-gradient(270deg, var(--bs-secondary-color-75), transparent);
+    color: var(--bs-body-bg);
 }
 .msg-label {
     font-size: 0.75rem;
@@ -318,8 +336,9 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
 }
 .msg-label-agent { color: var(--bs-emphasis-color); }
 [data-bs-theme="spaceship"] .msg-label-agent { color: var(--accent-cyan); }
-.msg-label-user { color: var(--bs-success); }
+.msg-label-user { color: var(--bs-body-color); }
 [data-bs-theme="spaceship"] .msg-label-user { color: var(--accent-magenta); }
+[data-bs-theme="darkheroine"] .msg-label-user { color: var(--bs-body-bg); }
 
 /* --- Inputs & Buttons --- */
 .input-group-sf {

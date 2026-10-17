@@ -65,6 +65,7 @@ agentView.chat = (session_id) => {
     }
     agentView.chatMessages.attr('data-session_id', session_id);
     agentView.message_id = null;
+    agentView.chat_reconnect_count = 0;
     //agentView.btn_user_msg.prop('disabled', true); // 初期状態で送信ボタンを無効化
     // 送信ボタンのクリックイベント
     agentView.btn_user_msg.off('click.cmdbox').on('click.cmdbox', async () => {
@@ -301,6 +302,8 @@ agentView.chat = (session_id) => {
             agentView.chat_send(agentView.ws, 'ping', true);
             agentView.chat_reconnect_count = 0; // pingが成功したら再接続回数をリセット
         };
+        clearInterval(agentView.chat_reconnectInterval_handler);
+        agentView.chat_reconnectInterval_handler = null;
         agentView.btn_say.prop('disabled', false);
         agentView.btn_user_msg.prop('disabled', false);
         agentView.btn_rec.prop('disabled', false);
@@ -312,18 +315,24 @@ agentView.chat = (session_id) => {
     agentView.ws.onerror = (event) => {
         console.error(event);
         clearInterval(agentView.chat_callback_ping_handler);
+        cmdbox.message({'warn':'Connection error detected. Reconnecting to the agent...'}, true);
     };
     const ws_of_this_chat = agentView.ws;
     agentView.ws.onclose = () => {
         clearInterval(agentView.chat_callback_ping_handler);
         if (agentView.ws !== ws_of_this_chat) return; // 既に別ソケットへ切り替わっていたら再接続しない
-        if (agentView.chat_reconnect_count >= max_reconnect_count) {
+        const reconnect_count = Number.isFinite(agentView.chat_reconnect_count) ? agentView.chat_reconnect_count : 0;
+        if (reconnect_count >= max_reconnect_count) {
             clearInterval(agentView.chat_reconnectInterval_handler);
             cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'}, true);
             location.reload(true);
             return;
         }
-        agentView.chat_reconnect_count++;
+        agentView.btn_user_msg.prop('disabled', true);
+        agentView.btn_rec.prop('disabled', true);
+        agentView.btn_say.prop('disabled', true);
+        cmdbox.message({'warn':'Connection to the agent was lost. Reconnecting...'}, true);
+        agentView.chat_reconnect_count = reconnect_count + 1;
         agentView.chat_reconnectInterval_handler = setInterval(() => {
             agentView.chat(session_id);
         }, ping_interval);

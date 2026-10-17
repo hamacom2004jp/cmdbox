@@ -228,9 +228,8 @@ class RedisClient(object):
                 reskey = f"cl-{reskey}-{int(time.time())}"
                 self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
                 if nowait: return
-                self.is_running = True
                 stime = time.time()
-                while self.is_running:
+                while True:
                     ctime = time.time()
                     if ctime - stime > timeout:
                         raise Exception(f"Response timed out.")
@@ -300,9 +299,8 @@ class RedisClient(object):
                 reskey = f"cl-{reskey}-{int(time.time())}"
                 self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
                 if nowait: return
-                self.is_running = True
                 stime = time.time()
-                while self.is_running:
+                while True:
                     ctime = time.time()
                     if ctime - stime > timeout:
                         raise Exception(f"Response timed out.")
@@ -314,7 +312,8 @@ class RedisClient(object):
                     if sse:
                         msg = self._res_cmd(reskey, res, True)
                         yield msg
-                        if 'end' in msg: return
+                        if 'end' in msg:
+                            return
                     else:
                         yield self._res_cmd(reskey, res)
                         return
@@ -353,7 +352,16 @@ class RedisClient(object):
         reskbyte = len(res_msg) / 1024
         msg = res_msg.decode('utf-8')
         res_json = json.loads(msg)
-        if not sse or (sse and 'end' in res_json):
+        # SSEモードで、'end'の値が真の完了を示す場合（True または 1）のみKeyを削除
+        should_delete = False
+        if not sse:
+            should_delete = True
+        elif sse and 'end' in res_json:
+            end_value = res_json.get('end')
+            if end_value is True or end_value == 1:
+                should_delete = True
+
+        if should_delete:
             self.redis_cli.delete(reskey)
         res_json = common.result_format(res_json, self.logger, pf=[
             dict(key="receive", val=f"{reskbyte:.3f}KB"),

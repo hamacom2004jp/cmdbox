@@ -1035,9 +1035,9 @@ def result_format(res_json:dict, logger:logging.Logger, pf:List[Any]=[]) -> dict
     if "warn" in res_json:
         logger.warning(to_str(msg_json))
     if "success" in res_json:
-        if logger.level == logging.DEBUG:
-            msg_str = to_str(msg_json, slise=100)
-            logger.debug(f"redis_client._res_cmd: msg={msg_str}")
+        #if logger.level == logging.DEBUG:
+        #    msg_str = to_str(msg_json, slise=100)
+        #    logger.debug(f"redis_client._res_cmd: msg={msg_str}")
         if type(res_json["success"]) is not dict:
             res_json["success"] = dict(data=res_json["success"])
         if "performance" not in res_json["success"]:

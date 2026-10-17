@@ -285,7 +285,7 @@ class Signin(object):
         path = path if path.startswith('/') else f'/{path}'
         jadge = signin_file_data['pathrule']['policy']
         for rule in signin_file_data['pathrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
+            if len([g for g in rule['groups_correct'] if g in user_groups]) <= 0:
                 continue
             if len([p for p in rule['paths'] if path.startswith(p)]) <= 0:
                 continue
@@ -463,7 +463,7 @@ class Signin(object):
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "cmdrule.rules" ({signin_file})')
             if type(rule['groups']) is not list:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "cmdrule.rules". ({signin_file})')
-            rule['groups'] = list(set(copy.deepcopy(cls.correct_group(yml, rule['groups'], yml['groups']))))
+            rule['groups_correct'] = list(set(copy.deepcopy(cls.correct_group(yml, rule['groups'], yml['groups']))))
             if 'rule' not in rule:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "cmdrule.rules" ({signin_file})')
             if rule['rule'] not in ['allow', 'deny']:
@@ -494,7 +494,7 @@ class Signin(object):
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "pathrule.rules" ({signin_file})')
             if type(rule['groups']) is not list:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "pathrule.rules". ({signin_file})')
-            rule['groups'] = list(set(copy.deepcopy(cls.correct_group(yml, rule['groups'], yml['groups']))))
+            rule['groups_correct'] = list(set(copy.deepcopy(cls.correct_group(yml, rule['groups'], yml['groups']))))
             if 'rule' not in rule:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "pathrule.rules" ({signin_file})')
             if rule['rule'] not in ['allow', 'deny']:
@@ -908,7 +908,7 @@ class Signin(object):
         # コマンドチェック
         jadge = signin_file_data['cmdrule']['policy']
         for rule in signin_file_data['cmdrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
+            if len([g for g in rule['groups_correct'] if g in user_groups]) <= 0:
                 continue
             if rule['mode'] is not None:
                 if rule['mode'] != mode:
@@ -950,7 +950,7 @@ class Signin(object):
             for m in modes:
                 jadge_modes += list(m.keys()) if type(m) is dict else [m]
         for rule in data['cmdrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
+            if len([g for g in rule['groups_correct'] if g in user_groups]) <= 0:
                 continue
             if 'mode' not in rule:
                 continue
@@ -995,7 +995,7 @@ class Signin(object):
             for c in cmds:
                 jadge_cmds += list(c.keys()) if type(c) is dict else [c]
         for rule in data['cmdrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
+            if len([g for g in rule['groups_correct'] if g in user_groups]) <= 0:
                 continue
             if 'mode' not in rule:
                 continue
@@ -1008,7 +1008,7 @@ class Signin(object):
                     jadge_cmds += rule['cmds']
                 elif rule['rule'] == 'deny':
                     for c in rule['cmds']:
-                        jadge_cmds.remove[c]
+                        jadge_cmds.remove(c)
             elif rule['mode'] is None and len(rule['cmds']) <= 0:
                 if rule['rule'] == 'allow':
                     for c in cmds:
