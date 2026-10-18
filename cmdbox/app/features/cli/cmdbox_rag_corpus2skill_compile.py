@@ -10,17 +10,21 @@ import re
 import numpy as np
 import time
 import sys
-
+"""
 # Initialize sys.path for corpus2skill imports before importing from Corpus2Skill
 _corpus2skill_root = Path(__file__).parent / "Corpus2Skill"
 if str(_corpus2skill_root) not in sys.path:
     sys.path.insert(0, str(_corpus2skill_root))
-
+"""
 from cmdbox.app import common, client, feature, filer
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_llm_chat, cmdbox_llm_embed
-from cmdbox.app.features.cli.Corpus2Skill.corpus2skill.clustering import build_hierarchy, tree_stats, ClusterNode
-from cmdbox.app.features.cli.Corpus2Skill.corpus2skill.skill_builder import build_skill_tree
+from cmdbox.app.features.cli.Corpus2Skill.corpus2skill_api import (
+    ClusterNode,
+    build_hierarchy,
+    build_skill_tree,
+    tree_stats,
+)
 from cmdbox.app.options import Options
 
 
