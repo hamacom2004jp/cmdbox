@@ -43,11 +43,9 @@ To install the project, follow these steps:
 
     .. code-block:: bash
 
-        uv sync --extra app --link-mode=copy
-        uv sync --extra dev --link-mode=copy
+        uv sync --extra app --extra dev --link-mode=copy
         uv pip uninstall cmdbox
         uv pip install --upgrade pip
-        uv pip install collectlicense
 
 5. Build the project:
 

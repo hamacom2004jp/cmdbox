@@ -142,11 +142,284 @@ docs_src/docs/ 配下のコマンドリファレンスRSTファイルを新規�
 </dd></dl>
 
 </section>
-<section id="cmdbox-app-features-cli-test-gen-cli-spec-module">
-<h2>cmdbox.app.features.cli.test.gen_cli_spec module<a class="headerlink" href="#cmdbox-app-features-cli-test-gen-cli-spec-module" title="Link to this heading"></a></h2>
+<section id="module-cmdbox.app.features.cli.test.gen_cli_spec">
+<span id="cmdbox-app-features-cli-test-gen-cli-spec-module"></span><h2>cmdbox.app.features.cli.test.gen_cli_spec module<a class="headerlink" href="#module-cmdbox.app.features.cli.test.gen_cli_spec" title="Link to this heading"></a></h2>
+<p>CLIコマンド詳細設計書生成ツール。</p>
+<p>cmdboxを拡張して作成したコマンドでも利用できるよう、
+フィーチャーパッケージ名や出力先をパラメータとして受け取ります。</p>
+<p>使い方 (コマンドライン):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">cmdbox</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">generate_cli_specifications</span> \
+    <span class="o">--</span><span class="n">feature</span><span class="o">-</span><span class="n">package</span> <span class="n">myapp</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">cli</span> \
+    <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">Specifications</span> \
+    <span class="o">--</span><span class="n">root</span><span class="o">-</span><span class="nb">dir</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">project</span>
+</pre></div>
+</div>
+<p>使い方 (Python API):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.tools.test.generate_cli_specifications</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate</span>
+<span class="n">generate</span><span class="p">(</span>
+    <span class="n">feature_package</span><span class="o">=</span><span class="s2">"myapp.app.features.cli"</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/Specifications"</span><span class="p">),</span>
+    <span class="n">root_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/project"</span><span class="p">),</span>
+    <span class="n">appcls</span><span class="o">=</span><span class="n">MyApp</span><span class="p">,</span>
+    <span class="n">ver</span><span class="o">=</span><span class="n">my_version_module</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">MethodInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defining_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docstring</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[str]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[str]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statuses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[str]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#MethodInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.defining_class">
+<span class="sig-name descname"><span class="pre">defining_class</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.defining_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.docstring">
+<span class="sig-name descname"><span class="pre">docstring</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.docstring" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.result_keys">
+<span class="sig-name descname"><span class="pre">result_keys</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.result_keys" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.source_lines">
+<span class="sig-name descname"><span class="pre">source_lines</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.source_lines" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.statuses">
+<span class="sig-name descname"><span class="pre">statuses</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.statuses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.steps">
+<span class="sig-name descname"><span class="pre">steps</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo.steps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.build_command_spec">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">build_command_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docs_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#build_command_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.build_command_spec" title="Link to this definition"></a></dt>
+<dd><p>フィーチャーオブジェクトから完全なコマンド仕様を構築します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> -- コマンドモード (例: 'app', 'sv')</p></li>
+<li><p><strong>cmd</strong> -- コマンド名</p></li>
+<li><p><strong>feature_obj</strong> -- フィーチャーオブジェクトのインスタンス</p></li>
+<li><p><strong>option_def</strong> -- フィーチャーのオプション定義</p></li>
+<li><p><strong>docs_dir</strong> -- マークダウン出力先ディレクトリ</p></li>
+<li><p><strong>root_dir</strong> -- プロジェクトルートディレクトリ</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>完全なコマンド仕様を含む辞書</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.collect_helper_methods">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">collect_helper_methods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#collect_helper_methods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.collect_helper_methods" title="Link to this definition"></a></dt>
+<dd><p>クラス内の補助メソッド情報を収集します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.collect_method_info">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">collect_method_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo" title="cmdbox.app.features.cli.test.gen_cli_spec.MethodInfo"><span class="pre">MethodInfo</span></a></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#collect_method_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.collect_method_info" title="Link to this definition"></a></dt>
+<dd><p>メソッドの詳細情報を収集します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.collect_result_keys">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">collect_result_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AST</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#collect_result_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.collect_result_keys" title="Link to this definition"></a></dt>
+<dd><p>returnステートメントと代入からの結果辞書キーを抽出します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.collect_statuses">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">collect_statuses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AST</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#collect_statuses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.collect_statuses" title="Link to this definition"></a></dt>
+<dd><p>ASTからステータスコード (RESP_* 属性と整数定数) を抽出します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.find_class_node">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">find_class_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AST</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ClassDef</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#find_class_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.find_class_node" title="Link to this definition"></a></dt>
+<dd><p>ASTから名前でクラス定義ノードを検索します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.generate">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_package</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cmdbox_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">appcls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ja_JP'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.generate" title="Link to this definition"></a></dt>
+<dd><p>フィーチャーパッケージからCLIコマンド仕様を生成します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_package</strong> -- フィーチャーを含むPythonパッケージ名
+(例: <code class="docutils literal notranslate"><span class="pre">cmdbox.app.features.cli</span></code>, <code class="docutils literal notranslate"><span class="pre">myapp.app.features.cli</span></code>)</p></li>
+<li><p><strong>output_dir</strong> -- 仕様書の出力先ディレクトリ</p></li>
+<li><p><strong>root_dir</strong> -- プロジェクトルートディレクトリ (ソースファイルの相対パス計算に使用)</p></li>
+<li><p><strong>prefix</strong> -- フィーチャーモジュールのファイル名プレフィックス (デフォルト: <code class="docutils literal notranslate"><span class="pre">cmdbox_</span></code>)</p></li>
+<li><p><strong>appcls</strong> -- アプリケーションクラス (省略時はCmdBoxAppを使用)</p></li>
+<li><p><strong>ver</strong> -- バージョンモジュール (省略時は``cmdbox.version``を使用)</p></li>
+<li><p><strong>language</strong> -- 言語設定 (デフォルト: <code class="docutils literal notranslate"><span class="pre">ja_JP</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成された仕様書の辞書リスト</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_cli_spec.main">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_cli_spec.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_cli_spec.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_cli_spec.main" title="Link to this definition"></a></dt>
+<dd><p>コマンドラインから詳細設計書を生成します。</p>
+<p>デフォルトでは cmdbox.app.features.cli を対象にします。
+--feature-package オプションで任意のフィーチャーパッケージを指定できます。</p>
+</dd></dl>
+
 </section>
-<section id="cmdbox-app-features-cli-test-gen-test-spec-module">
-<h2>cmdbox.app.features.cli.test.gen_test_spec module<a class="headerlink" href="#cmdbox-app-features-cli-test-gen-test-spec-module" title="Link to this heading"></a></h2>
+<section id="module-cmdbox.app.features.cli.test.gen_test_spec">
+<span id="cmdbox-app-features-cli-test-gen-test-spec-module"></span><h2>cmdbox.app.features.cli.test.gen_test_spec module<a class="headerlink" href="#module-cmdbox.app.features.cli.test.gen_test_spec" title="Link to this heading"></a></h2>
+<p>ユニットテスト仕様書生成ツール。</p>
+<p>cmdboxを拡張して作成したコマンドでも利用できるよう、
+入力JSONパスや出力先をパラメータとして受け取ります。</p>
+<p>使い方 (コマンドライン):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">cmdbox</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">generate_unit_test_specifications</span> \
+    <span class="o">--</span><span class="nb">input</span><span class="o">-</span><span class="n">json</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">Specifications</span><span class="o">/</span><span class="n">cli</span><span class="o">-</span><span class="n">command</span><span class="o">-</span><span class="n">specifications</span><span class="o">.</span><span class="n">json</span> \
+    <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">Specifications_forUnitTest</span> \
+    <span class="o">--</span><span class="n">root</span><span class="o">-</span><span class="nb">dir</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">project</span>
+</pre></div>
+</div>
+<p>使い方 (Python API):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.tools.test.generate_unit_test_specifications</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate</span>
+<span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_json</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/Specifications/cli-command-specifications.json"</span><span class="p">),</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/Specifications_forUnitTest"</span><span class="p">),</span>
+    <span class="n">root_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"path/to/project"</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_test_spec.</span></span><span class="sig-name descname"><span class="pre">TestCase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">focus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_checks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'dict[str,</span> <span class="pre">Any]</span> <span class="pre">|</span> <span class="pre">None'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_create_tests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_tests_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str</span> <span class="pre">|</span> <span class="pre">None'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_test_spec.html#TestCase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.category">
+<span class="sig-name descname"><span class="pre">category</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.category" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.create_tests_name">
+<span class="sig-name descname"><span class="pre">create_tests_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.create_tests_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.expected_result">
+<span class="sig-name descname"><span class="pre">expected_result</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.expected_result" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.expected_status">
+<span class="sig-name descname"><span class="pre">expected_status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.expected_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.focus">
+<span class="sig-name descname"><span class="pre">focus</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.focus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.from_create_tests">
+<span class="sig-name descname"><span class="pre">from_create_tests</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.from_create_tests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.input_pattern">
+<span class="sig-name descname"><span class="pre">input_pattern</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.input_pattern" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.input_values">
+<span class="sig-name descname"><span class="pre">input_values</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.input_values" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.TestCase.post_checks">
+<span class="sig-name descname"><span class="pre">post_checks</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase.post_checks" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.build_unit_test_spec">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_test_spec.</span></span><span class="sig-name descname"><span class="pre">build_unit_test_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docs_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_specs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">appcls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_test_spec.html#build_unit_test_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.build_unit_test_spec" title="Link to this definition"></a></dt>
+<dd><p>コマンドの完全なユニットテスト仕様を構築します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command_spec</strong> -- CLI仕様JSONからのコマンド仕様</p></li>
+<li><p><strong>docs_dir</strong> -- マークダウン出力先ディレクトリ</p></li>
+<li><p><strong>root_dir</strong> -- プロジェクトルートディレクトリ</p></li>
+<li><p><strong>all_specs</strong> -- 全コマンド仕様のリスト (pre/post_cmds 推定用)</p></li>
+<li><p><strong>appcls</strong> -- UnitTestable.create_tests() 呼び出し用アプリケーションクラス (省略可)</p></li>
+<li><p><strong>ver</strong> -- UnitTestable.create_tests() 呼び出し用バージョンモジュール (省略可)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>完全なユニットテスト仕様の辞書</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.extract_test_cases_from_markdown">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_test_spec.</span></span><span class="sig-name descname"><span class="pre">extract_test_cases_from_markdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cmdbox.app.features.cli.test.gen_test_spec.TestCase" title="cmdbox.app.features.cli.test.gen_test_spec.TestCase"><span class="pre">TestCase</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_test_spec.html#extract_test_cases_from_markdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.extract_test_cases_from_markdown" title="Link to this definition"></a></dt>
+<dd><p>マークダウン仕様ファイルからテストパターン表を抽出します。</p>
+<p>表の形式:
+| ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
+| TC-001 | 正常系 | ... | ... | ... | ... | ... |</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.generate">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_test_spec.</span></span><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">appcls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_test_spec.html#generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.generate" title="Link to this definition"></a></dt>
+<dd><p>CLIコマンド仕様JSONからユニットテスト仕様を生成します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_json</strong> -- 入力となる cli-command-specifications.json のパス</p></li>
+<li><p><strong>output_dir</strong> -- テスト仕様書の出力先ディレクトリ</p></li>
+<li><p><strong>root_dir</strong> -- プロジェクトルートディレクトリ
+(詳細設計書マークダウンの参照に使用)</p></li>
+<li><p><strong>appcls</strong> -- UnitTestable.create_tests() 呼び出し用アプリケーションクラス (省略可)</p></li>
+<li><p><strong>ver</strong> -- UnitTestable.create_tests() 呼び出し用バージョンモジュール (省略可)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成されたテスト仕様書の辞書リスト</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.features.cli.test.gen_test_spec.main">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.features.cli.test.gen_test_spec.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/features/cli/test/gen_test_spec.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.features.cli.test.gen_test_spec.main" title="Link to this definition"></a></dt>
+<dd><p>コマンドラインからユニットテスト仕様書を生成します。</p>
+<p>デフォルトでは &lt;root-dir&gt;/Specifications/cli-command-specifications.json を読み込み、
+&lt;root-dir&gt;/Specifications_forUnitTest に出力します。</p>
+</dd></dl>
+
 </section>
 <section id="module-cmdbox.app.features.cli.test.run_spec">
 <span id="cmdbox-app-features-cli-test-run-spec-module"></span><h2>cmdbox.app.features.cli.test.run_spec module<a class="headerlink" href="#module-cmdbox.app.features.cli.test.run_spec" title="Link to this heading"></a></h2>
