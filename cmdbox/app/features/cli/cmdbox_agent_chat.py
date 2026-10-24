@@ -1061,6 +1061,43 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 return enable_tts, None
         return enable_tts, tts_engine_obj
 
+    async def _create_success_msg(self, message:str, agent_session:Any, *,
+                                  final_response:bool=False, function_call:bool=False, function_response:bool=False,
+                                  interrupted:bool=False, turn_complete:bool=False,
+                                  event_id:str=None, invocation_id:str=None) -> Dict[str, Any]:
+        """
+        成功メッセージを作成します
+
+        Args:
+            message (str): 成功メッセージの内容
+            agent_session (Any): エージェントセッション
+            final_response (bool): 最終応答フラグ
+            function_call (bool): 関数呼び出しフラグ
+            function_response (bool): 関数応答フラグ
+            interrupted (bool): 中断フラグ
+            turn_complete (bool): ターン完了フラグ
+            event_id (str): イベントID
+            invocation_id (str): 呼び出しID
+
+        Returns:
+            Dict[str, Any]: 成功メッセージ。message引数で指定された内容が含まれる
+        """
+        flags = dict(
+            final_response=final_response,
+            function_call=function_call,
+            function_response=function_response,
+            interrupted=interrupted,
+            turn_complete=turn_complete)
+        ids = dict(
+            agent_session_id=agent_session.id,
+            event_id=event_id,
+            invocation_id=invocation_id)
+        if not ids['agent_session_id']: del ids['agent_session_id']
+        if not ids['event_id']: del ids['event_id']
+        if not ids['invocation_id']: del ids['invocation_id']
+        msg = dict(success=dict(message=f"{message}", flags=flags, ids=ids))
+        return msg
+
     async def _svrun_chat_exec(self, redis_cli:redis_client.RedisClient, payload:Dict[str, Any],
                                runner:Any, agent_session:Any, content:Any,
                                enable_tts:bool, tts_engine_obj:Any, reskey:str, chat_ctx:Any) -> None:
@@ -1089,6 +1126,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         run_config = RunConfig(streaming_mode=StreamingMode.NONE)
         resval = []
         token_usage = dict(prompt_tokens=0, completion_tokens=0, total_tokens=0)
+        redis_cli.rpush(reskey, await self._create_success_msg(message=f"Chat processing...", agent_session=agent_session))
         async with aclosing(runner.run_async(user_id=user_name,
                                                 session_id=agent_session.id,
                                                 new_message=content,

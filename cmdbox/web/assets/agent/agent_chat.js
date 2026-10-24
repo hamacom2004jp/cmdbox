@@ -1,5 +1,9 @@
 agentView.scrollToBottom = () => {
-    agentView.chatContainer.scrollTop(agentView.chatContainer.prop("scrollHeight"));
+    const lastUserMessage = agentView.chatMessages.find('.message-user').last();
+    if (lastUserMessage.length > 0) {
+        const position = lastUserMessage.offset().top - agentView.chatContainer.offset().top + agentView.chatContainer.scrollTop();
+        agentView.chatContainer.scrollTop(position);
+    }
 };
 agentView.chat_listeners = [];
 agentView.chat_send_filters = [];
@@ -50,6 +54,33 @@ agentView.after_chat = (session_id) => (agentView.after_chat_listeners || []).fo
     try { l(session_id); } catch (e) { console.warn('after_chat_listener failed:', e); }
 });
 
+/**
+ * 読み込み中のメッセージを生成する拡張ポイント。
+ * @param {object} success - 成功レスポンスオブジェクト
+ * @returns {string} - 読み込み中のメッセージ
+ */
+agentView.spinner_loading = (success) => {
+    let loading_msg = 'Thinking...';
+    if(success.flags && success.flags.function_call) {
+        loading_msg = 'Calling function...';
+        if(success.function_calls && success.function_calls.length > 0) {
+            const fc = success.function_calls[success.function_calls.length - 1];
+            if(fc.name) loading_msg += ` ( ${fc.name} )`;
+        }
+    }
+    else if (success.flags && success.flags.function_response) {
+        loading_msg = 'Function responded...';
+        if(success.function_responses && success.function_responses.length > 0) {
+            const fc = success.function_responses[success.function_responses.length - 1];
+            if(fc.name) loading_msg += ` ( ${fc.name} )`;
+        }
+    }
+    else if (success.flags && !success.flags.final_response) {
+        loading_msg = success.message ?? 'Thinking...';
+    }
+    return loading_msg;
+};
+
 agentView.chat = (session_id) => {
     const ping_interval = 5000; // pingの間隔
     const max_reconnect_count = 60000/ping_interval*1; // 最大再接続回数
@@ -90,7 +121,7 @@ agentView.chat = (session_id) => {
         if (!agentView.message_id) {
             agentView.message_id = cmdbox.random_string(16);
             const txt = agentView.create_agent_message(agentView.message_id);
-            cmdbox.show_loading(txt);
+            cmdbox.show_loading(txt, 'Starting Agent ...');
         }
         if (!agentView.ws) {
             cmdbox.message({'warn':'The connection to the runner has not yet been established.'}, true);
@@ -100,7 +131,7 @@ agentView.chat = (session_id) => {
         agentView.chat_send(agentView.ws, msg);
         $('.ai-core').addClass('ai-core2');
         // メッセージ一覧を一番下までスクロール
-        agentView.chatContainer.scrollTop(agentView.chatContainer.prop('scrollHeight'));
+        agentView.scrollToBottom();
     });
     // recボタンのクリックイベント
     const rec_handler = async () => {
@@ -217,7 +248,7 @@ agentView.chat = (session_id) => {
                 txt = warn_container.find('.msg-content').last();
             }
             await agentView.format_agent_message(txt, `${packet['warn']}`);
-            msg_container.find('.spinner-grow').remove();
+            cmdbox.hide_loading(msg_container);
             warn_container.find('.msg-content').filter(function () {
                 return $(this).children().length === 0 && !$(this).text().trim();
             }).remove();
@@ -268,6 +299,8 @@ agentView.chat = (session_id) => {
                 msg_content.addClass('collapsed');
                 msg_container.find('.btn-toggle-message').text('▶');
             }
+            let loading_msg = agentView.spinner_loading(success);
+            msg_container.find('.spinner-loading').text(loading_msg);
             const msg_str = agentView.parse_message(success.message);
             await agentView.format_agent_message(msg_content, msg_str, success);
             agentView.scrollToBottom();
@@ -286,16 +319,10 @@ agentView.chat = (session_id) => {
         if (msg_container.find('.message-thinking').length <= 0) {
             msg_container.find('.btn-toggle-message').remove();
         }
-        msg_container.find('.spinner-grow').remove();
+        // 読み込み中のスピナーを削除
+        cmdbox.hide_loading(msg_container);
         await agentView.say.play(success.wav_b64);
         agentView.message_id = null;
-        // 読み込み中のスピナーを削除
-        $('.msg-content').each((index, element) => {
-            const content_elem = $(element);
-            if (content_elem.children('.spinner-grow').length > 0) {
-                content_elem.remove();
-            }
-        });
     };
     agentView.ws.onopen = () => {
         const ping = () => {
@@ -644,7 +671,7 @@ agentView.format_agent_message =  async (txt, message, success = null) => {
     }
     agentView.render_structured_event(txt, success);
     // メッセージ一覧を一番下までスクロール
-    agentView.chatContainer.scrollTop(agentView.chatContainer.prop('scrollHeight'));
+    agentView.scrollToBottom();
     const msg_width = agentView.chatMessages.prop('scrollWidth');
     if (msg_width > 800) {
         // メッセージ一覧の幅が800pxを超えたら、メッセージ一覧の幅を調整

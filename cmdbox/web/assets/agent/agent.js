@@ -17,7 +17,6 @@ agentView.initView = () => {
     agentView.docViewerTitle = $('#docViewerTitle');
     agentView.docViewerContent = $('#docViewerContent');
     agentView.chatMessages = $('#messages');
-    agentView.chatContainer = $('#chatContainer');
     agentView.historyModal = $('#historyModal');
     agentView.chatHistories = $('#session_tab ul.sf-list-group');
     agentView.fileTranceferModal = $('#fileTranceferModal');

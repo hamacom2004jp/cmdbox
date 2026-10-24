@@ -54,12 +54,13 @@ cmdbox.change_color_mode = async (color_mode=undefined, nosignin=false) => {
 /**
  * ローディング表示
  */
-cmdbox.show_loading = async (target) => {
+cmdbox.show_loading = async (target=null, msg='') => {
     if (!target) {
         const elem = $('#loading');
         elem.removeClass('d-none');
         return;
     }
+    $(`<span class="spinner-loading me-2">${msg}</span>`).appendTo(target);
     $('<div class="spinner-grow spinner-grow-sm" role="status"><span class="visually-hidden">Loading...</span></div>').appendTo(target);
     await cmdbox.sleep(100);
     $('<div class="spinner-grow spinner-grow-sm" role="status"><span class="visually-hidden">Loading...</span></div>').appendTo(target);
@@ -70,11 +71,16 @@ cmdbox.sleep = (time) => new Promise((r) => setTimeout(r, time));
 /**
  * ローディング非表示
  */
-cmdbox.hide_loading = () => {
-    const elem = $('#loading');
-    elem.addClass('d-none');
-    const progress = $('#progress');
-    progress.addClass('d-none');
+cmdbox.hide_loading = (target=null) => {
+    if (!target) {
+        const elem = $('#loading');
+        elem.addClass('d-none');
+        const progress = $('#progress');
+        progress.addClass('d-none');
+        return;
+    }
+    target.find('.spinner-loading').remove();
+    target.find('.spinner-grow').remove();
 };
 /**
  * テキストデータかどうか判定
