@@ -125,7 +125,11 @@ cmdbox.sanitize_html = (html, config={}) => {
         FORBID_TAGS: ['style', 'form', 'input', 'button', 'select', 'textarea', 'option'],
         ...config
     };
-    return DOMPurify.sanitize(html, config);
+    try {
+        return DOMPurify.sanitize(html, config);
+    } catch (e) {
+        return html;
+    }
 };
 /**
  * 確認メッセージ表示

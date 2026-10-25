@@ -302,7 +302,9 @@ agentView.chat = (session_id) => {
             let loading_msg = agentView.spinner_loading(success);
             msg_container.find('.spinner-loading').text(loading_msg);
             const msg_str = agentView.parse_message(success.message);
-            await agentView.format_agent_message(msg_content, msg_str, success);
+            if (msg_str != success.message) {
+                await agentView.format_agent_message(msg_content, msg_str, success);
+            }
             agentView.scrollToBottom();
             return;
         }
