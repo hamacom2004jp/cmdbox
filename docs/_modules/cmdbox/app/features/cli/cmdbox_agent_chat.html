@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.cmdbox_agent_chat &mdash; cmdbox 2026/10/17 documentation</title>
+  <title>cmdbox.app.features.cli.cmdbox_agent_chat &mdash; cmdbox 2026/10/25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=769f61d8"></script>
+      <script src="../../../../../_static/documentation_options.js?v=484f1f67"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -1214,6 +1214,43 @@
                 <span class="k">return</span> <span class="n">enable_tts</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">enable_tts</span><span class="p">,</span> <span class="n">tts_engine_obj</span>
 
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_create_success_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">agent_session</span><span class="p">:</span><span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
+                                  <span class="n">final_response</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">function_call</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">function_response</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                  <span class="n">interrupted</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">turn_complete</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                  <span class="n">event_id</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">invocation_id</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        成功メッセージを作成します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message (str): 成功メッセージの内容</span>
+<span class="sd">            agent_session (Any): エージェントセッション</span>
+<span class="sd">            final_response (bool): 最終応答フラグ</span>
+<span class="sd">            function_call (bool): 関数呼び出しフラグ</span>
+<span class="sd">            function_response (bool): 関数応答フラグ</span>
+<span class="sd">            interrupted (bool): 中断フラグ</span>
+<span class="sd">            turn_complete (bool): ターン完了フラグ</span>
+<span class="sd">            event_id (str): イベントID</span>
+<span class="sd">            invocation_id (str): 呼び出しID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: 成功メッセージ。message引数で指定された内容が含まれる</span>
+<span class="sd">        """</span>
+        <span class="n">flags</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">final_response</span><span class="o">=</span><span class="n">final_response</span><span class="p">,</span>
+            <span class="n">function_call</span><span class="o">=</span><span class="n">function_call</span><span class="p">,</span>
+            <span class="n">function_response</span><span class="o">=</span><span class="n">function_response</span><span class="p">,</span>
+            <span class="n">interrupted</span><span class="o">=</span><span class="n">interrupted</span><span class="p">,</span>
+            <span class="n">turn_complete</span><span class="o">=</span><span class="n">turn_complete</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">agent_session_id</span><span class="o">=</span><span class="n">agent_session</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">event_id</span><span class="o">=</span><span class="n">event_id</span><span class="p">,</span>
+            <span class="n">invocation_id</span><span class="o">=</span><span class="n">invocation_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ids</span><span class="p">[</span><span class="s1">'agent_session_id'</span><span class="p">]:</span> <span class="k">del</span> <span class="n">ids</span><span class="p">[</span><span class="s1">'agent_session_id'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ids</span><span class="p">[</span><span class="s1">'event_id'</span><span class="p">]:</span> <span class="k">del</span> <span class="n">ids</span><span class="p">[</span><span class="s1">'event_id'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ids</span><span class="p">[</span><span class="s1">'invocation_id'</span><span class="p">]:</span> <span class="k">del</span> <span class="n">ids</span><span class="p">[</span><span class="s1">'invocation_id'</span><span class="p">]</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">flags</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">msg</span>
+
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_svrun_chat_exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
                                <span class="n">runner</span><span class="p">:</span><span class="n">Any</span><span class="p">,</span> <span class="n">agent_session</span><span class="p">:</span><span class="n">Any</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span><span class="n">Any</span><span class="p">,</span>
                                <span class="n">enable_tts</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">tts_engine_obj</span><span class="p">:</span><span class="n">Any</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">chat_ctx</span><span class="p">:</span><span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1242,6 +1279,7 @@
         <span class="n">run_config</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span><span class="n">streaming_mode</span><span class="o">=</span><span class="n">StreamingMode</span><span class="o">.</span><span class="n">NONE</span><span class="p">)</span>
         <span class="n">resval</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">token_usage</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">prompt_tokens</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">completion_tokens</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_tokens</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_success_msg</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Chat processing..."</span><span class="p">,</span> <span class="n">agent_session</span><span class="o">=</span><span class="n">agent_session</span><span class="p">))</span>
         <span class="k">async</span> <span class="k">with</span> <span class="n">aclosing</span><span class="p">(</span><span class="n">runner</span><span class="o">.</span><span class="n">run_async</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_name</span><span class="p">,</span>
                                                 <span class="n">session_id</span><span class="o">=</span><span class="n">agent_session</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                                                 <span class="n">new_message</span><span class="o">=</span><span class="n">content</span><span class="p">,</span>

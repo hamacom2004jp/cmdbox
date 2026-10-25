@@ -312,17 +312,20 @@ agentView.chat = (session_id) => {
         let msg_content = agentView.create_agent_message(agentView.message_id);
         msg_container = $(`#${agentView.message_id}`);
         if (msg_content.children().length > 0) {
-            msg_container.append('<div class="msg-content"></div>');
+            msg_container.append('<div class="msg-content message-thinking"></div>');
             msg_content = agentView.create_agent_message(agentView.message_id);
             msg_container = $(`#${agentView.message_id}`);
         }
         const msg_str = agentView.parse_message(success.message);
         await agentView.format_agent_message(msg_content, msg_str, success);
+        cmdbox.hide_loading(msg_container);
+        msg_container.find('.message-thinking').each((index, elem) => {
+            if ($(elem).html().trim()=='') $(elem).remove();
+        });
+        msg_container.find('.message-thinking:last').removeClass('message-thinking').removeClass('collapsed');
         if (msg_container.find('.message-thinking').length <= 0) {
             msg_container.find('.btn-toggle-message').remove();
         }
-        // 読み込み中のスピナーを削除
-        cmdbox.hide_loading(msg_container);
         await agentView.say.play(success.wav_b64);
         agentView.message_id = null;
     };

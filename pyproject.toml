@@ -11,7 +11,7 @@ authors = [
     { name = "hamacom2004jp", email = "hamacom2004jp@gmail.com" },
 ]
 license = "MIT"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 keywords = [
     "audit",
     "a2a",
@@ -74,10 +74,10 @@ dependencies = [
 agent_mcp = [
     "pydantic>=2.0.0,<3.0.0",
     "fastmcp>=2.14.4",
-    "mcp>=1.24.0,<2.0.0",
+    "mcp>=2.2.0,<3",
 ]
 agent_adk = [
-    "google-adk>=2.8,<2.9",
+    "google-adk>=2.13,<2.14",
     "a2a-sdk>=1.0.0",
     "culsans>=0.11.0",
     "litellm[proxy]>=1.82.6,>=1.106.2", # >=1.93.1
