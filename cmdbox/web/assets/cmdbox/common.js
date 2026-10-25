@@ -141,10 +141,13 @@ cmdbox.confirm = (res, i18n=false, nosave=false) => {
  * @param {object} res - レスポンス
  * @param {boolean} i18n - 翻訳を有効にするかどうか
  * @param {boolean} nosave - 翻訳メッセージを保存しないかどうか
- * @returns {Promise<string|null>} - 入力された値、またはキャンセルされた場合はnull
+ * @param {Array<string>} enable_prompt - プロンプトを有効にする場合の入力タイプのリスト
+ * @param {Array<string>} prompt_placeholders - プロンプトの入力欄に表示するプレースホルダーのリスト
+ * @param {Array<string>} prompt_default_values - プロンプトの入力欄のデフォルト値のリスト
+ * @returns {Promise<string|Array<string>|boolean|null>} - 入力された値、またはキャンセルされた場合はnull
  */
-cmdbox.prompt = (res, i18n=false, nosave=false) => {
-    return cmdbox.message(res, i18n, nosave, false, false, true);
+cmdbox.prompt = (res, i18n=false, nosave=false, enable_prompt=['text'], prompt_placeholders=[], prompt_default_values=[]) => {
+    return cmdbox.message(res, i18n, nosave, false, false, enable_prompt, prompt_placeholders, prompt_default_values);
 };
 /**
  * アラートメッセージ表示
@@ -153,9 +156,13 @@ cmdbox.prompt = (res, i18n=false, nosave=false) => {
  * @param {boolean} nosave - 翻訳メッセージを保存しないかどうか
  * @param {boolean} enable_closebot - 閉じるボタンを有効にするかどうか
  * @param {boolean} enable_confirm - 確認ダイアログを有効にするかどうか（このオプションが有効な場合、enable_closebotは無効になります）
- * @param {boolean} enable_prompt - プロンプトを有効にするかどうか
+ * @param {Array<string>} prompt_types - プロンプトを有効にする場合の入力タイプのリスト
+ * @param {Array<string>} prompt_placeholders - プロンプトの入力欄に表示するプレースホルダーのリスト
+ * @param {Array<string>} prompt_default_values - プロンプトの入力欄のデフォルト値のリスト
+ * @returns {Promise<string|Array<string>|boolean|null>} - 入力された値、またはキャンセルされた場合はnull
  */
-cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_confirm=false, enable_prompt=false) => {
+cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_confirm=false,
+                  prompt_types=[], prompt_placeholders=[], prompt_default_values=[]) => {
     return new Promise((resolve) => {
         if (typeof res === 'object') {
             if (typeof res.success === 'string') res = res.success;
@@ -183,7 +190,7 @@ cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_co
                         <textarea class="form-control overflow-auto w-100 h-100" rows="10" style="border:0px;box-shadow:none;resize:none;field-sizing:content;max-height:300px;" readonly>${msg}</textarea>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-outline-secondary button-close i18n" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>
@@ -193,29 +200,55 @@ cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_co
             const ok_btn = $(`<button type="button" class="btn btn-outline-primary i18n" data-bs-dismiss="modal">OK</button>`);
             const cancel_btn = $(`<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Cancel</button>`);
             modal.find('.modal-footer').append(cancel_btn).append(ok_btn);
+            modal.find('.modal-footer .button-close').hide();
             ok_btn.off('click').on('click', () => {resolve(true);});
             cancel_btn.off('click').on('click', () => {resolve(false);});
         }
-        else if (enable_prompt) {
-            const input = $(`<input type="text" class="form-control mt-2" placeholder="Input here...">`);
-            modal.find('.modal-body').append(input);
+        else if (prompt_types && prompt_types.length > 0) {
+            const modal_body = modal.find('.modal-body');
+            const container = $(`<div class="container-fluid"></div>`).appendTo(modal_body);
+            const rows = $(`<div class="row mt-2"></div>`).appendTo(container);
             const ok_btn = $(`<button type="button" class="btn btn-outline-primary i18n" data-bs-dismiss="modal">OK</button>`);
             const cancel_btn = $(`<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Cancel</button>`);
             modal.find('.modal-footer').append(cancel_btn).append(ok_btn);
-            ok_btn.off('click').on('click', () => {resolve(input.val());});
-            cancel_btn.off('click').on('click', () => {resolve(null);});
-            input.off('keypress').on('keypress', (ev) => {
-                if (ev.which === 13) {
-                    ev.preventDefault();
-                    ok_btn.click();
-                }
+            modal.find('.modal-footer .button-close').hide();
+            const inputs = [];
+            const prompt_count = prompt_types.length;
+            prompt_types.forEach((val, idx)=>{
+                const placeholder = prompt_placeholders.length>idx && prompt_placeholders[idx] || "Input here..."; 
+                const default_value = prompt_default_values.length>idx && prompt_default_values[idx] || "";
+                const input = $(`<input type="${val}" class="form-control" placeholder="${placeholder}" value="${default_value}">`);
+                const col_width = prompt_count==1?12:6;
+                const col = $(`<div class="col-${col_width} px-1"></div>`);
+                col.append(input);
+                rows.append(col);
+                inputs.push(input);
             });
-            modal.on('shown.bs.modal', () => {input.focus();});
+            ok_btn.off('click').on('click', () => {
+                const values = inputs.map(input => input.val()).filter(val => val !== null && val !== '');
+                if (prompt_count == 1) return resolve(values[0]);
+                resolve(values);
+            });
+            cancel_btn.off('click').on('click', () => {resolve(null);});
+            inputs.forEach(input => {
+                input.off('keypress').on('keypress', (ev) => {
+                    if (ev.which === 13) {
+                        const elem = $(ev.currentTarget).parent();
+                        if (elem.next().length > 0) {
+                            elem.next().find('input').focus();
+                            return;
+                        }
+                        ev.preventDefault();
+                        ok_btn.click();
+                    }
+                });
+            });
+            modal.on('shown.bs.modal', () => {modal_body.find('input').first().focus();});
         }
         else if (enable_closebot) {
             modal.find('.modal-footer .btn-outline-secondary').on('click', () => {resolve(true);});
             modal.on('shown.bs.modal', () => {
-                modal.find('.modal-footer .btn-outline-secondary').focus();
+                modal.find('.modal-footer .button-close').focus();
             });
         }
         if (i18n) {
@@ -404,26 +437,31 @@ cmdbox.editapikey = async () => {
             cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
             return;
         }
-        cmdbox.message(await res.json(), true, true);
-        editapikey_modal.modal('hide');
-        cmdbox.editapikey();
+        await cmdbox.message('The API key was successfully deleted.', true);
+        await editapikey_modal.modal('hide');
+        window.setTimeout(cmdbox.editapikey, 500);
     });
     const addapikey_btn = $(`<button type="button" class="btn btn-outline-primary i18n">Add apikey</button>`).appendTo(footer);
     addapikey_btn.off('click').on('click', async (event) => {
-        const apikey_name = await cmdbox.prompt('Please enter the apikey name.', true);
-        if (!apikey_name) return;
+        const inputs = await cmdbox.prompt('Please enter the apikey name, valid days.', true, false,
+                                           ['text', 'number'], ['Enter apikey name', 'Enter valid days'], ['', '30']);
+        if (!inputs) return;
         const res = await fetch('gui/apikey/add', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({'name': user['name'], 'apikey_name': apikey_name})
+            body: JSON.stringify({
+                'name': user['name'],
+                'apikey_name': inputs[0],
+                'valid_days': inputs[1],
+                'note': inputs[2]})
         });
         if (res.status != 200) {
             cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
             return;
         }
-        cmdbox.message(await res.json(), false);
-        editapikey_modal.modal('hide');
-        cmdbox.editapikey();
+        await cmdbox.message('The API key was successfully added.', true);
+        await editapikey_modal.modal('hide');
+        window.setTimeout(cmdbox.editapikey, 500);
     });
     editapikey_modal.appendTo('body');
     daialog.draggable({cursor:'move',cancel:'.modal-body'});

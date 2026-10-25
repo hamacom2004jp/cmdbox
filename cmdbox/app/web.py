@@ -452,7 +452,8 @@ class Web:
                 if signin_data['apikey']['gen_jwt']['enabled']:
                     cls = self.signin.__class__
                     claims = cls.gen_jwt_claims.copy() if cls.gen_jwt_claims is not None else dict()
-                    claims['exp'] = int(time.time()) + int(claims.get('exp', 3600))
+                    valid_day = int(user.get('valid_days', 0)) * 86400
+                    claims['exp'] = int(time.time()) + (valid_day if valid_day > 0 else int(claims.get('exp', 3600)))
                     claims['uid'] = u['uid']
                     claims['name'] = u['name']
                     claims['groups'] = u['groups']
