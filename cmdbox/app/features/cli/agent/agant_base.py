@@ -242,8 +242,7 @@ All incoming requests must be processed in the following order:
             session = await session_service.create_session(app_name=runner_name, user_id=user_name, session_id=session_id)
             return session
 
-    @classmethod
-    def apply_prompt_param(cls, text: str, prompt_param: Dict[str, Any]) -> str:
+    def apply_prompt_param(self, text: str, prompt_param: Dict[str, Any]) -> str:
         """
         テキスト中のプレースホルダーを prompt_param の値で置換します
 
@@ -261,13 +260,12 @@ All incoming requests must be processed in the following order:
         except (KeyError, ValueError):
             return text
 
-    @classmethod
-    def gen_msg(cls, event:Any) -> Tuple[str, bool, bool, bool, int]:
+    def gen_msg(self, event:Any) -> Tuple[str, bool, bool, bool, int]:
         msg = None
         is_func_call = False
         is_func_response = False
         is_final_response = False
-        st = cls.RESP_SUCCESS
+        st = self.RESP_SUCCESS
         calls = event.get_function_calls()
         responses = event.get_function_responses()
         is_func_call = bool(calls)
@@ -282,5 +280,5 @@ All incoming requests must be processed in the following order:
             msg = msg if msg else ""
             msg = f"{event.error_code if event.error_code else ''}"
             msg = f"{msg} {event.error_message if event.error_message else ''}".strip()
-            st = cls.RESP_WARN
+            st = self.RESP_WARN
         return msg, is_func_call, is_func_response, is_final_response, st

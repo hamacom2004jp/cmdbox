@@ -100,7 +100,7 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
 
     def format_event(self, ev:Any) -> Dict[str, Any]:
         """1 イベントを session_list 応答用 dict に整形するフック。"""
-        msg, is_func_call, is_func_response, is_final_response, st = cmdbox_agent_chat.AgentChat.gen_msg(ev)
+        msg, is_func_call, is_func_response, is_final_response, st = self.gen_msg(ev)
         return dict(author=ev.author, text=msg,
                     final_response=is_final_response,
                     function_call=is_func_call,

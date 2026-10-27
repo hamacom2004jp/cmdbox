@@ -11,6 +11,7 @@ import argparse
 import logging
 import json
 import pydantic
+import time
 
 
 class AgentOutputContent(pydantic.BaseModel):
@@ -66,6 +67,10 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
     def __init__(self, appcls, ver, language:str=None):
         super().__init__(appcls, ver, language=language)
         self.call_a2asv_start:bool = False
+        # キャッシング用インスタンス変数
+        self._planner_cache: Dict[str, Tuple[Any, float]] = {}  # key -> (planner_instance, created_timestamp)
+        self._agent_cache: Dict[str, Tuple[Any, float]] = {}    # key -> (agent_instance, created_timestamp)
+        self._cache_ttl_seconds = 1800  # 30分
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -327,11 +332,65 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
         return swap_native_output_schema_to_tool
 
+    def _cleanup_expired_cache(self, cache: Dict[str, Tuple[Any, float]], logger: Optional[logging.Logger] = None) -> None:
+        """
+        TTLを超過したキャッシュエントリを削除します
+
+        Args:
+            cache (Dict): キャッシュ辞書
+            logger (Optional[logging.Logger]): ロガー
+        """
+        import time
+        current_time = time.time()
+        expired_keys = [
+            key for key, (_, created_at) in cache.items()
+            if current_time - created_at > self._cache_ttl_seconds
+        ]
+        for key in expired_keys:
+            del cache[key]
+            if logger:
+                logger.debug(f"Expired cache entry removed: {key}")
+
+    def _get_planner_cache_key(self, runner_name: str, llmprov: str) -> str:
+        """Planner キャッシュキーを生成"""
+        return f"planner:{runner_name}:{llmprov}"
+
+    def _get_agent_cache_key(self, runner_name: str, user_name: str, config_hash: str) -> str:
+        """Agent キャッシュキーを生成"""
+        return f"agent:{runner_name}:{user_name}:{config_hash}"
+
+    def _compute_config_hash(self, agent_conf: Dict[str, Any]) -> str:
+        """
+        エージェント設定のハッシュを計算
+        
+        Args:
+            agent_conf (Dict[str, Any]): エージェント設定
+
+        Returns:
+            str: 設定のMD5ハッシュ
+        """
+        import hashlib
+        try:
+            conf_str = json.dumps(agent_conf, sort_keys=True)
+            return hashlib.md5(conf_str.encode()).hexdigest()
+        except Exception:
+            # JSON化失敗時は詳細ハッシュを使用しない
+            return "default"
+
+    def set_cache_ttl(self, ttl_seconds: int) -> None:
+        """
+        キャッシュのTTLを設定します。
+        
+        Args:
+            ttl_seconds (int): TTL（秒）
+        """
+        self._cache_ttl_seconds = ttl_seconds
+
     def create_agent(self, *, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
                      agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]],
                      payload:Dict[str, Any]) -> Any:
         """
-        エージェントを作成します
+        エージェントを作成します。
 
         Args:
             logger (logging.Logger): ロガー
@@ -415,7 +474,18 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
         llmprov = llm_conf.get('llmprov', None)
         reasoning_effort = self.get_reasoning_effort(agent_conf, payload)
-        planner = self.create_agent_planner(agent_conf, llm_conf, reasoning_effort)
+        runner_name = agent_conf.get('runner_name', payload.get('runner_name', 'default'))
+        
+        # Planner をキャッシュから取得または新規作成
+        planner_cache_key = self._get_planner_cache_key(runner_name, llmprov)
+        self._cleanup_expired_cache(self._planner_cache)
+        
+        if planner_cache_key in self._planner_cache:
+            planner, _ = self._planner_cache[planner_cache_key]
+        else:
+            planner = self.create_agent_planner(agent_conf, llm_conf, reasoning_effort)
+            if planner is not None:
+                self._planner_cache[planner_cache_key] = (planner, time.time())
         if agent_type == 'remote' and not disable_remote_agent:
             from google.adk.agents.remote_a2a_agent import RemoteA2aAgent, AGENT_CARD_WELL_KNOWN_PATH
             from a2a.client.client_factory import ClientConfig, ClientFactory
@@ -608,7 +678,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
     def create_agent_planner(self, agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], reasoning_effort:str) -> Any:
         """
-        エージェントのプランナーを作成します
+        エージェントのプランナーを作成します。
         Args:
             agent_conf (Dict[str, Any]): エージェント設定
             llm_conf (Dict[str, Any]): LLM設定
@@ -919,7 +989,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
             runner_name = payload.get('runner_name')
-            user_name = payload.get('user_name')
+            user_name = payload.get('user_name', 'unknown')
             session_id = payload.get('session_id')
             message = payload.get('message')
 
@@ -928,10 +998,22 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             # 設定をロードする
             runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf = self.load_conf(runner_name, data_dir, logger)
             agent_conf = self.prepare_agent_conf(agent_conf, payload)
-            # Agentを作成する
-            agent = self.create_agent(logger=logger, data_dir=data_dir, disable_remote_agent=False,
-                                      agent_conf=agent_conf, llm_conf=llm_conf, mcpsv_confs=mcpsv_confs,
-                                      payload=payload)
+            
+            # Agent をキャッシュから取得または新規作成
+            agent_cache_key = self._get_agent_cache_key(runner_name, user_name, self._compute_config_hash(agent_conf))
+            self._cleanup_expired_cache(self._agent_cache, logger)
+            
+            if agent_cache_key in self._agent_cache:
+                agent, _ = self._agent_cache[agent_cache_key]
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"Agent reused from cache: {agent_cache_key}")
+            else:
+                # Agentを作成する
+                agent = self.create_agent(logger=logger, data_dir=data_dir, disable_remote_agent=False,
+                                          agent_conf=agent_conf, llm_conf=llm_conf, mcpsv_confs=mcpsv_confs,
+                                          payload=payload)
+                # キャッシュに保存
+                self._agent_cache[agent_cache_key] = (agent, time.time())
             # セッションサービスを作成する
             session_service = self.create_session_service(logger=logger, data_dir=data_dir, ds_conf=ds_conf)
             # セッションを作成する
@@ -1126,7 +1208,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         run_config = RunConfig(streaming_mode=StreamingMode.NONE)
         resval = []
         token_usage = dict(prompt_tokens=0, completion_tokens=0, total_tokens=0)
-        redis_cli.rpush(reskey, await self._create_success_msg(message=f"Chat processing...", agent_session=agent_session))
+        redis_cli.rpush(reskey, await self._create_success_msg(message=f"Planning query...", agent_session=agent_session))
         async with aclosing(runner.run_async(user_id=user_name,
                                                 session_id=agent_session.id,
                                                 new_message=content,
@@ -1144,7 +1226,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     flags = outputs['success']['flags'] = dict()
                     flags['turn_complete'] = bool(ev.turn_complete)
                     flags['interrupted'] = bool(ev.interrupted)
-                    msg, is_func_call, is_func_response, is_final_response, st = self.__class__.gen_msg(ev)
+                    msg, is_func_call, is_func_response, is_final_response, st = self.gen_msg(ev)
                     flags['final_response'] = is_final_response
                     flags['function_call'] = is_func_call
                     flags['function_response'] = is_func_response
@@ -1156,10 +1238,22 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                         token_usage['prompt_tokens'] += getattr(meta, "prompt_token_count", 0)
                         token_usage['completion_tokens'] += getattr(meta, "completion_token_count", 0)
                         token_usage['total_tokens'] += getattr(meta, "total_token_count", 0)
+                        # Send progress update with current token usage
+                        if token_usage['total_tokens'] > 0 and not is_final_response:
+                            progress_msg = await self._create_success_msg(
+                                message=f"Tokens: {token_usage['total_tokens']} (P:{token_usage['prompt_tokens']}, C:{token_usage['completion_tokens']})",
+                                agent_session=agent_session)
+                            redis_cli.rpush(reskey, progress_msg)
 
                     calls = ev.get_function_calls() or []
                     if calls:
                         success['function_calls'] = [self._serialize_function_call(c) for c in calls]
+                        # Notify user that tool execution is starting
+                        tool_names = ', '.join([getattr(c, 'name', 'unknown') for c in calls])
+                        tool_msg = await self._create_success_msg(
+                            message=f"Executing tools: {tool_names}",
+                            agent_session=agent_session, function_call=True)
+                        redis_cli.rpush(reskey, tool_msg)
 
                     responses = ev.get_function_responses() or []
                     if responses:
@@ -1201,16 +1295,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                             except Exception as e:
                                 success['wav_b64'] = None
 
-                    has_output = any([
-                        success.get('message') is not None and str(success.get('message')).strip() != '',
-                        bool(success.get('function_calls')),
-                        bool(success.get('function_responses')),
-                        bool(success.get('artifact_delta')),
-                        bool(success.get('artifacts')),
-                    ])
-
-                    resval.append(outputs)
-                    if has_output:
+                    if self._is_output(outputs, redis_cli):
+                        resval.append(outputs)
                         redis_cli.rpush(reskey, outputs)
             except Exception as e:
                 raise e
@@ -1222,8 +1308,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         redis_cli.rpush(reskey, msg)
         await run_iter.aclose()
 
-    @staticmethod
-    def _to_primitive(value: Any) -> Any:
+    def _to_primitive(self, value: Any) -> Any:
         if value is None:
             return None
         if isinstance(value, (str, int, float, bool, list, dict)):
@@ -1234,24 +1319,50 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             return value.dict()
         return common.to_str(value)
 
-    @classmethod
-    def _serialize_function_call(cls, call: Any) -> Dict[str, Any]:
+    def _serialize_function_call(self, call: Any) -> Dict[str, Any]:
+        """
+        関数呼び出し情報をシリアライズします
+
+        Args:
+            call (Any): 関数呼び出しオブジェクト
+
+        Returns:
+            Dict[str, Any]: シリアライズされた関数呼び出し情報
+        """
         return dict(
             id=getattr(call, 'id', None),
             name=getattr(call, 'name', None),
-            args=cls._to_primitive(getattr(call, 'args', None)),
+            args=self._to_primitive(getattr(call, 'args', None)),
         )
 
-    @classmethod
-    def _serialize_function_response(cls, response: Any) -> Dict[str, Any]:
+    def _serialize_function_response(self, response: Any) -> Dict[str, Any]:
+        """
+        関数のレスポンス情報をシリアライズします
+
+        Args:
+            response (Any): 関数のレスポンスオブジェクト
+
+        Returns:
+            Dict[str, Any]: シリアライズされた関数レスポンス情報
+        """
         return dict(
             id=getattr(response, 'id', None),
             name=getattr(response, 'name', None),
-            response=cls._to_primitive(getattr(response, 'response', None)),
+            response=self._to_primitive(getattr(response, 'response', None)),
         )
 
-    @classmethod
-    def _serialize_artifact(cls, filename: str, version: int, artifact_part: Any) -> Dict[str, Any]:
+    def _serialize_artifact(self, filename: str, version: int, artifact_part: Any) -> Dict[str, Any]:
+        """
+        アーティファクトの情報をシリアライズします
+
+        Args:
+            filename (str): ファイル名
+            version (int): バージョン
+            artifact_part (Any): アーティファクトの一部
+
+        Returns:
+            Dict[str, Any]: シリアライズされたアーティファクト情報
+        """
         row = dict(filename=filename, version=version)
         if artifact_part is None:
             return row
@@ -1268,6 +1379,28 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             row['mime_type'] = row.get('mime_type', getattr(file_data, 'mime_type', None))
             row['file_uri'] = getattr(file_data, 'file_uri', None)
         return row
+
+    def _is_output(self, outputs: Dict[str, Any], redis_cli:redis_client.RedisClient) -> bool:
+        """
+        作成したoutputsが出力できる内容かどうかを判定します
+
+        Args:
+            outputs (Dict[str, Any]): 判定対象のoutputs
+            redis_cli (redis_client.RedisClient): Redisクライアント
+
+        Returns:
+            bool: 出力可能な場合はTrue、そうでない場合はFalse
+        """
+        success = outputs.get('success', {})
+        has_output = any([
+            success.get('message') is not None and str(success.get('message')).strip() != '',
+            bool(success.get('function_calls')),
+            bool(success.get('function_responses')),
+            bool(success.get('artifact_delta')),
+            bool(success.get('artifacts')),
+        ])
+        return has_output
+        #return True
 
     def svrun_output_bytes(self, data_dir, logger, opt, msg, msg_size):
         msg_size = msg.get('success', {}).get('ressize', msg_size)

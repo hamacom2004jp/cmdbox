@@ -48,15 +48,24 @@ class VersionsCmdbox(feature.WebFeature):
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             ret = []
-            with open(Path(cmdbox.__file__).parent / 'licenses' / 'files.txt', 'r', encoding='utf-8') as f:
+            files_txt = Path(self.ver.__file__).parent / 'licenses' / 'files.txt'
+            if not files_txt.is_file():
+                files_txt = Path(version.__file__).parent / 'licenses' / 'files.txt'
+            with open(files_txt, 'r', encoding='utf-8') as f:
                 for i, line in enumerate(f.readlines()):
                     parts = line.strip().split('\t')
                     ret.append(parts)
-            with open(Path(cmdbox.__file__).parent / 'web' / 'voicevox_license_list.txt', 'r', encoding='utf-8') as f:
+            voicevox_license_list = Path(self.ver.__file__).parent / 'web' / 'voicevox_license_list.txt'
+            if not voicevox_license_list.is_file():
+                voicevox_license_list = Path(version.__file__).parent / 'web' / 'voicevox_license_list.txt'
+            with open(voicevox_license_list, 'r', encoding='utf-8') as f:
                 for i, line in enumerate(f.readlines()):
                     parts = line.strip().split('\t')
                     ret.append(parts)
-            with open(Path(cmdbox.__file__).parent / 'web' / 'assets_license_list.txt', 'r', encoding='utf-8') as f:
+            assets_license_list = Path(self.ver.__file__).parent / 'web' / 'assets_license_list.txt'
+            if not assets_license_list.is_file():
+                assets_license_list = Path(version.__file__).parent / 'web' / 'assets_license_list.txt'
+            with open(assets_license_list, 'r', encoding='utf-8') as f:
                 for i, line in enumerate(f.readlines()):
                     parts = line.strip().split('\t')
                     ret.append(parts)
