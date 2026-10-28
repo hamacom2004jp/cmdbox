@@ -67,7 +67,7 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator, limiter.L
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        from fastmcp import FastMCP
+        from fastmcp.server import create_proxy
         config = dict(
             mcpServers=dict(
                 default=dict(
@@ -79,7 +79,7 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator, limiter.L
         )
         try:
             common.reset_logger('FastMCP.fastmcp.server.server')
-            proxy = FastMCP.as_proxy(config, name="Config-Based Proxy")
+            proxy = create_proxy(config, name="Config-Based Proxy")
             proxy.run()
         except Exception as e:
             logger.setLevel(logging.ERROR)

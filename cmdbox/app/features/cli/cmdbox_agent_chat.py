@@ -986,6 +986,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         tts_engine_obj = None
         enable_tts = True
         chat_ctx = None
+        agent = None
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
             runner_name = payload.get('runner_name')
@@ -1059,6 +1060,15 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         finally:
             if enable_tts:
                 cmdbox_tts_say.TtsSay.tts_stop(tts_engine_obj)
+            # litellm のグローバル非同期クライアントをクローズ
+            try:
+                import litellm
+                # agent の実行に伴い、litellm が内部的に作成した
+                # aiohttp.ClientSession / httpx.AsyncClient をクローズ
+                if hasattr(litellm, 'close_litellm_async_clients'):
+                    await litellm.close_litellm_async_clients()
+            except Exception as e:
+                logger.debug(f"Error closing litellm async clients: {e}")
             if runner:
                 if hasattr(runner.session_service, 'db_engine'):
                     await runner.session_service.db_engine.dispose()
