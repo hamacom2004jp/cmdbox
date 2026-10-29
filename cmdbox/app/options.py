@@ -373,6 +373,18 @@ class Options:
             type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=['','add','update'], web="readonly",
             description_ja="保存モードを指定します。 `add` は新規追加、`update` は既存のオプションを更新します。省略した場合はコマンド標準の処理を行います。",
             description_en="Specify the save mode. `add` adds a new option, and `update` updates an existing option. If omitted, the command performs its default action.")
+        self._options["signin_user"] = dict(
+            type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None, web="mask",
+            description_ja="サインインユーザーを指定します。",
+            description_en="Specify the signed-in user.")
+        self._options["signin_groups"] = dict(
+            type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="mask",
+            description_ja="サインインユーザーの所属グループを指定します。",
+            description_en="Specify the groups to which the signed-in user belongs.")
+        self._options["allow_groups"] = dict(
+            type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="fixed",
+            description_ja="コマンドレットの実行を許可するグループを指定します。",
+            description_en="Specify the groups that are allowed to run the command-let.")
 
     def init_debugoption(self):
         # デバックオプションを追加
@@ -392,6 +404,10 @@ class Options:
         self._options["cache_clear"]["opt"] = "cache_clear"
         self._options["cache_timeout"]["opt"] = "cache_timeout"
         self._options["save_mode"]["opt"] = "save_mode"
+        self._options["signin_user"]["opt"] = "signin_user"
+        self._options["signin_user"]["opt"] = "signin_user"
+        self._options["signin_groups"]["opt"] = "signin_groups"
+        self._options["allow_groups"]["opt"] = "allow_groups"
 
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
@@ -432,6 +448,12 @@ class Options:
                     c["choice"].append(self._options["cache_timeout"])
                 if "save_mode" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["save_mode"])
+                if "signin_user" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["signin_user"])
+                if "signin_groups" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["signin_groups"])
+                if "allow_groups" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["allow_groups"])
 
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]

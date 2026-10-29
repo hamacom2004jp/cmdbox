@@ -37,3 +37,7 @@ Common Options
     "--capture_maxsize <size>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
     "--cache_clear","","Specify if the cache should be cleared."
     "--cache_timeout <sec>","","Specify the cache timeout in seconds."
+    "--save_mode <mode>","","Specify the save mode. `add` adds a new option, and `update` updates an existing option. If omitted, the command performs its default action."
+    "--signin_user <user>","","Specify the signed-in user."
+    "--signin_groups <groups>","","Specify the groups to which the signed-in user belongs."
+    "--allow_groups <groups>","","Specify the groups that are allowed to run the command-let."

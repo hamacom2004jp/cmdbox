@@ -187,6 +187,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         appcls = self.appcls if appcls is None else appcls
         appcls = app.CmdBoxApp if appcls is None else appcls
         web.container['cmdbox_app'] = ap = appcls.getInstance(appcls=appcls, ver=self.ver)
+        opt['allow_groups'] = None # allow_groupsはパラメータから取得しない（アクセスコントロールで使用するため）
         if 'mode' in opt and 'cmd' in opt:
             # webモードで特定のオプションを自動的にセットする
             opt['host'] = web.redis_host
@@ -207,7 +208,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     found = False
                     for s in schema:
                         if 'opt' not in s or s['opt'] != o: continue
-                        if 'web' not in s or s['web'] != 'mask': continue
+                        if 'web' not in s or s['web'] not in ['mask', 'fixed']: continue
                         found = True
                     if not found or o not in loaded: continue
                     opt[o] = loaded[o]
@@ -244,10 +245,22 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         opt['meta'] = opt['meta'] if 'meta' in opt else {}
         if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
             if 'groups' in req.session['signin'] and req.session['signin']['groups'] is not None:
-                opt['groups'] = req.session['signin']['groups']
+                signin_groups = req.session['signin']['groups']
+                opt['groups'] = signin_groups
+                opt['signin_groups'] = signin_groups # サインインユーザーのグループを設定
+                # allow_groupsが設定されているとき、signin_groupsが含まれているかを確認する
+                if opt.get('allow_groups', None):
+                    allow_groups = opt['allow_groups']
+                    if type(allow_groups) is str: allow_groups = [allow_groups]
+                    allow_groups = [group for group in allow_groups if group and group.strip()] # 空文字列を除外
+                    if allow_groups and not any(group in signin_groups for group in allow_groups):
+                        return [dict(warn=f'You attempted to run an unauthorized command-let. ( your groups: {signin_groups} )')]
+                    opt['allow_groups'] = allow_groups
             if 'name' in req.session['signin'] and req.session['signin']['name'] is not None:
-                opt['meta'].update(dict(last_access_user=req.session['signin']['name'])) # ファイル操作のmeta情報として最後にアクセスしたユーザーを記録
-                opt['clmsg_user'] = req.session['signin']['name'] # 監査ログ用のユーザー名を強制上書き
+                signin_user = req.session['signin']['name']
+                opt['meta'].update(dict(last_access_user=signin_user)) # ファイル操作のmeta情報として最後にアクセスしたユーザーを記録
+                opt['clmsg_user'] = signin_user # 監査ログ用のユーザー名を強制上書き
+                opt['signin_user'] = signin_user # サインインユーザーを設定
         opt['meta'].update(dict(last_access_date=datetime.now().isoformat()))
         opt = self.coercion_param(req.session, opt.copy())
         opt['debug'] = web.debug
