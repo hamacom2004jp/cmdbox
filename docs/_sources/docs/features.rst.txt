@@ -332,7 +332,10 @@ Implementation of the `get_option(self) -> Dict[str, Any]` method
         - required: Whether this option is required
         - multi: Whether multiple values can be specified
         - hide: Whether to hide this option by default in Web mode
-        - web: Specifies how to display options that cannot be edited in web mode. Specifying “mask” masks the option. Specifying “readonly” makes it read-only.
+        - web: Specifies how to display options that cannot be edited in web mode.
+            - Specifying “mask” masks the option.
+            - Specifying “readonly” makes it read-only.
+            - Specifying “fixed” locks the option, preventing its value from being overwritten when running in Web mode.
         - fileio: When the type is file, specify whether it is a read file or a write file. Specify `in` or `out`.
         - choice: Specifies the choices for this option. If dynamic generation is required, implement the `choice_fn` method in the feature class.
             Choices can be specified in either of the following two ways.

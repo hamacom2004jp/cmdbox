@@ -23,6 +23,7 @@ See below for available options for the various commands.
    GUI <cmd_gui.rst>
    Limiter <cmd_limiter.rst>
    LLM <cmd_llm.rst>
+   Keystore <cmd_keystore.rst>
    MCPServer <cmd_mcpsv.rst>
    RAG <cmd_rag.rst>
    Server <cmd_server.rst>

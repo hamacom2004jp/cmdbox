@@ -68,15 +68,15 @@ list_pipe_func_then = () => {
                 // フォームに値をセット
                 if(Array.isArray(val)){
                     val.forEach((v, i) => {
-                        const e = pipe_modal.find(`[name="${key}"]`).parent().find('.add_buton')[i];
+                        const e = pipe_modal.find(`:input[name="${key}"]`).parent().find('.add_buton')[i];
                         $(e).click();
                     });
-                    pipe_modal.find(`[name="${key}"]`).each((i, e) => {
+                    pipe_modal.find(`:input[name="${key}"]`).each((i, e) => {
                         if (val[i] && val[i]!="" || i==0) $(e).val(val[i]);
                         else $(e).parent().find('.del_buton').click();
                     });
                 } else {
-                    pipe_modal.find(`[name="${key}"]`).val(val);
+                    pipe_modal.find(`:input[name="${key}"]`).val(val);
                 }
             });
             $('#pipe_del').show();

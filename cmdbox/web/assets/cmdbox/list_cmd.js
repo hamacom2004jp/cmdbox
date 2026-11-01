@@ -239,10 +239,10 @@ const list_cmd_func_then = () => {
                 }
                 if(Array.isArray(val)){
                     val.forEach((v, i) => {
-                        e = cmd_modal.find(`[name="${key}"]`).parent().find('.add_buton')[i];
+                        e = cmd_modal.find(`:input[name="${key}"]`).parent().find('.add_buton')[i];
                         $(e).click();
                     });
-                    cmd_modal.find(`[name="${key}"]`).each((i, e) => {
+                    cmd_modal.find(`:input[name="${key}"]`).each((i, e) => {
                         if (val[i] && val[i]!="" || i==0) $(e).val(val[i]);
                         else $(e).parent().parent().remove();
                     });
@@ -257,7 +257,7 @@ const list_cmd_func_then = () => {
                         if (index < valsize) $(btn).click();
                     });
                 } else {
-                    cmd_modal.find(`[name="${key}"]`).val(val);
+                    cmd_modal.find(`:input[name="${key}"]`).val(val);
                 }
             });
             // 選択肢による表示非表示の設定

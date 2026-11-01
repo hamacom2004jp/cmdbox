@@ -111,7 +111,7 @@ agentView.list_rag = async () => {
                     // 各フィールドに値をセット
                     Object.keys(config).forEach(key => {
                         if (key === 'rag_name') return;
-                        const input = form.find(`[name="${key}"]`);
+                        const input = form.find(`:input[name="${key}"]`);
                         if (input.length > 0) {
                             if (input.attr('type') === 'checkbox') {
                                 input.prop('checked', config[key]);

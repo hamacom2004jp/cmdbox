@@ -92,7 +92,7 @@ agentView.list_datasource = async () => {
                     // 各フィールドに値をセット
                     Object.keys(config).forEach(key => {
                         if (key === 'dsname') return;
-                        const input = form.find(`[name="${key}"]`);
+                        const input = form.find(`:input[name="${key}"]`);
                         if (input.length > 0 && config[key] != null) input.val(`${config[key]}`);
                     });
                     // choice_showによる表示切り替えをトリガー

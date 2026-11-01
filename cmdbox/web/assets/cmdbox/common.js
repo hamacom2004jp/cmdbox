@@ -1065,14 +1065,14 @@ cmdbox.init_modal_button = () => {
         await cmdbox.bbforce_cmd();
         cmdbox.hide_loading();
     });
-    // F5 and Ctrl+R 無効化
+    /* F5 and Ctrl+R 無効化
     $(document).on('keydown', (e) => {
         if ((e.which || e.keyCode) == 116) {
             return false;
         } else if ((e.which || e.keyCode) == 82 && e.ctrlKey) {
             return false;
         }
-    });
+    });*/
 };
 cmdbox.bbforce_cmd = async () => {
     try {
@@ -2114,10 +2114,10 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
                     }
                 }
                 names = [...new Set(names)];
-                names.forEach(name => row_content.find(`[name="${name}"]`).parent().parent().hide());
+                names.forEach(name => row_content.find(`:input[name="${name}"]`).parent().parent().hide());
                 const v = input_elem.val();
                 if (!row.choice_show[v]) return;
-                row.choice_show[v].forEach(n => row_content.find(`[name="${n}"]`).parent().parent().show());
+                row.choice_show[v].forEach(n => row_content.find(`:input[name="${n}"]`).parent().parent().show());
             });
         }
         // 配列をoptionタグに変換
@@ -2152,9 +2152,9 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
         }
     }
     let index = 0;
-    if (cmd_modal.find(`[name="${target_name}"]`).length > 0) {
+    if (cmd_modal.find(`:input[name="${target_name}"]`).length > 0) {
         index = 0;
-        cmd_modal.find(`[name="${target_name}"][param_data_index]`).each((i, val) => {
+        cmd_modal.find(`:input[name="${target_name}"][param_data_index]`).each((i, val) => {
             v = Number($(val).attr('param_data_index'));
             if (index <= v) index = v + 1;
         });
@@ -2240,14 +2240,13 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
         }
         btn_a.click(mk_func(row, input_elem.parent().parent()));
         // 2個目以降は削除ボタンを追加
-        const len = cmd_modal.find(`[name="${target_name}"]`).length;
+        const len = cmd_modal.find(`:input[name="${target_name}"]`).length;
         if (row.type!='dict' && len > 1 || row.type=='dict' && len > 2) {
             mk_func = (del_elem, row) => {
                 // del_elemの値を残すためにクロージャーにする
                 return () => del_elem.remove();
             }
             const btn_t = $('<button class="btn btn-secondary" type="button"></button>');
-            btn_trash
             btn_t.append('<svg class="bi bi-trash" width="16" height="16" fill="currentColor"><use href="#btn_trash"></use></svg>');
             input_elem.parent().append(btn_t);
             btn_t.click(mk_func(input_elem.parent().parent(), row));
@@ -2442,7 +2441,7 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=t
         }
         if (callback) callback(res[0]['success']);
         else if (!cmd_opt[opt_name]) return res;
-        $(`[name="${opt_name}"]`).val(cmd_opt[opt_name]);
+        $(`:input[name="${opt_name}"]`).val(cmd_opt[opt_name]);
     });
 };
 cmdbox.isAsync = (func) => {

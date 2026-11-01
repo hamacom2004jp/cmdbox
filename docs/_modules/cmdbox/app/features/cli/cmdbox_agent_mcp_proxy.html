@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.cmdbox_agent_mcp_proxy &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>cmdbox.app.features.cli.cmdbox_agent_mcp_proxy &mdash; cmdbox 2026/11/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/documentation_options.js?v=6f679952"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../resources/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
 </ul>
 
@@ -159,7 +160,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト</span>
 <span class="sd">        """</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_proxy</span>
         <span class="n">config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">mcpServers</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">default</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
@@ -171,7 +172,7 @@
         <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">common</span><span class="o">.</span><span class="n">reset_logger</span><span class="p">(</span><span class="s1">'FastMCP.fastmcp.server.server'</span><span class="p">)</span>
-            <span class="n">proxy</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="o">.</span><span class="n">as_proxy</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Config-Based Proxy"</span><span class="p">)</span>
+            <span class="n">proxy</span> <span class="o">=</span> <span class="n">create_proxy</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Config-Based Proxy"</span><span class="p">)</span>
             <span class="n">proxy</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>

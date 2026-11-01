@@ -331,11 +331,11 @@ audit.init_form = async () => {
             elem.val(data['value']);
             return;
         }
-        const last_elem = row_content.find(`[name="${data['name']}"]:last`);
+        const last_elem = row_content.find(`:input[name="${data['name']}"]:last`);
         const add_btn = last_elem.next('.add_buton');
         if (add_btn.length <= 0) return;
         add_btn.click();
-        elem = row_content.find(`[name="${data['name']}"]:last`);
+        elem = row_content.find(`:input[name="${data['name']}"]:last`);
         elem.val(data['value']);
     });
     row_content.find(':input').each((i, elem) => {

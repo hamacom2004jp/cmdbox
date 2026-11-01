@@ -121,7 +121,7 @@ agentView.list_runner = async () => {
                     // 各フィールドに値をセット
                     Object.keys(config).forEach(key => {
                         if (key === 'runner_name') return;
-                        const input = form.find(`[name="${key}"]`);
+                        const input = form.find(`:input[name="${key}"]`);
                         if (input.length > 0) {
                             input.val(config[key]);
                         }

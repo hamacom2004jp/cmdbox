@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.cmdbox_agent_chat &mdash; cmdbox 2026/10/27 documentation</title>
+  <title>cmdbox.app.features.cli.cmdbox_agent_chat &mdash; cmdbox 2026/11/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=dbcf1114"></script>
+      <script src="../../../../../_static/documentation_options.js?v=6f679952"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -1139,6 +1139,7 @@
         <span class="n">tts_engine_obj</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">enable_tts</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">chat_ctx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">agent</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">b64str2str</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
             <span class="n">runner_name</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'runner_name'</span><span class="p">)</span>
@@ -1212,6 +1213,15 @@
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">enable_tts</span><span class="p">:</span>
                 <span class="n">cmdbox_tts_say</span><span class="o">.</span><span class="n">TtsSay</span><span class="o">.</span><span class="n">tts_stop</span><span class="p">(</span><span class="n">tts_engine_obj</span><span class="p">)</span>
+            <span class="c1"># litellm のグローバル非同期クライアントをクローズ</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+                <span class="c1"># agent の実行に伴い、litellm が内部的に作成した</span>
+                <span class="c1"># aiohttp.ClientSession / httpx.AsyncClient をクローズ</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">litellm</span><span class="p">,</span> <span class="s1">'close_litellm_async_clients'</span><span class="p">):</span>
+                    <span class="k">await</span> <span class="n">litellm</span><span class="o">.</span><span class="n">close_litellm_async_clients</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error closing litellm async clients: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">runner</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">runner</span><span class="o">.</span><span class="n">session_service</span><span class="p">,</span> <span class="s1">'db_engine'</span><span class="p">):</span>
                     <span class="k">await</span> <span class="n">runner</span><span class="o">.</span><span class="n">session_service</span><span class="o">.</span><span class="n">db_engine</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>

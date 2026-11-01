@@ -118,12 +118,12 @@ agentView.list_agent = async () => {
                     // 各フィールドに値をセット
                     Object.keys(config).forEach(key => {
                         if (key === 'agent_name') return;
-                        const input = form.find(`[name="${key}"]`);
+                        const input = form.find(`:input[name="${key}"]`);
                         if (input.length > 0) {
                             if (config[key]) {
                                 if (Array.isArray(config[key]) && config[key].length > 1) {
                                     config[key].slice(0,-1).forEach((v, i) => {
-                                        const e = form.find(`[name="${key}"]`).parent().find('.add_buton')[i];
+                                        const e = form.find(`:input[name="${key}"]`).parent().find('.add_buton')[i];
                                         $(e).click();
                                     });
                                 } else {

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Features &mdash; cmdbox 2026/10/27 documentation</title>
+  <title>Features &mdash; cmdbox 2026/11/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dbcf1114"></script>
+      <script src="../_static/documentation_options.js?v=6f679952"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -423,7 +423,15 @@
 <li><p>required: Whether this option is required</p></li>
 <li><p>multi: Whether multiple values can be specified</p></li>
 <li><p>hide: Whether to hide this option by default in Web mode</p></li>
-<li><p>web: Specifies how to display options that cannot be edited in web mode. Specifying “mask” masks the option. Specifying “readonly” makes it read-only.</p></li>
+<li><dl class="simple">
+<dt>web: Specifies how to display options that cannot be edited in web mode.</dt><dd><ul class="simple">
+<li><p>Specifying “mask” masks the option.</p></li>
+<li><p>Specifying “readonly” makes it read-only.</p></li>
+<li><p>Specifying “fixed” locks the option, preventing its value from being overwritten when running in Web mode.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
 <li><p>fileio: When the type is file, specify whether it is a read file or a write file. Specify <cite>in</cite> or <cite>out</cite>.</p></li>
 <li><dl>
 <dt>choice: Specifies the choices for this option. If dynamic generation is required, implement the <cite>choice_fn</cite> method in the feature class.</dt><dd><p>Choices can be specified in either of the following two ways.</p>

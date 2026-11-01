@@ -2,6 +2,13 @@ from cmdbox.app import common, feature
 from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cmdbox.app.auth import signin
+from fastapi import Response
+from fastmcp import FastMCP
+from fastmcp.exceptions import NotFoundError
+from fastmcp.tools import FunctionTool
+from fastmcp.server.auth.providers.jwt import JWTVerifier
+from fastmcp.server.providers import Provider
+from fastmcp.server.middleware import Middleware, MiddlewareContext
 from pathlib import Path
 from typing import Callable, List, Dict, Any, Tuple
 import argparse
@@ -36,21 +43,20 @@ class Mcp:
         self.signin = sign
         self.language = language
 
-    def create_mcpserver(self, logger:logging.Logger, args:argparse.Namespace, tools) -> Any:
+    def create_mcpserver(self, logger:logging.Logger, args:argparse.Namespace) -> Any:
         """
         mcpserverを作成します
 
         Args:
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
-            tools (List[Callable]): ツールのリスト
+            tool_providers (Provider): ツールプロバイダー
 
         Returns:
             Any: FastMCP
         """
-        from fastmcp import FastMCP
-        from fastmcp.server.auth.providers.jwt import JWTVerifier
         cls = self.signin.__class__
+        tool_provider = self.create_tools(logger, args, False)
         publickey_str = cls.verify_jwt_publickey_str if hasattr(cls, 'verify_jwt_publickey_str') else None
         issuer = cls.verify_jwt_issuer if hasattr(cls, 'verify_jwt_issuer') else None
         audience = cls.verify_jwt_audience if hasattr(cls, 'verify_jwt_audience') else None
@@ -61,51 +67,13 @@ class Mcp:
                 issuer=issuer,
                 audience=audience
             )
-            mcp = FastMCP(name=self.ver.__appid__, auth=auth, tools=tools)
+            mcp = FastMCP(name=self.ver.__appid__, auth=auth, providers=[tool_provider])
         else:
             self.logger.info(f"Using JWTVerifier without public key, issuer, or audience.")
-            mcp = FastMCP(name=self.ver.__appid__)
+            mcp = FastMCP(name=self.ver.__appid__, providers=[tool_provider])
         mcp.add_middleware(self.create_mw_logging(self.logger, args))
         mcp.add_middleware(self.create_mw_reqscope(self.logger, args))
-        mcp.add_middleware(self.create_mw_toollist(self.logger, args, tools))
         return mcp
-
-    def create_session_service(self, args:argparse.Namespace) -> Any:
-        """
-        セッションサービスを作成します
-
-        Args:
-            args (argparse.Namespace): 引数
-
-        Returns:
-            BaseSessionService: セッションサービス
-        """
-        from google.adk.events import Event
-        from google.adk.sessions import DatabaseSessionService, InMemorySessionService, session
-        #from typing_extensions import override
-        if hasattr(args, 'agent_session_dburl') and args.agent_session_dburl is not None:
-            """
-            class _DatabaseSessionService(DatabaseSessionService):
-                @override
-                async def append_event(self, session: session.Session, event: Event) -> Event:
-                    # 永続化されるセッションには <important> タグを含めない
-                    bk_parts = event.content.parts.copy()
-                    for part in event.content.parts:
-                        if not part.text: continue
-                        part.text = re.sub(r"<important>.*</important>", "", part.text)
-                    for part in bk_parts:
-                        if not part.text: continue
-                        part.text = part.text.replace("<important>", "").replace("</important>", "")
-                    ret = await super().append_event(session, event)
-                    ret.content.parts = bk_parts
-                    return ret
-            dss = _DatabaseSessionService(db_url=args.agent_session_dburl)
-            """
-            dss = DatabaseSessionService(db_url=args.agent_session_dburl)
-            #dss.db_engine.echo = True
-            return dss
-        else:
-            return InMemorySessionService()
 
     def create_tools(self, logger:logging.Logger, args:argparse.Namespace, extract_callable:bool) -> Any:
         """
@@ -119,7 +87,7 @@ class Mcp:
         Returns:
             ToolList: ToolListのリスト
         """
-        tool_list = ToolList(logger, self.data, appcls=self.appcls, ver=self.ver, language=self.language)
+        tool_list = ToolListProvider(logger, self.data, appcls=self.appcls, ver=self.ver, language=self.language)
         tool_list.extract_callable = extract_callable
         return tool_list
 
@@ -162,8 +130,6 @@ class Mcp:
             Any: ミドルウェア
         """
         from cmdbox.app.web import Web
-        from fastapi import Response
-        from fastmcp.server.middleware import Middleware, MiddlewareContext
         class ReqScopeMiddleware(Middleware):
             async def on_message(self, context: MiddlewareContext, call_next):
                 try:
@@ -186,28 +152,8 @@ class Mcp:
                 return result
         return ReqScopeMiddleware()
 
-    def create_mw_toollist(self, logger:logging.Logger, args:argparse.Namespace, tools:Any) -> Any:
-        """
-        toolsリスト取得用のミドルウェアを作成します
 
-        Args:
-            logger (logging.Logger): ロガー
-            args (argparse.Namespace): 引数
-            tools (Any): ツールリスト
-
-        Returns:
-            Any: ミドルウェア
-        """
-        from fastmcp.server.middleware import Middleware, MiddlewareContext
-        class ToolListMiddleware(Middleware):
-            async def on_list_tools(self, context: MiddlewareContext, call_next):
-                if logger.level == logging.DEBUG:
-                    logger.debug(f"Intercepting tools/list request to return latest ToolList")
-                # ツールリストの最新版を取得（ToolListクラスのイテレータを使用）
-                return [tool for tool in tools]
-        return ToolListMiddleware()
-
-class ToolList(object):
+class ToolListProvider(Provider):
     def __init__(self, logger:logging.Logger, data:Path, *tools:List, appcls=None, ver=None, language:str=None):
         """
         ツールリストを初期化します
@@ -220,8 +166,7 @@ class ToolList(object):
             ver ([type], optional): バージョン. Defaults to None.
             language (str, optional): 言語. Defaults to None.
         """
-        from fastmcp.tools import FunctionTool
-
+        super().__init__()
         self.tools = []
         self.logger = logger
         self.data = data
@@ -236,6 +181,17 @@ class ToolList(object):
             else:
                 raise TypeError(f"Expected FunctionTool, got {type(tool)}")
             self.tools.append(tool)
+
+    async def _list_tools(self):
+        """FastMCP provider が現在のツール一覧を取得するためのポイント。"""
+        return list(self)
+
+    async def _get_tool(self, name: str, version=None):
+        """FastMCP provider が名前でツールを検索するために使用する。"""
+        for tool in self:
+            if getattr(tool, 'name', None) == name:
+                return tool
+        raise NotFoundError(f"Tool not found: {name}")
 
     @property
     def extract_callable(self):
@@ -336,30 +292,44 @@ class ToolList(object):
             # ユーザーコマンドの読み込み
             paths = glob.glob(str(Path(web.data) / ".cmds" / f"cmd-*.json"))
             cmd_list = [common.loadopt(path, True) for path in paths]
+            # サインインユーザー取得
+            scope = signin.get_request_scope()
+            req = scope["req"] if scope["req"] is not None else scope["websocket"]
+            sign = web.signin._check_signin(req, scope["res"], data, self.logger)
+            if sign is not None or "signin" not in req.session or "groups" not in req.session["signin"]:
+                self.logger.warning("You do not have permission to execute this command. check="+common.to_str(sign))
+                #return ret_tools.__iter__()
+                return [].__iter__()
+            groups = req.session["signin"]["groups"]
+            user_name = req.session["signin"]["name"]
+            user_session = req.session["signin"]
             cmd_list = sorted(cmd_list, key=lambda cmd: cmd["title"])
-            # ユーザーコマンドリストの取得(すべてのコマンドを取得するためにgroupsをadminに設定)
-            # 実行時にはユーザーのグループに応じて認可する
             ret = []
-            for r in cmd_list:
+            for cmd in cmd_list:
                 # エージェント経由での実行が許可されているかどうかをチェック
-                if not options.get_cmd_attr(r['mode'], r['cmd'], 'use_agent'):
+                if not options.get_cmd_attr(cmd['mode'], cmd['cmd'], 'use_agent'):
+                    continue
+                # コマンドに許可されているグループ(allow_groups)にユーザーが属していない場合はスキップ
+                allow_groups = [g for g in cmd.get("allow_groups", []) if g]
+                if allow_groups and not any(g in allow_groups for g in groups):
                     continue
                 # ユーザーコマンドが実行可能かどうかをチェック
-                if not signin.Signin._check_cmd(signin_file_data=data, user_groups=['admin'], mode=r['mode'], cmd=r['cmd'],
-                                           opt=r, user_name="unknown", user_session={}, logger=self.logger,
+                if not signin.Signin._check_cmd(signin_file_data=data, user_groups=groups, mode=cmd['mode'], cmd=cmd['cmd'],
+                                           opt=cmd, user_name=user_name, user_session=user_session, logger=self.logger,
                                            appcls=self.appcls, ver=self.ver, language=web.language):
                     continue
-                ret.append(dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
-                                description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
-                                tag=r.get('tag','')))
+                ret.append(dict(title=cmd.get('title',''), mode=cmd['mode'], cmd=cmd['cmd'],
+                                description=cmd.get('description','') + str(options.get_cmd_attr(cmd['mode'], cmd['cmd'], 'description_ja' if is_japan else 'description_en')),
+                                tag=cmd.get('tag','')))
             cmd_list = ret
         except Exception as e:
             # ユーザーコマンドの読み込みに失敗した場合は警告を出して登録済みのリストを返す
             self.logger.warning(f"Error loading user commands: {e}", exc_info=True)
-            if self.extract_callable:
-                # 関数を抽出する場合はツールリストから関数を抽出して返す
-                return (tool.fn for tool in ret_tools if callable(tool.fn)).__iter__()
-            return ret_tools.__iter__()
+            #if self.extract_callable:
+            #    # 関数を抽出する場合はツールリストから関数を抽出して返す
+            #    return (tool.fn for tool in ret_tools if callable(tool.fn)).__iter__()
+            #return ret_tools.__iter__()
+            return [].__iter__()
         _tools_fns = [tool.name for tool in ret_tools]
         # ユーザーコマンドの定義を関数として生成
         for opt in cmd_list:

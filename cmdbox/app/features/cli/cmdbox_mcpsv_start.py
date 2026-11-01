@@ -121,7 +121,7 @@ class McpsvStart(feature.UnsupportEdgeFeature, validator.Validator):
             from fastmcp import FastMCP
             sign = signin.getDefaultInstance(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver, self.language)
             self.mcp = mcp_mod.Mcp(logger, Path(args.data), sign, self.appcls, self.ver, self.language)
-            fastmcp:FastMCP = self.mcp.create_mcpserver(logger, args, self.mcp.create_tools(logger, args, False))
+            fastmcp:FastMCP = self.mcp.create_mcpserver(logger, args)
 
             # SSL/paths を Path に揃える
             args.ssl_cert = None if args.ssl_cert is None else Path(args.ssl_cert)

@@ -430,7 +430,7 @@ limiter_page.open_edit_modal = async (name, defaults) => {
         if (key === 'target_option') {
             return;
         }
-        const input = form.find(`[name="${key}"]`);
+        const input = form.find(`:input[name="${key}"]`);
         if (input.length > 0) {
             if (key === 'exec_period_start' || key === 'exec_period_end' ||
                 key === 'limiter_start' || key === 'limiter_end' || key === 'reset_datetime') {

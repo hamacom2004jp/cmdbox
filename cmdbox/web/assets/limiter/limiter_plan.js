@@ -358,7 +358,7 @@ limiter_plan_page.open_edit_modal = async (name) => {
     // 設定値を form にセット
     const form = $('#plan_form_content');
     Object.keys(cfg).forEach(key => {
-        const input = form.find(`[name="${key}"]`);
+        const input = form.find(`:input[name="${key}"]`);
         if (input.length > 0) {
             if (key === 'plan_start' || key === 'plan_end' || key === 'open_date' || 
                 key === 'suspend_date' || key === 'notice_date') {
