@@ -46,6 +46,9 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="key_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込むキーIDを指定します。",
                      description_en="Specify the key ID to load."),
+                dict(opt="key_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="読み込むキー名を指定します。",
+                     description_en="Specify the key name to load."),
             ]
         )
 
@@ -54,6 +57,8 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
     async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(
             key_id=args.key_id,
+            key_name=args.key_name,
+            signin_groups=args.signin_groups if hasattr(args, 'signin_groups') else []
         )
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -66,7 +71,7 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:
-        class Data(resdata.Data):
+        class KeyRecord(resdata.Base):
             key_id: Union[str, None] = pydantic.Field(default=None, description="キーID")
             key_name: Union[str, None] = pydantic.Field(default=None, description="キー名")
             key_provider: Union[str, None] = pydantic.Field(default=None, description="キー発行者")
@@ -83,6 +88,10 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             groups: Union[List[str], None] = pydantic.Field(default=None, description="利用可能グループ")
             owner: Union[List[str], None] = pydantic.Field(default=None, description="所有者")
             claims: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="要求クレーム")
+            description: Union[str, None] = pydantic.Field(default=None, description="説明")
+            created_at: Union[str, None] = pydantic.Field(default=None, description="作成日時")
+        class Data(resdata.Data):
+            data: List[KeyRecord] = pydantic.Field(default_factory=list, description="処理結果のデータ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -102,27 +111,14 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 return self.RESP_WARN
 
             key_id = payload.get('key_id')
-            matches = []
-            pattern = f"key_{key_id}_*.json"
-            for p in sorted(keystore_dir.glob(pattern)):
-                try:
-                    cfg = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=True)
-                    if cfg.get('key_id') != key_id:
-                        continue
-                    matches.append(cfg)
-                except Exception:
-                    continue
-
-            if len(matches) <= 0:
-                result = dict(warn=f"Keystore key not found. key_id='{key_id}'.")
+            key_name = payload.get('key_name')
+            try:
+                cfg = self.load_key(data_dir, key_id, key_name, payload.get('signin_groups', []))
+            except Exception as e:
+                result = dict(warn=str(e))
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
-            if len(matches) > 1:
-                result = dict(warn=f"Multiple keystore keys found for key_id='{key_id}'. Please specify --key_name.")
-                redis_cli.rpush(reskey, result)
-                return self.RESP_WARN
-
-            result = dict(success=matches[0])
+            result = dict(success=dict(data=cfg))
             redis_cli.rpush(reskey, result)
             return self.RESP_SUCCESS
         except Exception as e:
@@ -130,3 +126,10 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, result)
             return self.RESP_WARN
+
+    def load_key(self, data_dir:Path, key_id:str, key_name:str, signin_groups:List[str]) -> Dict[str, Any]:
+        keystore_dir = data_dir / '.keystore'
+        key_file = keystore_dir / f"key_{key_id}_{key_name}.json"
+        if not key_file.exists():
+            raise FileNotFoundError(f"Keystore key not found. key_id='{key_id}', key_name='{key_name}'.")
+        return common.load_file(key_file, lambda f: json.load(f), encoding='utf-8', nolock=True)

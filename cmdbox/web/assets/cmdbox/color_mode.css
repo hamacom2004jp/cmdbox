@@ -7,8 +7,8 @@
     --area-bg-color-10: rgba(0, 247, 255, 0.1);
     --area-bg-color-danger-50: rgba(255, 0, 230, 0.5);
     --area-bg-color-danger-10: rgba(255, 0, 230, 0.1);
-    --font-header: 'Orbitron', sans-serif;
-    --font-body: 'Rajdhani', sans-serif;
+    --font-header: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", 'Orbitron', 'Rajdhani', sans-serif;
+    --font-body: var(--font-header);
 }
 body {
     font-family: var(--font-body);
@@ -181,7 +181,7 @@ body::after {
 [data-bs-theme="light"] {
     --bs-body-bg: #fff;
     --bs-body-color: #212529;
-    --bs-body-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --bs-body-font-family: var(--font-body);
     --bs-body-font-size: 1rem;
     --bs-body-font-weight: 400;
     --bs-body-line-height: 1.5;
@@ -737,8 +737,6 @@ body::after {
     --accent-green: #39ff14;
     --accent-blue: #1439ff;
     --text-primary: #e2e8f0;
-    --font-header: 'Orbitron', sans-serif;
-    --font-body: 'Rajdhani', sans-serif;
     --area-border-color: rgba(0, 247, 255, 0.3);
     --item-border-color: rgba(0, 247, 255, 0.2);
     --item-border-danger-color: rgba(255, 0, 230, 0.3);

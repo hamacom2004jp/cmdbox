@@ -24,12 +24,15 @@ keystore ( add ) : ``cmdbox -m keystore -c add <Option>``
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
-    "--key_id <key_id>","str","","","","","Unique key identifier across all keys. If omitted, it will be auto-generated."
     "--key_name <key_name>","str","","required","","","Readable key name."
-    "--key_provider <key_provider>","str","","","","","Key provider, usually a domain name. If omitted, `cmdbox` is used."
     "--key_type <key_type>","str","","required","apikey","apikey | signkey | enckey | cacert","Specify the type of key information to register."
-    "--key_usage <key_usage>","str","multi","","","","Target commands (get_svcmd values) that can use this key. Multiple values allowed."
+    "--key_id <key_id>","str","","","","","Unique key identifier across all keys. If omitted, it will be auto-generated."
+    "--key_provider <key_provider>","str","","","","","Key provider, usually a domain name. If omitted, `cmdbox` is used."
     "--key_value <key_value>","text","","","","","Actual key value. If omitted, a JWT token will be auto-generated for the current user."
+    "--key_usage <key_usage>","str","multi","required","","","Target commands (get_svcmd values) that can use this key. Multiple values allowed."
+    "--scope <scope>","str","","","client","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
+    "--fwpath <fwpath>","file","multi","required","","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--rjpath <rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
     "--sign_key <sign_key>","file","","","","","Private key file for the public key certificate."
     "--sign_cert <sign_cert>","file","","","","","Public key certificate file."
     "--key_pass <key_pass>","passwd","","","","","Password for the private key."
@@ -59,7 +62,6 @@ This command implements ``output_schema()`` returning ``Result`` model.
         ],
         "key_id": "string",
         "key_name": "string",
-        "path": "string",
         "msg": "string"
       },
       "warn": {},
@@ -78,7 +80,6 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.key_id","str | null","no","null","キーID"
     "success.key_name","str | null","no","null","キー名"
-    "success.path","str | null","no","null","保存先パス"
     "success.msg","str | null","no","null","処理結果メッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
@@ -197,7 +198,14 @@ This command implements ``output_schema()`` returning ``Result`` model.
             ],
             "key_period_start": "string",
             "key_period_end": "string",
-            "path": "string"
+            "groups": [
+              "string"
+            ],
+            "owner": [
+              "string"
+            ],
+            "description": "string",
+            "created_at": "string"
           }
         ]
       },
@@ -223,7 +231,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data.key_usage","list[str]","no","(必須)","利用対象コマンド"
     "success.data.key_period_start","str | null","no","null","使用開始日時"
     "success.data.key_period_end","str | null","no","null","使用終了日時"
-    "success.data.path","str","yes","(必須)","保存先パス"
+    "success.data.groups","list[str]","no","(必須)","所属グループ"
+    "success.data.owner","list[str]","no","(必須)","所有者"
+    "success.data.description","str | null","no","null","説明"
+    "success.data.created_at","str | null","no","null","作成日時"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -252,6 +263,7 @@ keystore ( load ) : ``cmdbox -m keystore -c load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--key_id <key_id>","str","","required","","","Specify the key ID to load."
+    "--key_name <key_name>","str","","required","","","Specify the key name to load."
 
 **Output Schema**
 
@@ -268,28 +280,34 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "value": null
           }
         ],
-        "key_id": "string",
-        "key_name": "string",
-        "key_provider": "string",
-        "key_type": "string",
-        "key_usage": [
-          "string"
-        ],
-        "key_value": "string",
-        "sign_key": "string",
-        "sign_cert": "string",
-        "key_pass": "string",
-        "enc_key": "string",
-        "ca_cert": "string",
-        "key_period_start": "string",
-        "key_period_end": "string",
-        "groups": [
-          "string"
-        ],
-        "owner": [
-          "string"
-        ],
-        "claims": {}
+        "data": [
+          {
+            "key_id": "string",
+            "key_name": "string",
+            "key_provider": "string",
+            "key_type": "string",
+            "key_usage": [
+              "string"
+            ],
+            "key_value": "string",
+            "sign_key": "string",
+            "sign_cert": "string",
+            "key_pass": "string",
+            "enc_key": "string",
+            "ca_cert": "string",
+            "key_period_start": "string",
+            "key_period_end": "string",
+            "groups": [
+              "string"
+            ],
+            "owner": [
+              "string"
+            ],
+            "claims": {},
+            "description": "string",
+            "created_at": "string"
+          }
+        ]
       },
       "warn": {},
       "error": {},
@@ -305,22 +323,25 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.key_id","str | null","no","null","キーID"
-    "success.key_name","str | null","no","null","キー名"
-    "success.key_provider","str | null","no","null","キー発行者"
-    "success.key_type","str | null","no","null","キー種別"
-    "success.key_usage","list[str] | null","no","null","利用対象コマンド"
-    "success.key_value","str | null","no","null","キー実体"
-    "success.sign_key","str | null","no","null","秘密鍵ファイル"
-    "success.sign_cert","str | null","no","null","証明書ファイル"
-    "success.key_pass","str | null","no","null","秘密鍵パスワード"
-    "success.enc_key","str | null","no","null","暗号鍵"
-    "success.ca_cert","str | null","no","null","CA証明書ファイル"
-    "success.key_period_start","str | null","no","null","使用開始日時"
-    "success.key_period_end","str | null","no","null","使用終了日時"
-    "success.groups","list[str] | null","no","null","利用可能グループ"
-    "success.owner","list[str] | null","no","null","所有者"
-    "success.claims","dict[str, any] | null","no","null","要求クレーム"
+    "success.data","list[KeyRecord]","no","(必須)","処理結果のデータ"
+    "success.data.key_id","str | null","no","null","キーID"
+    "success.data.key_name","str | null","no","null","キー名"
+    "success.data.key_provider","str | null","no","null","キー発行者"
+    "success.data.key_type","str | null","no","null","キー種別"
+    "success.data.key_usage","list[str] | null","no","null","利用対象コマンド"
+    "success.data.key_value","str | null","no","null","キー実体"
+    "success.data.sign_key","str | null","no","null","秘密鍵ファイル"
+    "success.data.sign_cert","str | null","no","null","証明書ファイル"
+    "success.data.key_pass","str | null","no","null","秘密鍵パスワード"
+    "success.data.enc_key","str | null","no","null","暗号鍵"
+    "success.data.ca_cert","str | null","no","null","CA証明書ファイル"
+    "success.data.key_period_start","str | null","no","null","使用開始日時"
+    "success.data.key_period_end","str | null","no","null","使用終了日時"
+    "success.data.groups","list[str] | null","no","null","利用可能グループ"
+    "success.data.owner","list[str] | null","no","null","所有者"
+    "success.data.claims","dict[str, any] | null","no","null","要求クレーム"
+    "success.data.description","str | null","no","null","説明"
+    "success.data.created_at","str | null","no","null","作成日時"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"

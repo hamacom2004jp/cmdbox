@@ -73,7 +73,10 @@ class KeystoreList(feature.OneshotResultEdgeFeature, validator.Validator):
             key_usage: List[str] = pydantic.Field(default_factory=list, description="利用対象コマンド")
             key_period_start: Union[str, None] = pydantic.Field(default=None, description="使用開始日時")
             key_period_end: Union[str, None] = pydantic.Field(default=None, description="使用終了日時")
-            path: str = pydantic.Field(..., description="保存先パス")
+            groups: List[str] = pydantic.Field(default_factory=list, description="所属グループ")
+            owner: List[str] = pydantic.Field(default_factory=list, description="所有者")
+            description: Union[str, None] = pydantic.Field(default=None, description="説明")
+            created_at: Union[str, None] = pydantic.Field(default=None, description="作成日時")
         class Data(resdata.Data):
             data: List[KeyRecord] = pydantic.Field(default_factory=list, description="処理結果のデータ")
         class Result(resdata.Result):
@@ -104,7 +107,10 @@ class KeystoreList(feature.OneshotResultEdgeFeature, validator.Validator):
                             key_usage=cfg.get('key_usage') if isinstance(cfg.get('key_usage'), list) else [],
                             key_period_start=cfg.get('key_period_start'),
                             key_period_end=cfg.get('key_period_end'),
-                            path=str(p),
+                            groups=cfg.get('groups') if isinstance(cfg.get('groups'), list) else [],
+                            owner=cfg.get('owner') if isinstance(cfg.get('owner'), list) else [],
+                            description=cfg.get('description'),
+                            created_at=cfg.get('created_at')
                         ))
                     except Exception:
                         continue

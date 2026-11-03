@@ -109,7 +109,7 @@
 .nav-label {
     display: none;
     white-space: nowrap;
-    font-family: var(--font-body), sans-serif;
+    font-family: var(--font-body);
     letter-spacing: 0.04em;
     opacity: 0;
     transition: opacity 0.35s ease-in-out;
@@ -158,7 +158,7 @@ body.status-sidebar-expanded .status-main {
 }
 
 .stat-title {
-    font-family: var(--font-body), sans-serif;
+    font-family: var(--font-body);
     font-weight: 700;
     font-size: 1.02rem;
     letter-spacing: 0.02em;
@@ -166,7 +166,7 @@ body.status-sidebar-expanded .status-main {
 }
 
 .stat-kpi {
-    font-family: var(--font-body), sans-serif;
+    font-family: var(--font-body);
     font-size: 1.65rem;
     line-height: 1;
     letter-spacing: 0.02em;
@@ -277,7 +277,7 @@ body.status-sidebar-expanded .status-main {
 }
 
 .storage-name {
-    font-family: 'Rajdhani', monospace;
+    font-family: var(--font-body);
     font-size: 0.95rem;
 }
 
@@ -294,7 +294,7 @@ body.status-sidebar-expanded .status-main {
     background: color-mix(in oklab, var(--bs-body-bg) 92%, var(--bs-black) 8%);
     color: var(--bs-body-color);
     padding: 10px;
-    font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+    font-family: var(--font-body);
     font-size: 0.82rem;
     line-height: 1.45;
     white-space: pre-wrap;
