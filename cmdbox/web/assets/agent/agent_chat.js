@@ -302,7 +302,7 @@ agentView.chat = (session_id) => {
             let loading_msg = agentView.spinner_loading(success);
             msg_container.find('.spinner-loading').text(loading_msg);
             const msg_str = agentView.parse_message(success.message);
-            if (msg_str != success.message) {
+            if (msg_str != success.message || hasStructured) {
                 await agentView.format_agent_message(msg_content, msg_str, success);
             }
             agentView.scrollToBottom();
@@ -328,6 +328,13 @@ agentView.chat = (session_id) => {
         }
         await agentView.say.play(success.wav_b64);
         agentView.message_id = null;
+        // 読み込み中のスピナーを削除
+        $('.msg-content').each((index, element) => {
+            const content_elem = $(element);
+            if (content_elem.children('.spinner-grow').length > 0) {
+                content_elem.remove();
+            }
+        });
     };
     agentView.ws.onopen = () => {
         const ping = () => {

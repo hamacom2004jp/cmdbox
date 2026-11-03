@@ -67,10 +67,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
     def __init__(self, appcls, ver, language:str=None):
         super().__init__(appcls, ver, language=language)
         self.call_a2asv_start:bool = False
-        # キャッシング用インスタンス変数
-        self._planner_cache: Dict[str, Tuple[Any, float]] = {}  # key -> (planner_instance, created_timestamp)
-        self._agent_cache: Dict[str, Tuple[Any, float]] = {}    # key -> (agent_instance, created_timestamp)
-        self._cache_ttl_seconds = 1800  # 30分
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -332,60 +328,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
         return swap_native_output_schema_to_tool
 
-    def _cleanup_expired_cache(self, cache: Dict[str, Tuple[Any, float]], logger: Optional[logging.Logger] = None) -> None:
-        """
-        TTLを超過したキャッシュエントリを削除します
-
-        Args:
-            cache (Dict): キャッシュ辞書
-            logger (Optional[logging.Logger]): ロガー
-        """
-        import time
-        current_time = time.time()
-        expired_keys = [
-            key for key, (_, created_at) in cache.items()
-            if current_time - created_at > self._cache_ttl_seconds
-        ]
-        for key in expired_keys:
-            del cache[key]
-            if logger:
-                logger.debug(f"Expired cache entry removed: {key}")
-
-    def _get_planner_cache_key(self, runner_name: str, llmprov: str) -> str:
-        """Planner キャッシュキーを生成"""
-        return f"planner:{runner_name}:{llmprov}"
-
-    def _get_agent_cache_key(self, runner_name: str, user_name: str, config_hash: str) -> str:
-        """Agent キャッシュキーを生成"""
-        return f"agent:{runner_name}:{user_name}:{config_hash}"
-
-    def _compute_config_hash(self, agent_conf: Dict[str, Any]) -> str:
-        """
-        エージェント設定のハッシュを計算
-        
-        Args:
-            agent_conf (Dict[str, Any]): エージェント設定
-
-        Returns:
-            str: 設定のMD5ハッシュ
-        """
-        import hashlib
-        try:
-            conf_str = json.dumps(agent_conf, sort_keys=True)
-            return hashlib.md5(conf_str.encode()).hexdigest()
-        except Exception:
-            # JSON化失敗時は詳細ハッシュを使用しない
-            return "default"
-
-    def set_cache_ttl(self, ttl_seconds: int) -> None:
-        """
-        キャッシュのTTLを設定します。
-        
-        Args:
-            ttl_seconds (int): TTL（秒）
-        """
-        self._cache_ttl_seconds = ttl_seconds
-
     def create_agent(self, *, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
                      agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]],
                      payload:Dict[str, Any]) -> Any:
@@ -462,7 +404,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
             else:
                 mcpsv_confs = []
-            return self.create_agent(logger, data_dir, disable_remote_agent, agent_conf, llm_conf, mcpsv_confs, payload)
+            return self.create_agent(logger=logger, data_dir=data_dir, disable_remote_agent=disable_remote_agent,
+                                     agent_conf=agent_conf, llm_conf=llm_conf, mcpsv_confs=mcpsv_confs, payload=payload)
 
         agent_subagents = agent_subagents if agent_subagents is not None else []
         subagents = []
@@ -474,18 +417,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
         llmprov = llm_conf.get('llmprov', None)
         reasoning_effort = self.get_reasoning_effort(agent_conf, payload)
-        runner_name = agent_conf.get('runner_name', payload.get('runner_name', 'default'))
-        
-        # Planner をキャッシュから取得または新規作成
-        planner_cache_key = self._get_planner_cache_key(runner_name, llmprov)
-        self._cleanup_expired_cache(self._planner_cache)
-        
-        if planner_cache_key in self._planner_cache:
-            planner, _ = self._planner_cache[planner_cache_key]
-        else:
-            planner = self.create_agent_planner(agent_conf, llm_conf, reasoning_effort)
-            if planner is not None:
-                self._planner_cache[planner_cache_key] = (planner, time.time())
+        planner = self.create_agent_planner(agent_conf, llm_conf, reasoning_effort)
         if agent_type == 'remote' and not disable_remote_agent:
             from google.adk.agents.remote_a2a_agent import RemoteA2aAgent, AGENT_CARD_WELL_KNOWN_PATH
             from a2a.client.client_factory import ClientConfig, ClientFactory
@@ -1000,21 +932,10 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf = self.load_conf(runner_name, data_dir, logger)
             agent_conf = self.prepare_agent_conf(agent_conf, payload)
             
-            # Agent をキャッシュから取得または新規作成
-            agent_cache_key = self._get_agent_cache_key(runner_name, user_name, self._compute_config_hash(agent_conf))
-            self._cleanup_expired_cache(self._agent_cache, logger)
-            
-            if agent_cache_key in self._agent_cache:
-                agent, _ = self._agent_cache[agent_cache_key]
-                if logger.level == logging.DEBUG:
-                    logger.debug(f"Agent reused from cache: {agent_cache_key}")
-            else:
-                # Agentを作成する
-                agent = self.create_agent(logger=logger, data_dir=data_dir, disable_remote_agent=False,
-                                          agent_conf=agent_conf, llm_conf=llm_conf, mcpsv_confs=mcpsv_confs,
-                                          payload=payload)
-                # キャッシュに保存
-                self._agent_cache[agent_cache_key] = (agent, time.time())
+            # Agentを作成する
+            agent = self.create_agent(logger=logger, data_dir=data_dir, disable_remote_agent=False,
+                                        agent_conf=agent_conf, llm_conf=llm_conf, mcpsv_confs=mcpsv_confs,
+                                        payload=payload)
             # セッションサービスを作成する
             session_service = self.create_session_service(logger=logger, data_dir=data_dir, ds_conf=ds_conf)
             # セッションを作成する
