@@ -1062,9 +1062,18 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 cmdbox_tts_say.TtsSay.tts_stop(tts_engine_obj)
             # litellm のグローバル非同期クライアントをクローズ
             try:
+                import asyncio
                 import litellm
-                # agent の実行に伴い、litellm が内部的に作成した
-                # aiohttp.ClientSession / httpx.AsyncClient をクローズ
+                from openai import AsyncOpenAI
+                cache = litellm.in_memory_llm_clients_cache
+                suffix = f"-{id(asyncio.get_running_loop())}"
+                for key, client in list(cache.cache_dict.items()):
+                    if key.endswith(suffix) and isinstance(client, AsyncOpenAI):
+                        try:
+                            await client.close()
+                        except Exception as e:
+                            logger.debug(f"Error closing litellm openai client: {e}")
+                        cache.delete_cache(key)
                 if hasattr(litellm, 'close_litellm_async_clients'):
                     await litellm.close_litellm_async_clients()
             except Exception as e:

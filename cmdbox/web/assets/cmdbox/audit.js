@@ -206,8 +206,8 @@ audit.metrics_modal_func = (title) => {
                 choice:{key:axis, val:['-','count','sum','avg','min','max']}});
         });
         const base_rows = await cmdbox.get_cmd_choices('audit', 'search');
-        base_rows.filter(row => row['opt'].startsWith('filter')).forEach((row) => {
-            row['hide'] = true;
+        base_rows.filter(row => row['opt'].startsWith('filter') || row['opt'].startsWith('exclude')).forEach((row) => {
+            //row['hide'] = true;
             if (data[row['opt']]) {
                 const val = data[row['opt']];
                 if (Array.isArray(val) && val.length > 0) {
@@ -309,8 +309,11 @@ audit.init_form = async () => {
         cmdbox.save_user_data('audit', 'condition', JSON.stringify(condition));
     });
     // 主なフィルター条件のフォームを表示
-    const nml_conditions = ['filter_audit_type', 'filter_clmsg_id', 'filter_clmsg_src', 'filter_clmsg_title', 'filter_clmsg_title', 'filter_clmsg_user',
-                        'filter_clmsg_tag', 'filter_svmsg_sdate', 'filter_svmsg_edate']
+    const nml_conditions = ['filter_audit_type', 'filter_clmsg_id', 'filter_clmsg_src',
+                        'filter_clmsg_title', 'filter_clmsg_title', 'filter_clmsg_user',
+                        'filter_clmsg_tag', 'filter_svmsg_sdate', 'filter_svmsg_edate',
+                        'exclude_audit_type', 'exclude_clmsg_src', 'exclude_clmsg_title', 'exclude_clmsg_user',
+                        'exclude_clmsg_body', 'exclude_clmsg_tag']
     py_get_cmd_choices.filter(row => nml_conditions.includes(row.opt)).forEach((row, i) => cmdbox.add_form_func(i, modal, row_content, row, null, 12, 6));
     const adv_link = $('<div class="text-center card-hover col-12 mb-3"><a href="#">[ advanced options ]</a></div>').appendTo(row_content);
     adv_link.off('click').on('click', (e) => {row_content.find('.adv').toggle();});
