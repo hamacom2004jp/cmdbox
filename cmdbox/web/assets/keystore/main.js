@@ -8,8 +8,8 @@ const keystore_page = {
  */
 keystore_page.to_dt_local = (s) => {
     if (!s) return '';
-    // "2024-01-01 00:00:00" または "2024-01-01_00:00:00" を "2024-01-01_00:00:00" に
-    return s.replace(' ', 'T').replace('T', '_').substring(0, 19);
+    // "2024-01-01 00:00:00" または "2024-01-01_00:00:00" を "2024-01-01_00:00" に
+    return s.replace(' ', 'T').replace('T', '_').substring(0, 16);
 };
 
 keystore_page.normalize_response = (res) => {
@@ -20,7 +20,7 @@ keystore_page.normalize_response = (res) => {
 keystore_page.get_add_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('keystore', 'add');
     const names = [
-        'key_id', 'key_name', 'key_provider', 'key_type', 'key_usage','scope',
+        'key_name', 'key_provider', 'key_type', 'key_usage','scope',
         'key_value', 'sign_key', 'sign_cert', 'key_pass', 'enc_key', 'ca_cert',
         'key_period_start', 'key_period_end', 'groups', 'owner', 'claims', 'description'
     ];
@@ -94,11 +94,11 @@ keystore_page.collect_form_data = () => {
 keystore_page.add = async () => {
     const data = keystore_page.collect_form_data();
     if (!data.key_name || !data.key_name.trim()) {
-        cmdbox.message({ warn: 'key_name is required.' }, true, true);
+        cmdbox.message({ warn: 'key_name is required.' }, false);
         return;
     }
     if (!data.key_usage || (Array.isArray(data.key_usage) && data.key_usage.length === 0)) {
-        cmdbox.message({ warn: 'key_usage is required.' }, true, true);
+        cmdbox.message({ warn: 'key_usage is required.' }, false);
         return;
     }
 
@@ -108,24 +108,24 @@ keystore_page.add = async () => {
         res = await cmdbox.sv_exec_cmd({ mode: 'keystore', cmd: 'add', ...data });
     } catch (e) {
         cmdbox.hide_loading();
-        cmdbox.message({ error: e.toString() }, true, true);
+        cmdbox.message({ error: e.toString() }, false);
         return;
     }
     cmdbox.hide_loading();
 
     const first = keystore_page.normalize_response(res);
     if (!first || !first.success) {
-        cmdbox.message(res, true, true);
+        cmdbox.message(res, false);
         return;
     }
-    cmdbox.message(first.success.msg || 'added', true, true);
+    cmdbox.message(first.success.msg || 'added', false);
     $('#keystore_modal').modal('hide');
     await keystore_page.load_list();
 };
 
 keystore_page.delete_row = async (row) => {
-    if (!row || !row.key_id || !row.key_name) return;
-    const ok = await cmdbox.confirm({ warn: `Delete key ${row.key_name} (${row.key_id}) ?` }, true);
+    if (!row || !row.key_name || !row.key_provider) return;
+    const ok = await cmdbox.confirm({ warn: `Delete key ${row.key_name}@${row.key_provider} ?` }, true);
     if (!ok) return;
 
     cmdbox.show_loading();
@@ -134,22 +134,22 @@ keystore_page.delete_row = async (row) => {
         res = await cmdbox.sv_exec_cmd({
             mode: 'keystore',
             cmd: 'del',
-            key_id: row.key_id,
-            key_name: row.key_name
+            key_name: row.key_name,
+            key_provider: row.key_provider
         });
     } catch (e) {
         cmdbox.hide_loading();
-        cmdbox.message({ error: e.toString() }, true, true);
+        cmdbox.message({ error: e.toString() }, false);
         return;
     }
     cmdbox.hide_loading();
 
     const first = keystore_page.normalize_response(res);
     if (!first || !first.success) {
-        cmdbox.message(res, true, true);
+        cmdbox.message(res, false);
         return;
     }
-    cmdbox.message(first.success.data || 'deleted', true, true);
+    cmdbox.message(first.success.data || 'deleted', false);
     await keystore_page.load_list();
 };
 
@@ -183,12 +183,28 @@ keystore_page.render_rows = () => {
         const card = $('<div class="card h-100 border-start border-4" style="border-left-color:var(--bs-info)!important;"></div>').appendTo(col);
         const hdr = $('<div class="doc-header d-flex align-items-center gap-2"></div>').appendTo(card);
         hdr.append(`<span class="badge rounded-pill text-bg-primary">${r.key_type || 'apikey'}</span>`);
-        hdr.append(`<strong>${r.key_name || ''}</strong>`);
-        hdr.append(`<span class="ms-auto text-body-secondary">${r.key_id || ''}</span>`);
+        hdr.append(`<strong>${r.key_name || ''}@keystore.${r.key_provider || ''}</strong>`);
+
+        // コピー用のボタン
+        const btn_copy = $(`<button type="button" class="btn btn_copy p-0 ms-1">`
+            +`<svg class="bi bi-copy" width="16" height="16" fill="currentColor"><use href="#btn_copy"></use></svg>`
+        +`</button>`).appendTo(hdr);
+        btn_copy.off('click').on('click', (event) => {
+            const key = '${'+`${r.key_name || ''}@keystore.${r.key_provider || ''}[key_value]`+'}';
+            if (!key) {
+                cmdbox.message({'error': 'No key available for this key name.'}, false);
+                return;
+            }
+            navigator.clipboard.writeText(key).then(() => {
+                cmdbox.message({'success': 'Key name copied to clipboard.'}, false);
+            }).catch((err) => {
+                cmdbox.message({'error': `Failed to copy key: ${err}`}, false);
+            });
+        });
+        hdr.append(`<span class="ms-auto text-body-secondary">created_at : ${keystore_page.to_dt_local(r.created_at) || ''}</span>`);
 
         const body = $('<div class="card-body container p-2"></div>').appendTo(card);
         const row = $('<div class="row"></div>').appendTo(body);
-        row.append(`<div class="col-6 small mb-1"><span class="text-secondary">provider:</span> ${r.key_provider || '-'}</div>`);
         row.append(`<div class="col-6 small mb-1"><span class="text-secondary">usage:</span> ${(r.key_usage || []).join(', ') || '-'}</div>`);
         if (Array.isArray(r.groups) && r.groups.length > 0) {
             row.append(`<div class="col-6 small mb-1"><span class="text-secondary">groups:</span> ${r.groups.join(', ')}</div>`);
@@ -196,8 +212,7 @@ keystore_page.render_rows = () => {
         if (Array.isArray(r.owner) && r.owner.length > 0) {
             row.append(`<div class="col-6 small mb-1"><span class="text-secondary">owner:</span> ${r.owner.join(', ')}</div>`);
         }
-        row.append(`<div class="col-6 small mb-1"><span class="text-secondary">period:</span> ${r.key_period_start || '-'} ~ ${r.key_period_end || '-'}</div>`);
-        row.append(`<div class="col-6 small mb-1"><span class="text-secondary">created_at:</span> ${keystore_page.to_dt_local(r.created_at) || '-'}</div>`);
+        row.append(`<div class="col-6 small mb-1 text-nowrap"><span class="text-secondary">period:</span> ${keystore_page.to_dt_local(r.key_period_start) || '-'} ~ ${keystore_page.to_dt_local(r.key_period_end) || '-'}</div>`);
         row.append(`<div class="col-12 small mb-1"><span class="text-secondary">description:</span><pre class="px-2 mb-0">${r.description || '-'}</pre></div>`);
 
         const btnRow = $('<div class="d-flex gap-2 mt-2"></div>').appendTo(body);
@@ -215,7 +230,7 @@ keystore_page.load_list = async () => {
         res = await cmdbox.sv_exec_cmd({ mode: 'keystore', cmd: 'list', kwd: kwd || null });
     } catch (e) {
         cmdbox.hide_loading();
-        cmdbox.message({ error: e.toString() }, true, true);
+        cmdbox.message({ error: e.toString() }, false);
         return;
     }
     cmdbox.hide_loading();
@@ -225,7 +240,7 @@ keystore_page.load_list = async () => {
         keystore_page.rows = [];
         keystore_page.render_tabs();
         keystore_page.render_rows();
-        if (first && !first.success) cmdbox.message(res, true, true);
+        if (first && !first.success) cmdbox.message(res, false);
         return;
     }
 

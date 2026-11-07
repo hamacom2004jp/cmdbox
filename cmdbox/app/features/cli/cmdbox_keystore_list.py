@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import cache, convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -49,6 +49,7 @@ class KeystoreList(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @cache.async_apprun_cache(exclude_fn=lambda args: getattr(args, 'kwd', None))
     @validator.async_apprun_check
     async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(
@@ -66,14 +67,13 @@ class KeystoreList(feature.OneshotResultEdgeFeature, validator.Validator):
 
     def output_schema(self) -> type:
         class KeyRecord(resdata.Base):
-            key_id: str = pydantic.Field(..., description="キーID")
             key_name: str = pydantic.Field(..., description="キー名")
             key_provider: Union[str, None] = pydantic.Field(default=None, description="キー発行者")
             key_type: Union[str, None] = pydantic.Field(default=None, description="キー種別")
             key_usage: List[str] = pydantic.Field(default_factory=list, description="利用対象コマンド")
             key_period_start: Union[str, None] = pydantic.Field(default=None, description="使用開始日時")
             key_period_end: Union[str, None] = pydantic.Field(default=None, description="使用終了日時")
-            groups: List[str] = pydantic.Field(default_factory=list, description="所属グループ")
+            allow_groups: List[str] = pydantic.Field(default_factory=list, description="所属グループ")
             owner: List[str] = pydantic.Field(default_factory=list, description="所有者")
             description: Union[str, None] = pydantic.Field(default=None, description="説明")
             created_at: Union[str, None] = pydantic.Field(default=None, description="作成日時")
@@ -96,18 +96,17 @@ class KeystoreList(feature.OneshotResultEdgeFeature, validator.Validator):
 
             results: List[Dict[str, Any]] = []
             if keystore_dir.exists() and keystore_dir.is_dir():
-                for p in sorted(keystore_dir.glob(f"key_{kwd}.json")):
+                for p in sorted(keystore_dir.glob(f"{kwd}.json")):
                     try:
                         cfg = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=True)
                         results.append(dict(
-                            key_id=cfg.get('key_id'),
                             key_name=cfg.get('key_name'),
                             key_provider=cfg.get('key_provider'),
                             key_type=cfg.get('key_type') if cfg.get('key_type') else 'apikey',
                             key_usage=cfg.get('key_usage') if isinstance(cfg.get('key_usage'), list) else [],
                             key_period_start=cfg.get('key_period_start'),
                             key_period_end=cfg.get('key_period_end'),
-                            groups=cfg.get('groups') if isinstance(cfg.get('groups'), list) else [],
+                            allow_groups=cfg.get('allow_groups') if isinstance(cfg.get('allow_groups'), list) else [],
                             owner=cfg.get('owner') if isinstance(cfg.get('owner'), list) else [],
                             description=cfg.get('description'),
                             created_at=cfg.get('created_at')

@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, keystore, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli import cmdbox_client_file_download, cmdbox_llm_list
 from pathlib import Path
@@ -155,6 +155,8 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                        msg_file_mime=args.msg_file_mime,
                        msg_file_name=args.msg_file_name if hasattr(args, 'msg_file_name') else None,
                        groups=args.groups if hasattr(args, 'groups') else None,
+                       signin_user=args.signin_user if hasattr(args, 'signin_user') else None,
+                       signin_groups=args.signin_groups if hasattr(args, 'signin_groups') else [],
                        )
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -220,6 +222,8 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                                     msg_file=payload.get('msg_file', None),
                                     msg_file_mime=payload.get('msg_file_mime', None),
                                     msg_file_name=payload.get('msg_file_name', None),
+                                    signin_user=payload.get('signin_user', None),
+                                    signin_groups=payload.get('signin_groups', []),
                                     )
                     if st == self.RESP_SUCCESS:
                         redis_cli.rpush(reskey, msg)
@@ -241,7 +245,8 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
     def chat(self, data_dir:Path, logger:logging.Logger, llmname:str, *,
              msg_role:str=None, msg_name:str=None, msg_text:str=None, msg_text_system:str=None, msg_text_param:Dict[str, Any]=None,
              msg_image_url:str=None, msg_audio:str=None, msg_audio_format:str=None, msg_video_url:str=None, msg_file_url:str=None,
-             msg_file:str=None, msg_file_mime:str=None, msg_file_name:str=None) -> Tuple[int, List[Dict[str, Any]]]:
+             msg_file:str=None, msg_file_mime:str=None, msg_file_name:str=None,
+             signin_user:str=None, signin_groups:List[str]=None) -> Tuple[int, List[Dict[str, Any]]]:
         """
         LLMにチャットメッセージを送信します。
 
@@ -262,7 +267,8 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             msg_file (str, optional): 送信するファイルの内容。Base64エンコードされた文字列で指定します。
             msg_file_mime (str, optional): 送信するファイルのMIMEタイプ。
             msg_file_name (str, optional): 送信するファイルの名前。
-            groups (List[str], optional): リクエスト元のユーザーグループのリスト。指定された場合、許可されているグループに含まれる設定のみを返します。
+            signin_user (str, optional): リクエスト元のユーザー。
+            signin_groups (List[str], optional): リクエスト元のユーザーグループのリスト。指定された場合、許可されているグループに含まれる設定のみを返します。
         Returns:
             Tuple[int, List[Dict[str, Any]]]: (ステータスコード, LLMからの応答メッセージのリスト)
         """
@@ -312,6 +318,9 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             llmendpoint = configure.get('llmendpoint', None)
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmapikey is None: raise ValueError("llmapikey is required.")
+            llmapikey = keystore.replace_value(data_dir=data_dir, string_value=llmapikey,
+                                               key_usage=self.get_svcmd(),
+                                               signin_user=signin_user, signin_groups=signin_groups)
             response = litellm.completion(
                 model=llmmodel,
                 api_key=llmapikey,
@@ -334,6 +343,9 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             if llmapiversion is None: raise ValueError("llmapiversion is required.")
             if not llmmodel.startswith("azure/"):
                 llmmodel = f"azure/{llmmodel}"
+            llmapikey = keystore.replace_value(data_dir=data_dir, string_value=llmapikey,
+                                               key_usage=self.get_svcmd(),
+                                               signin_user=signin_user, signin_groups=signin_groups)
             response = litellm.completion(
                 model=llmmodel,
                 api_key=llmapikey,
@@ -376,6 +388,9 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmendpoint is None: raise ValueError("llmendpoint is required.")
             if llmapikey is None: raise ValueError("llmapikey is required.")
+            llmapikey = keystore.replace_value(data_dir=data_dir, string_value=llmapikey,
+                                               key_usage=self.get_svcmd(),
+                                               signin_user=signin_user, signin_groups=signin_groups)
             response = litellm.completion(
                 model=f"litellm_proxy/{llmmodel}",
                 api_base=llmendpoint,

@@ -6,7 +6,7 @@ import logging
 import time
 
 
-def apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None) -> Callable:
+def apprun_cache(func:Callable=None, args_key:str=None, cache_key_fn:Callable=None, exclude_fn:Callable=None) -> Callable:
     """
     list系コマンドの実行結果をキャッシュするデコレーター。
     list系コマンド実行関数に適用することで、コマンドの実行前にキャッシュを確認し、実行後にキャッシュを更新します。
@@ -14,6 +14,7 @@ def apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None
     Args:
         func (Callable): コマンドの実行関数。引数なしで使用された場合はNone。
         args_key (str): キャッシュキーを決定するための引数名。argsからこの引数の値を取得してキャッシュキーとして使用します。指定しなかった場合はデフォルトのキャッシュキー 'default' が使用されます。
+        cache_key_fn (Callable): キャッシュキーを決定するための関数。引数はselfとargsで、戻り値をキャッシュキーとして使用します。指定しなかった場合はargs_keyが使用されます。
         exclude_fn (Callable): キャッシュから除外する条件を判定する関数。引数はargsでTrueを返すと除外します。指定しなかった場合は全ての結果がキャッシュされます。
     Returns:
         Callable: デコレーターでラップされた関数
@@ -37,8 +38,13 @@ def apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None
             if exclude:
                 return f(self, logger, args, tm, pf)
 
+            # cache_key_fnが指定されている場合は、cache_key_fnを使用してキャッシュキーを取得します
+            if cache_key_fn is not None:
+                cache_key = cache_key_fn(self, args)
+
             # args_keyが指定されている場合は、argsからキャッシュキーを取得し、指定されていない場合はデフォルトのキャッシュキー 'default' を使用します
-            cache_key = getattr(args, args_key) if args_key is not None else str(f)
+            if cache_key_fn is None:
+                cache_key = getattr(args, args_key) if args_key is not None else str(f)
             if not cache_key:
                 logger.warning(f"Cache key is empty for args_key '{args_key}'. no cache will be used.")
                 return f(self, logger, args, tm, pf)
@@ -56,7 +62,7 @@ def apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None
                 return feature.Feature.RESP_WARN, cached, None
             return feature.Feature.RESP_SUCCESS, cached, None
         return wrapper
-    
+
     # 引数なしで使用された場合 @apprun_cache
     if func is not None and callable(func):
         return decorator(func)
@@ -64,7 +70,7 @@ def apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None
     else:
         return decorator
 
-def async_apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None) -> Callable:
+def async_apprun_cache(func:Callable=None, args_key:str=None, cache_key_fn:Callable=None, exclude_fn:Callable=None) -> Callable:
     """
     list系コマンドの実行結果をキャッシュするデコレーター。
     list系コマンド実行関数に適用することで、コマンドの実行前にキャッシュを確認し、実行後にキャッシュを更新します。
@@ -72,6 +78,7 @@ def async_apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callabl
     Args:
         func (Callable): コマンドの実行関数。引数なしで使用された場合はNone。
         args_key (str): キャッシュキーを決定するための引数名。argsからこの引数の値を取得してキャッシュキーとして使用します。指定しなかった場合はデフォルトのキャッシュキー 'default' が使用されます。
+        cache_key_fn (Callable): キャッシュキーを決定するための関数。引数はselfとargsで、戻り値をキャッシュキーとして使用します。指定しなかった場合はargs_keyが使用されます。
         exclude_fn (Callable): キャッシュから除外する条件を判定する関数。引数はargsでTrueを返すと除外します。指定しなかった場合は全ての結果がキャッシュされます。
     Returns:
         Callable: デコレーターでラップされた関数
@@ -94,8 +101,13 @@ def async_apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callabl
             if exclude:
                 return await f(self, logger, args, tm, pf)
 
+            # cache_key_fnが指定されている場合は、cache_key_fnを使用してキャッシュキーを取得します
+            if cache_key_fn is not None:
+                cache_key = cache_key_fn(self, args)
+
             # args_keyが指定されている場合は、argsからキャッシュキーを取得し、指定されていない場合はデフォルトのキャッシュキー 'default' を使用します
-            cache_key = getattr(args, args_key) if args_key is not None else str(f)
+            if cache_key_fn is None:
+                cache_key = getattr(args, args_key) if args_key is not None else str(f)
             if not cache_key:
                 logger.warning(f"Cache key is empty for args_key '{args_key}'. no cache will be used.")
                 return await f(self, logger, args, tm, pf)

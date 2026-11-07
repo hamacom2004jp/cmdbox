@@ -138,7 +138,7 @@ All incoming requests must be processed in the following order:
             mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
         else:
             mcpsv_confs = []
-        
+
         if runner_conf.get('session_datasource', None) is not None:
             ds_conf = self._load_ds_config(data_dir, runner_conf['session_datasource'])
         else:

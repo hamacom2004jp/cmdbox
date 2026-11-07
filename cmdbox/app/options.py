@@ -155,7 +155,7 @@ class Options:
             ret.append(o)
         return ret
 
-    def get_cmd_opt(self, mode:str, cmd:str, opt:str, webmode:bool=False) -> Dict[str, Any]:
+    def get_cmd_opt(self, mode:str, cmd:str, opt:str, webmode:bool=False, skip_choice_fn:bool=False) -> Dict[str, Any]:
         """
         コマンドのオプションを取得します。
         Args:
@@ -166,7 +166,7 @@ class Options:
         Returns:
             Dict[str, Any]: オプションの値
         """
-        opts = self.get_cmd_choices(mode, cmd, webmode)
+        opts = self.get_cmd_choices(mode, cmd, webmode, opt={}, skip_choice_fn=skip_choice_fn)
         for o in opts:
             if 'opt' in o and o['opt'] == opt:
                 return o

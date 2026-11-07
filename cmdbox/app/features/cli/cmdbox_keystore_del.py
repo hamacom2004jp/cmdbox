@@ -43,20 +43,20 @@ class KeystoreDel(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定します。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="key_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                     description_ja="削除するキーIDを指定します。",
-                     description_en="Specify the key ID to delete."),
                 dict(opt="key_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="キー名を指定すると一致するキーのみを削除します。",
                      description_en="If key name is specified, delete only the matching key."),
+                dict(opt="key_provider", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja=f"キーの発行者で通常ドメイン名などを指定。省略した場合 `{self.ver.__appid__}` を使用します。",
+                     description_en=f"Key provider, usually a domain name. If omitted, `{self.ver.__appid__}` is used."),
             ]
         )
 
     @validator.async_apprun_check
     async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(
-            key_id=args.key_id,
             key_name=args.key_name,
+            key_provider=args.key_provider,
         )
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -89,33 +89,26 @@ class KeystoreDel(feature.OneshotResultEdgeFeature, validator.Validator):
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
 
-            key_id = payload.get('key_id')
             key_name = payload.get('key_name')
-            matches = []
-            pattern = f"key_{key_id}_*.json"
-            for p in sorted(keystore_dir.glob(pattern)):
-                try:
-                    cfg = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=True)
-                    if cfg.get('key_id') != key_id:
-                        continue
-                    if key_name and cfg.get('key_name') != key_name:
-                        continue
-                    matches.append((p, cfg))
-                except Exception:
-                    continue
-
-            if len(matches) <= 0:
-                result = dict(warn=f"Keystore key not found. key_id='{key_id}', key_name='{key_name}'.")
+            key_provider = payload.get('key_provider', self.ver.__appid__)
+            key_path = keystore_dir / f"{key_name}@keystore.{key_provider}.json"
+            if not key_path.exists():
+                result = dict(warn=f"Keystore key not found at '{key_path.name}'.")
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
-            if len(matches) > 1:
-                result = dict(warn=f"Multiple keystore keys found for key_id='{key_id}'. Please specify --key_name.")
+            try:
+                cfg = common.load_file(key_path, lambda f: json.load(f), encoding='utf-8', nolock=True)
+                if key_name and cfg.get('key_name') != key_name or key_provider and cfg.get('key_provider') != key_provider:
+                    result = dict(warn=f"Keystore key not found for '{key_path.name}'.")
+                    redis_cli.rpush(reskey, result)
+                    return self.RESP_WARN
+            except Exception:
+                result = dict(warn=f"Failed to load keystore key at '{key_path.name}'.")
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
 
-            key_path, cfg = matches[0]
             key_path.unlink()
-            result = dict(success=dict(data=f"Keystore key deleted. key_id='{cfg.get('key_id')}', key_name='{cfg.get('key_name')}'."))
+            result = dict(success=dict(data=f"Keystore key deleted. '{key_path.name}'."))
             redis_cli.rpush(reskey, result)
             return self.RESP_SUCCESS
         except Exception as e:

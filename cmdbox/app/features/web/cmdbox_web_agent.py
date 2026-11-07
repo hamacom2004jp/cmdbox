@@ -82,9 +82,9 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
 
             agent_chat = cmdbox_agent_chat.AgentChat(self.appcls, self.ver)
             _options = options.Options.getInstance(self.appcls, self.ver)
-            retry_interval = _options.get_cmd_opt('agent', 'chat', 'retry_interval').get('default', 3)
-            retry_count = _options.get_cmd_opt('agent', 'chat', 'retry_count').get('default', 5)
-            timeout = _options.get_cmd_opt('agent', 'chat', 'timeout').get('default', 120)
+            retry_interval = _options.get_cmd_opt('agent', 'chat', 'retry_interval', skip_choice_fn=True).get('default', 3)
+            retry_count = _options.get_cmd_opt('agent', 'chat', 'retry_count', skip_choice_fn=True).get('default', 5)
+            timeout = _options.get_cmd_opt('agent', 'chat', 'timeout', skip_choice_fn=True).get('default', 120)
 
             from google.genai import types
             call_reasoning = 'off'
@@ -110,7 +110,8 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                                                               retry_interval=retry_interval, retry_count=retry_count, timeout=timeout,
                                                               runner_name=runner_name, user_name=user_name, session_id=session_id,
                                                               mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey,
-                                                              message=query, call_tts=call_tts, reasoning_effort=call_reasoning):
+                                                              message=query, call_tts=call_tts, reasoning_effort=call_reasoning,
+                                                              signin_user=user_name, signin_groups=groups):
 
                         if st != cmdbox_agent_chat.AgentChat.RESP_SUCCESS:
                             yield common.to_str(result)

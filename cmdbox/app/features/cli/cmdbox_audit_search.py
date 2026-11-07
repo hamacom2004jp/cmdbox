@@ -90,13 +90,13 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
             dict(opt="exclude_audit_type", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=['']+Options.AUDITS,
                  description_ja="除外条件の監査の種類を指定します。複数指定できます。",
                  description_en="Specifies the type of audit for the exclude condition. Multiple values can be specified."),
-            dict(opt="exclude_clmsg_src", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+            dict(opt="exclude_clmsg_src", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                  description_ja="除外条件のクライアントのメッセージの発生源を指定します。LIKE検索を行います。",
                  description_en="Specifies the source of the message for the client in the exclude condition; performs a LIKE search."),
-            dict(opt="exclude_clmsg_title", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+            dict(opt="exclude_clmsg_title", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                  description_ja="除外条件のクライアントのメッセージタイトルを指定します。LIKE検索を行います。",
                  description_en="Specifies the message title of the client in the exclude condition; a LIKE search is performed."),
-            dict(opt="exclude_clmsg_user", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+            dict(opt="exclude_clmsg_user", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                  description_ja="除外条件のクライアントのメッセージの発生させたユーザーを指定します。LIKE検索を行います。",
                  description_en="Specifies the user who generated the message for the client in the exclude condition; performs a LIKE search."),
             dict(opt="exclude_clmsg_body", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
@@ -269,9 +269,9 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                              filter_svmsg_sdate=payload.get('filter_svmsg_sdate', ''),
                              filter_svmsg_edate=payload.get('filter_svmsg_edate', ''),
                              exclude_audit_type=payload.get('exclude_audit_type', []),
-                             exclude_clmsg_src=payload.get('exclude_clmsg_src', ''),
-                             exclude_clmsg_title=payload.get('exclude_clmsg_title', ''),
-                             exclude_clmsg_user=payload.get('exclude_clmsg_user', ''),
+                             exclude_clmsg_src=payload.get('exclude_clmsg_src', []),
+                             exclude_clmsg_title=payload.get('exclude_clmsg_title', []),
+                             exclude_clmsg_user=payload.get('exclude_clmsg_user', []),
                              exclude_clmsg_body=payload.get('exclude_clmsg_body', {}),
                              exclude_clmsg_tag=payload.get('exclude_clmsg_tag', []),
                              pg_enabled=payload.get('pg_enabled', False),
@@ -295,7 +295,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                filter_audit_type:List[str], filter_clmsg_id:str, filter_clmsg_sdate:str, filter_clmsg_edate:str,
                filter_clmsg_src:str, filter_clmsg_title:str, filter_clmsg_user:str, filter_clmsg_body:Dict[str, Any],
                filter_clmsg_tag:List[str], filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
-               exclude_audit_type:List[str], exclude_clmsg_src:str, exclude_clmsg_title:str, exclude_clmsg_user:str,
+               exclude_audit_type:List[str], exclude_clmsg_src:List[str], exclude_clmsg_title:List[str], exclude_clmsg_user:List[str],
                exclude_clmsg_body:Dict[str, Any], exclude_clmsg_tag:List[str],
                pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
                data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
@@ -324,9 +324,9 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
             filter_svmsg_sdate (str): サーバーメッセージ発生日時(開始)
             filter_svmsg_edate (str): サーバーメッセージ発生日時(終了)
             exclude_audit_type (List[str]): 除外条件の監査の種類（複数可）
-            exclude_clmsg_src (str): 除外条件のクライアントメッセージの発生源
-            exclude_clmsg_title (str): 除外条件のクライアントメッセージのタイトル
-            exclude_clmsg_user (str): 除外条件のクライアントメッセージの発生させたユーザー
+            exclude_clmsg_src (List[str]): 除外条件のクライアントメッセージの発生源
+            exclude_clmsg_title (List[str]): 除外条件のクライアントメッセージのタイトル
+            exclude_clmsg_user (List[str]): 除外条件のクライアントメッセージの発生させたユーザー
             exclude_clmsg_body (Dict[str, Any]): 除外条件のクライアントメッセージの本文
             exclude_clmsg_tag (List[str]): 除外条件のクライアントメッセージのタグ
             pg_enabled (bool): PostgreSQLを使用する場合はTrue
@@ -449,15 +449,24 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                             placeholders = ', '.join([f'{"%s" if pg_enabled else "?"}' for _ in exclude_audit_type])
                             where.append(f'audit_type NOT IN ({placeholders})')
                             params.extend(exclude_audit_type)
-                    if exclude_clmsg_src and exclude_clmsg_src != 'None':
-                        where.append(f'clmsg_src NOT LIKE {"%s" if pg_enabled else "?"}')
-                        params.append(exclude_clmsg_src)
-                    if exclude_clmsg_title and exclude_clmsg_title != 'None':
-                        where.append(f'clmsg_title NOT LIKE {"%s" if pg_enabled else "?"}')
-                        params.append(exclude_clmsg_title)
-                    if exclude_clmsg_user and exclude_clmsg_user != 'None':
-                        where.append(f'clmsg_user NOT LIKE {"%s" if pg_enabled else "?"}')
-                        params.append(exclude_clmsg_user)
+                    if exclude_clmsg_src and len(exclude_clmsg_src) > 0:
+                        exclude_clmsg_src = [t for t in exclude_clmsg_src if t and t != 'None']
+                        if exclude_clmsg_src:
+                            placeholders = ' AND '.join([f'clmsg_src NOT LIKE {"%s" if pg_enabled else "?"}' for _ in exclude_clmsg_src])
+                            where.append(f'({placeholders})')
+                            params.extend(exclude_clmsg_src)
+                    if exclude_clmsg_title and len(exclude_clmsg_title) > 0:
+                        exclude_clmsg_title = [t for t in exclude_clmsg_title if t and t != 'None']
+                        if exclude_clmsg_title:
+                            placeholders = ' AND '.join([f'clmsg_title NOT LIKE {"%s" if pg_enabled else "?"}' for _ in exclude_clmsg_title])
+                            where.append(f'({placeholders})')
+                            params.extend(exclude_clmsg_title)
+                    if exclude_clmsg_user and len(exclude_clmsg_user) > 0:
+                        exclude_clmsg_user = [t for t in exclude_clmsg_user if t and t != 'None']
+                        if exclude_clmsg_user:
+                            placeholders = ' AND '.join([f'clmsg_user NOT LIKE {"%s" if pg_enabled else "?"}' for _ in exclude_clmsg_user])
+                            where.append(f'({placeholders})')
+                            params.extend(exclude_clmsg_user)
                     if exclude_clmsg_body:
                         if sys.version_info[0] < 3 or sys.version_info[0] >= 3 and sys.version_info[1] < 10:
                             raise RuntimeError("Python 3.10 or later is required for JSON support.")

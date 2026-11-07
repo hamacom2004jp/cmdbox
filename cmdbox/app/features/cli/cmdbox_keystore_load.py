@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import cache, convert, redis_client, resdata, validator
+from cmdbox.app.commons import cache, convert, keystore, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -18,7 +18,7 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
 
     def get_option(self) -> Dict[str, Any]:
         return dict(
-            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True, use_agent=False,
             description_ja="キーストアのキー情報を読み込みます。",
             description_en="Load API key information from keystore.",
             choice=[
@@ -43,22 +43,28 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定します。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="key_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                     description_ja="読み込むキーIDを指定します。",
-                     description_en="Specify the key ID to load."),
                 dict(opt="key_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込むキー名を指定します。",
                      description_en="Specify the key name to load."),
+                dict(opt="key_provider", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja=f"読み込むキーの発行者を指定します。省略した場合 `{self.ver.__appid__}` を使用します。",
+                     description_en=f"Specify the provider of the key to load. If omitted, `{self.ver.__appid__}` is used."),
+                dict(opt="val_type", type=Options.T_STR, default="key_value", required=True, multi=False, hide=False,
+                     choice=keystore.val_types,
+                     description_ja="読み込むキー情報の値種類を指定します。",
+                     description_en="Specify the data type of the key information to be loaded."),
             ]
         )
 
-    @cache.async_apprun_cache(args_key='key_id')
+    @cache.async_apprun_cache(cache_key_fn=lambda self, args: f"{getattr(args, 'key_name', None)}@{getattr(args, 'key_provider', self.ver.__appid__)}")
     @validator.async_apprun_check
     async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(
-            key_id=args.key_id,
             key_name=args.key_name,
-            signin_groups=args.signin_groups if hasattr(args, 'signin_groups') else []
+            key_provider=args.key_provider if hasattr(args, 'key_provider') else self.ver.__appid__,
+            val_type=args.val_type if hasattr(args, 'val_type') else 'key_value',
+            signin_user=args.signin_user if hasattr(args, 'signin_user') else '',
+            signin_groups=args.signin_groups if hasattr(args, 'signin_groups') else [],
         )
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -72,7 +78,6 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
 
     def output_schema(self) -> type:
         class KeyRecord(resdata.Base):
-            key_id: Union[str, None] = pydantic.Field(default=None, description="キーID")
             key_name: Union[str, None] = pydantic.Field(default=None, description="キー名")
             key_provider: Union[str, None] = pydantic.Field(default=None, description="キー発行者")
             key_type: Union[str, None] = pydantic.Field(default=None, description="キー種別")
@@ -110,10 +115,13 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
 
-            key_id = payload.get('key_id')
             key_name = payload.get('key_name')
+            key_provider = payload.get('key_provider', self.ver.__appid__)
+            val_type = payload.get('val_type', 'key_value')
+            signin_user = payload.get('signin_user', '')
+            signin_groups = payload.get('signin_groups', [])
             try:
-                cfg = self.load_key(data_dir, key_id, key_name, payload.get('signin_groups', []))
+                cfg = load_key(data_dir, key_name, key_provider, signin_user, signin_groups, val_type)
             except Exception as e:
                 result = dict(warn=str(e))
                 redis_cli.rpush(reskey, result)
@@ -127,9 +135,23 @@ class KeystoreLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             redis_cli.rpush(reskey, result)
             return self.RESP_WARN
 
-    def load_key(self, data_dir:Path, key_id:str, key_name:str, signin_groups:List[str]) -> Dict[str, Any]:
-        keystore_dir = data_dir / '.keystore'
-        key_file = keystore_dir / f"key_{key_id}_{key_name}.json"
-        if not key_file.exists():
-            raise FileNotFoundError(f"Keystore key not found. key_id='{key_id}', key_name='{key_name}'.")
-        return common.load_file(key_file, lambda f: json.load(f), encoding='utf-8', nolock=True)
+def check_key(cfg: Dict[str, Any], key_name:str, key_provider:str,
+              signin_user:str, signin_groups:List[str], val_type:str):
+    if cfg.get('key_name') != key_name:
+        raise ValueError(f"Key name mismatch. expected='{key_name}'")
+    if cfg.get('key_provider') != key_provider:
+        raise ValueError(f"Key provider mismatch. expected='{key_provider}'")
+    if signin_user not in cfg.get('owner') and not any(group in cfg.get('groups', []) for group in signin_groups):
+        raise ValueError(f"Signin groups mismatch. expected='{signin_groups}'")
+    if val_type not in cfg:
+        raise ValueError(f"val_type {val_type} not found in key configuration.")
+
+def load_key(data_dir:Path, key_name:str, key_provider:str,
+                signin_user:str, signin_groups:List[str], val_type:str) -> Dict[str, Any]:
+    keystore_dir = data_dir / '.keystore'
+    key_file = keystore_dir / f"{key_name}@keystore.{key_provider}.json"
+    if not key_file.exists():
+        raise FileNotFoundError(f"Keystore key not found. '{key_file.name}'.")
+    cfg = common.load_file(key_file, lambda f: json.load(f), encoding='utf-8', nolock=True)
+    check_key(cfg, key_name, key_provider, signin_user, signin_groups, val_type)
+    return cfg

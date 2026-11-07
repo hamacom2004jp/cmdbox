@@ -55,31 +55,28 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定します。",
                      description_en="Specify the maximum waiting time until the server responds."),
                 dict(opt="key_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                     description_ja="キーの名前で識別しやすい名称。",
-                     description_en="Readable key name."),
+                     description_ja="キーの名前でkey_providerにおいて一意な名称を指定します。",
+                     description_en="Specify a unique name for the key_provider using the key's name."),
+                dict(opt="key_provider", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja=f"キーの発行者で通常ドメイン名などを指定。省略した場合 `{self.ver.__appid__}` を使用します。",
+                     description_en=f"Key provider, usually a domain name. If omitted, `{self.ver.__appid__}` is used."),
                 dict(opt="key_type", type=Options.T_STR, default="apikey", required=True, multi=False, hide=False,
                      choice=["apikey", "signkey", "enckey", "cacert"],
                      choice_show=dict(
                         apikey=["key_value", "claims"],
-                        signkey=["sign_key", "sign_cert", "key_pass"],
+                        signkey=["scope", "sign_key", "sign_cert", "key_pass"],
                         enckey=["enc_key"],
-                        cacert=["ca_cert"],
+                        cacert=["scope", "ca_cert"],
                      ),
                      description_ja="登録するキー情報の種類を指定します。",
                      description_en="Specify the type of key information to register."),
-                dict(opt="key_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja="キーのIDですべてのキーの一意な値。省略した場合自動生成します。",
-                     description_en="Unique key identifier across all keys. If omitted, it will be auto-generated."),
-                dict(opt="key_provider", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja=f"キーの発行者で通常ドメイン名などを指定。省略した場合 `{self.ver.__appid__}` を使用します。",
-                     description_en=f"Key provider, usually a domain name. If omitted, `{self.ver.__appid__}` is used."),
-                dict(opt="key_value", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja="キーの実体。省略した場合、現在のユーザーでjwtトークンを自動生成します。",
-                     description_en="Actual key value. If omitted, a JWT token will be auto-generated for the current user."),
                 dict(opt="key_usage", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=[],
                      choice_edit=True, choice_fn=self.list_svcmd,
                      description_ja="キーを使用するコマンド（get_svcmd相当）を指定。複数指定可能。",
                      description_en="Target commands (get_svcmd values) that can use this key. Multiple values allowed."),
+                dict(opt="key_value", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="キーの実体。省略した場合、現在のユーザーでjwtトークンを自動生成します。",
+                     description_en="Actual key value. If omitted, a JWT token will be auto-generated for the current user."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=False, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
@@ -98,7 +95,7 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="key_pass", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="秘密鍵のパスワード。",
                      description_en="Password for the private key."),
-                dict(opt="enc_key", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="enc_key", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="BASE64エンコードされた暗号キーの内容。",
                      description_en="Base64-encoded encryption key content."),
                 dict(opt="ca_cert", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
@@ -179,8 +176,6 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
             success = msg.get("success", None)
             args.ca_cert = success.get("data", None) if success else None
 
-        if hasattr(args, 'key_id') and args.key_id is None:
-            args.key_id = str(uuid.uuid4())
         if hasattr(args, 'key_provider') and args.key_provider is None:
             args.key_provider = self.ver.__appid__
         if key_type == 'apikey' and hasattr(args, 'key_value') and args.key_value is None:
@@ -202,9 +197,8 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
         if not hasattr(args, 'claims') or not isinstance(args.claims, dict):
             args.claims = {}
         payload = dict(
-            key_id=args.key_id,
             key_name=args.key_name,
-            key_provider=args.key_provider if hasattr(args, 'key_provider') else None,
+            key_provider=args.key_provider if hasattr(args, 'key_provider') else self.ver.__appid__,
             key_type=key_type,
             key_usage=key_usage,
             key_value=args.key_value,
@@ -232,8 +226,8 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
 
     def output_schema(self) -> type:
         class Data(resdata.Data):
-            key_id: Union[str, None] = pydantic.Field(default=None, description="キーID")
             key_name: Union[str, None] = pydantic.Field(default=None, description="キー名")
+            key_provider: Union[str, None] = pydantic.Field(default=None, description="キー提供者")
             msg: Union[str, None] = pydantic.Field(default=None, description="処理結果メッセージ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
@@ -250,19 +244,18 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
             keystore_dir = data_dir / '.keystore'
             keystore_dir.mkdir(parents=True, exist_ok=True)
 
-            key_id = payload.get('key_id')
             key_name = payload.get('key_name')
-            key_path = keystore_dir / f"key_{key_id}_{key_name}.json"
+            key_provider = payload.get('key_provider', self.ver.__appid__)
+            key_path = keystore_dir / f"{key_name}@keystore.{key_provider}.json"
 
             if key_path.exists():
-                result = dict(warn=f"Key file '{str(key_path)}' already exists.")
+                result = dict(warn=f"Key file '{key_path.name}' already exists.")
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
 
             key_data = dict(
-                key_id=key_id,
                 key_name=key_name,
-                key_provider=payload.get('key_provider'),
+                key_provider=key_provider,
                 key_type=payload.get('key_type'),
                 key_usage=payload.get('key_usage') if payload.get('key_usage') else [],
                 key_value=payload.get('key_value'),
@@ -282,8 +275,8 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
             common.save_file(key_path, lambda f: json.dump(key_data, f, indent=4), encoding='utf-8', nolock=False)
 
             result = dict(success=dict(
-                key_id=key_id,
                 key_name=key_name,
+                key_provider=key_provider,
                 msg=f"Keystore entry saved to '{key_path.name}'.",
             ))
             redis_cli.rpush(reskey, result)

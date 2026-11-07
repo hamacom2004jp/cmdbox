@@ -1,6 +1,6 @@
 from cmdbox.app import common, client, options
 from cmdbox.app.auth import signin
-from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, keystore, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_tts_say
 from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
@@ -126,6 +126,12 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                      choice=["auto", "off", "on", "low", "medium", "high", "xhigh"],
                     description_ja="エージェントで思考の連鎖の深さを指定します。使用するモデルによってはサポートされていない場合があります。",
                     description_en="Specify the depth of the thought chain in the agent. Depending on the model you are using, this feature may not be supported."),
+                dict(opt="agent_instruction", type=Options.T_TEXT, default=None, required=False, multi=False, hide=True, choice=None,
+                    description_ja="Agent設定の agent_instruction を指定します。省略した場合はAgent設定の値を使用します。",
+                    description_en="Specify the `agent_instruction` in the Agent settings. If omitted, the value from the Agent settings is used."),
+                dict(opt="agent_system_instruction", type=Options.T_TEXT, default=None, required=False, multi=False, hide=True, choice=None,
+                    description_ja="Agent設定の agent_system_instruction を指定します。省略した場合はAgent設定の値を使用します。",
+                    description_en="Specify the `agent_system_instruction` from the Agent settings. If omitted, the value from the Agent settings is used."),
             ]
         )
 
@@ -139,7 +145,10 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                                             retry_interval=args.retry_interval, retry_count=args.retry_count, timeout=args.timeout,
                                             runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
                                             a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message,
-                                            call_tts=args.call_tts, reasoning_effort=args.reasoning_effort):
+                                            call_tts=args.call_tts, reasoning_effort=args.reasoning_effort,
+                                            signin_user=args.signin_user, signin_groups=args.signin_groups,
+                                            agent_instruction=args.agent_instruction,
+                                            agent_system_instruction=args.agent_system_instruction):
             if st == self.RESP_SUCCESS:
                 msg['success'].append(res)
             else:
@@ -153,7 +162,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
     def apprun_generate(self, logger:logging.Logger, host:str, port:int, password:str, svname:str, retry_interval:int, retry_count:int, timeout:int,
                         runner_name:str, user_name:str, session_id:str, a2asv_apikey:str, mcpserver_apikey:str, message:str,
-                        call_tts:bool, reasoning_effort:str):
+                        call_tts:bool, reasoning_effort:str, signin_user:str=None, signin_groups:List[str]=[],
+                        agent_instruction:str=None, agent_system_instruction:str=None):
         """
         Agentチャットを実行します
         
@@ -174,12 +184,18 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             message (str): メッセージ
             call_tts (bool): TTS機能を呼び出すかどうか
             reasoning_effort (str): エージェントで思考の深さ
+            signin_user (str): サインインしているユーザー
+            signin_groups (List[str]): サインインしているユーザーの所属グループ
+            agent_instruction (str): エージェントへの指示
+            agent_system_instruction (str): エージェントのシステム指示
         Yields:
             Tuple[int, Any]: 処理結果ステータスと内容
         """
         payload = dict(runner_name=runner_name, user_name=user_name, session_id=session_id,
+                       signin_user=signin_user, signin_groups=signin_groups,
                        a2asv_apikey=a2asv_apikey, mcpserver_apikey=mcpserver_apikey, message=message,
-                       call_tts=call_tts, reasoning_effort=reasoning_effort)
+                       call_tts=call_tts, reasoning_effort=reasoning_effort,
+                       agent_instruction=agent_instruction, agent_system_instruction=agent_system_instruction)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
@@ -813,6 +829,12 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         Returns:
             Dict[str, Any]: 更新後のエージェント設定
         """
+        agent_instruction = payload.get('agent_instruction', '').strip()
+        agent_system_instruction = payload.get('agent_system_instruction', '').strip()
+        if agent_instruction:
+            agent_conf['agent_instruction'] = agent_instruction
+        if agent_system_instruction:
+            agent_conf['agent_system_instruction'] = agent_system_instruction
         return agent_conf
 
     async def before_chat_run(self, *, logger:logging.Logger, data_dir:Path, redis_cli:redis_client.RedisClient,
@@ -890,6 +912,17 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         redis_cli.rpush(reskey, msg)
         return self.RESP_WARN
 
+    def keystore_value(self, data_dir, conf, conf_key, signin_user, signin_groups):
+        value = conf.get(conf_key)
+        if not value:
+            return
+        value = keystore.replace_value(data_dir=data_dir, string_value=value,
+                                       key_usage=self.get_svcmd(),
+                                       signin_user=signin_user,
+                                       signin_groups=signin_groups,
+                                       default_val_type='key_value')
+        conf[conf_key] = value
+
     @limiter.async_svrun_check_limit
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
@@ -923,6 +956,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             payload = json.loads(convert.b64str2str(msg[2]))
             runner_name = payload.get('runner_name')
             user_name = payload.get('user_name', 'unknown')
+            signin_user = payload.get('signin_user', '')
+            signin_groups = payload.get('signin_groups', [])
             session_id = payload.get('session_id')
             message = payload.get('message')
 
@@ -931,7 +966,17 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             # 設定をロードする
             runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf = self.load_conf(runner_name, data_dir, logger)
             agent_conf = self.prepare_agent_conf(agent_conf, payload)
-            
+
+            # LLMのAPIキーをKeystoreから取得して設定する
+            self.keystore_value(data_dir, llm_conf, 'llmapikey', signin_user, signin_groups)
+            # A2ASVのAPIキーをKeystoreから取得して設定する
+            self.keystore_value(data_dir, agent_conf, 'a2asv_apikey', signin_user, signin_groups)
+            # MCPSVのAPIキーをKeystoreから取得して設定する
+            for mcpsv_conf in mcpsv_confs:
+                self.keystore_value(data_dir, mcpsv_conf, 'mcpserver_apikey', signin_user, signin_groups)
+            # DataSourceのパスワードをKeystoreから取得して設定する
+            self.keystore_value(data_dir, ds_conf, 'db_password', signin_user, signin_groups)
+
             # Agentを作成する
             agent = self.create_agent(logger=logger, data_dir=data_dir, disable_remote_agent=False,
                                         agent_conf=agent_conf, llm_conf=llm_conf, mcpsv_confs=mcpsv_confs,

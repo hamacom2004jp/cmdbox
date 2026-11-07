@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import limiter, resdata, validator
+from cmdbox.app.commons import keystore, limiter, resdata, validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -46,6 +46,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                      description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8091/mcp`となります。",
                      description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8091/mcp`.",),
                 dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
+                     placeholder=True,
                      description_ja="リモートMCPサーバーのAPI Keyを指定します。",
                      description_en="Specify the API Key of the remote MCP server.",),
                 dict(opt="mcpserver_transport", type=Options.T_STR, default='streamable-http', required=True, multi=False, hide=False, choice=['', 'streamable-http', 'sse', 'http'],
@@ -78,6 +79,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                      description_en="Specifies prompt arguments to be retrieved from the remote MCP server."),
             ])
 
+    @keystore.async_apprun_keyset
     @limiter.async_apprun_check_limit
     @validator.async_apprun_check
     async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:

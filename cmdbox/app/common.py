@@ -1054,6 +1054,37 @@ def result_format(res_json:dict, logger:logging.Logger, pf:List[Any]=[]) -> dict
             res_json["success"]["performance"] = list(_tmp_dict.values())
     return res_json
 
+def exec_sync_func(func, *args, **kwargs) -> Any:
+    """
+    指定された関数を同期的に実行します。関数が非同期関数であれば、内部でイベントループを実行して結果を取得します。
+
+    Args:
+        func (function): 実行する関数
+        *args: 関数に渡す位置引数
+        **kwargs: 関数に渡すキーワード引数
+
+    Returns:
+        Any: 関数の実行結果
+    """
+    if inspect.iscoroutinefunction(func):
+        def _run(func, ctx, *args, **kwargs):
+            ctx.append(asyncio.run(func(*args, **kwargs)))
+        ctx = []
+        try:
+            asyncio.get_running_loop()
+            event_loop_running = True
+        except RuntimeError:
+            event_loop_running = False
+        if not event_loop_running:
+            res = asyncio.run(func(*args, **kwargs))
+            return res
+        th = threading.Thread(target=_run, args=(func, ctx, *args), kwargs=kwargs)
+        th.start()
+        th.join()
+        res = ctx[0] if ctx else None
+        return res
+    return func(*args, **kwargs)
+
 def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]], webcall:bool=False) -> Tuple[int, Dict[str, Any], Any]:
     """"
     指定された関数が非同期関数であっても同期的に実行します。
@@ -1071,10 +1102,14 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
     """
     apprun_tm = perf_counter()
     if inspect.iscoroutinefunction(apprun):
-        def _run(apprun, ctx, logger, args, scope, tm, pf):
+        def _run(apprun, ctx, err, logger, args, scope, tm, pf):
             signin.set_request_scope(scope)
-            ctx.append(asyncio.run(apprun(logger, args, tm, pf)))
+            try:
+                ctx.append(asyncio.run(apprun(logger, args, tm, pf)))
+            except Exception as e:
+                err.append(e)
         ctx = []
+        err = []
         from cmdbox.app.auth import signin
         scope = signin.get_request_scope()
         try:
@@ -1087,10 +1122,14 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
             res = result_format(res, logger, pf)
             update_performance("apprun", apprun_tm, res)
             return st, res, o
-        th = threading.Thread(target=_run, args=(apprun, ctx, logger, args, scope, tm, pf))
+        th = threading.Thread(target=_run, args=(apprun, ctx, err, logger, args, scope, tm, pf))
         th.start()
         th.join()
-        st, res, o = ctx[0] if ctx else None
+        if err:
+            return 1, dict(warn=str(err[0])), None
+        if not ctx:
+            return 1, dict(warn="Failed to execute async apprun."), None
+        st, res, o = ctx[0]
         res = result_format(res, logger, pf)
         update_performance("apprun", apprun_tm, res)
         return st, res, o
