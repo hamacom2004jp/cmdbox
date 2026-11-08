@@ -24,19 +24,18 @@ keystore ( add ) : ``cmdbox -m keystore -c add <Option>``
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
-    "--key_name <key_name>","str","","required","","","Readable key name."
-    "--key_type <key_type>","str","","required","apikey","apikey | signkey | enckey | cacert","Specify the type of key information to register."
-    "--key_id <key_id>","str","","","","","Unique key identifier across all keys. If omitted, it will be auto-generated."
+    "--key_name <key_name>","str","","required","","","Specify a unique name for the key_provider using the key's name."
     "--key_provider <key_provider>","str","","","","","Key provider, usually a domain name. If omitted, `cmdbox` is used."
-    "--key_value <key_value>","text","","","","","Actual key value. If omitted, a JWT token will be auto-generated for the current user."
+    "--key_type <key_type>","str","","required","apikey","apikey | signkey | enckey | cacert","Specify the type of key information to register."
     "--key_usage <key_usage>","str","multi","required","","","Target commands (get_svcmd values) that can use this key. Multiple values allowed."
+    "--key_value <key_value>","text","","","","","Actual key value. If omitted, a JWT token will be auto-generated for the current user."
     "--scope <scope>","str","","","client","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
     "--fwpath <fwpath>","file","multi","required","","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
     "--rjpath <rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
     "--sign_key <sign_key>","file","","","","","Private key file for the public key certificate."
     "--sign_cert <sign_cert>","file","","","","","Public key certificate file."
     "--key_pass <key_pass>","passwd","","","","","Password for the private key."
-    "--enc_key <enc_key>","str","","","","","Base64-encoded encryption key content."
+    "--enc_key <enc_key>","text","","","","","Base64-encoded encryption key content."
     "--ca_cert <ca_cert>","file","","","","","CA certificate file."
     "--key_period_start <key_period_start>","datetime","","","","","Datetime when the key becomes valid. If omitted, effective immediately."
     "--key_period_end <key_period_end>","datetime","","","","","Datetime when the key expires. If omitted, no expiration."
@@ -60,8 +59,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "value": null
           }
         ],
-        "key_id": "string",
         "key_name": "string",
+        "key_provider": "string",
         "msg": "string"
       },
       "warn": {},
@@ -78,8 +77,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.key_id","str | null","no","null","キーID"
     "success.key_name","str | null","no","null","キー名"
+    "success.key_provider","str | null","no","null","キー提供者"
     "success.msg","str | null","no","null","処理結果メッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.save_mode","str | null","no","null","保存モード"
@@ -108,8 +107,8 @@ keystore ( del ) : ``cmdbox -m keystore -c del <Option>``
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
-    "--key_id <key_id>","str","","required","","","Specify the key ID to delete."
     "--key_name <key_name>","str","","required","","","If key name is specified, delete only the matching key."
+    "--key_provider <key_provider>","str","","","","","Key provider, usually a domain name. If omitted, `cmdbox` is used."
 
 **Output Schema**
 
@@ -189,7 +188,6 @@ This command implements ``output_schema()`` returning ``Result`` model.
         ],
         "data": [
           {
-            "key_id": "string",
             "key_name": "string",
             "key_provider": "string",
             "key_type": "string",
@@ -198,7 +196,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
             ],
             "key_period_start": "string",
             "key_period_end": "string",
-            "groups": [
+            "allow_groups": [
               "string"
             ],
             "owner": [
@@ -224,14 +222,13 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","list[KeyRecord]","no","(必須)","処理結果のデータ"
-    "success.data.key_id","str","yes","(必須)","キーID"
     "success.data.key_name","str","yes","(必須)","キー名"
     "success.data.key_provider","str | null","no","null","キー発行者"
     "success.data.key_type","str | null","no","null","キー種別"
     "success.data.key_usage","list[str]","no","(必須)","利用対象コマンド"
     "success.data.key_period_start","str | null","no","null","使用開始日時"
     "success.data.key_period_end","str | null","no","null","使用終了日時"
-    "success.data.groups","list[str]","no","(必須)","所属グループ"
+    "success.data.allow_groups","list[str]","no","(必須)","所属グループ"
     "success.data.owner","list[str]","no","(必須)","所有者"
     "success.data.description","str | null","no","null","説明"
     "success.data.created_at","str | null","no","null","作成日時"
@@ -262,8 +259,9 @@ keystore ( load ) : ``cmdbox -m keystore -c load <Option>``
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
-    "--key_id <key_id>","str","","required","","","Specify the key ID to load."
     "--key_name <key_name>","str","","required","","","Specify the key name to load."
+    "--key_provider <key_provider>","str","","","","","Specify the provider of the key to load. If omitted, `cmdbox` is used."
+    "--val_type <val_type>","str","","required","key_value","key_value | sign_key | sign_cert | key_pass | enc_key | ca_cert | claims","Specify the data type of the key information to be loaded."
 
 **Output Schema**
 
@@ -282,7 +280,6 @@ This command implements ``output_schema()`` returning ``Result`` model.
         ],
         "data": [
           {
-            "key_id": "string",
             "key_name": "string",
             "key_provider": "string",
             "key_type": "string",
@@ -324,7 +321,6 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","list[KeyRecord]","no","(必須)","処理結果のデータ"
-    "success.data.key_id","str | null","no","null","キーID"
     "success.data.key_name","str | null","no","null","キー名"
     "success.data.key_provider","str | null","no","null","キー発行者"
     "success.data.key_type","str | null","no","null","キー種別"

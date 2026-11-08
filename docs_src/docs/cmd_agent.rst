@@ -327,6 +327,8 @@ agent ( chat ) : ``cmdbox -m agent -c chat <Option>``
     "--message <message>","text","","required","","","Specify the message to send to the Runner."
     "--call_tts <call_tts>","bool","","","False","True | False","Specify whether to execute the TTS (Text-to-Speech) feature."
     "--reasoning_effort <reasoning_effort>","str","","","auto","auto | off | on | low | medium | high | xhigh","Specify the depth of the thought chain in the agent. Depending on the model you are using, this feature may not be supported."
+    "--agent_instruction <agent_instruction>","text","","","","","Specify the `agent_instruction` in the Agent settings. If omitted, the value from the Agent settings is used."
+    "--agent_system_instruction <agent_system_instruction>","text","","","","","Specify the `agent_system_instruction` from the Agent settings. If omitted, the value from the Agent settings is used."
 
 **Output Schema**
 

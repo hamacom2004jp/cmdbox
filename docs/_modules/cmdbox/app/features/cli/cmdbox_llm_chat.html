@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.cmdbox_llm_chat &mdash; cmdbox 2026/10/17 documentation</title>
+  <title>cmdbox.app.features.cli.cmdbox_llm_chat &mdash; cmdbox 2026/11/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=769f61d8"></script>
+      <script src="../../../../../_static/documentation_options.js?v=e88c2e44"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../resources/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
 </ul>
 
@@ -80,7 +81,7 @@
              
   <h1>Source code for cmdbox.app.features.cli.cmdbox_llm_chat</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">feature</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">limiter</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">,</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">limiter</span><span class="p">,</span> <span class="n">keystore</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">,</span> <span class="n">resdata</span><span class="p">,</span> <span class="n">validator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.features.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdbox_client_file_download</span><span class="p">,</span> <span class="n">cmdbox_llm_list</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -249,6 +250,8 @@
                        <span class="n">msg_file_mime</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">msg_file_mime</span><span class="p">,</span>
                        <span class="n">msg_file_name</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">msg_file_name</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'msg_file_name'</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                        <span class="n">groups</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">groups</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'groups'</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">signin_user</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">signin_user</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'signin_user'</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">signin_groups</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">signin_groups</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'signin_groups'</span><span class="p">)</span> <span class="k">else</span> <span class="p">[],</span>
                        <span class="p">)</span>
         <span class="n">payload_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
 
@@ -321,6 +324,8 @@
                                     <span class="n">msg_file</span><span class="o">=</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'msg_file'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                                     <span class="n">msg_file_mime</span><span class="o">=</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'msg_file_mime'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                                     <span class="n">msg_file_name</span><span class="o">=</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'msg_file_name'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                                    <span class="n">signin_user</span><span class="o">=</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'signin_user'</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                                    <span class="n">signin_groups</span><span class="o">=</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'signin_groups'</span><span class="p">,</span> <span class="p">[]),</span>
                                     <span class="p">)</span>
                     <span class="k">if</span> <span class="n">st</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">:</span>
                         <span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
@@ -344,7 +349,8 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">llmname</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
              <span class="n">msg_role</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_text</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_text_system</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_text_param</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">msg_image_url</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_audio</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_audio_format</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_video_url</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_file_url</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">msg_file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_file_mime</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_file_name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
+             <span class="n">msg_file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_file_mime</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_file_name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">signin_user</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signin_groups</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        LLMにチャットメッセージを送信します。</span>
 
@@ -365,7 +371,8 @@
 <span class="sd">            msg_file (str, optional): 送信するファイルの内容。Base64エンコードされた文字列で指定します。</span>
 <span class="sd">            msg_file_mime (str, optional): 送信するファイルのMIMEタイプ。</span>
 <span class="sd">            msg_file_name (str, optional): 送信するファイルの名前。</span>
-<span class="sd">            groups (List[str], optional): リクエスト元のユーザーグループのリスト。指定された場合、許可されているグループに含まれる設定のみを返します。</span>
+<span class="sd">            signin_user (str, optional): リクエスト元のユーザー。</span>
+<span class="sd">            signin_groups (List[str], optional): リクエスト元のユーザーグループのリスト。指定された場合、許可されているグループに含まれる設定のみを返します。</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple[int, List[Dict[str, Any]]]: (ステータスコード, LLMからの応答メッセージのリスト)</span>
 <span class="sd">        """</span>
@@ -415,6 +422,9 @@
             <span class="n">llmendpoint</span> <span class="o">=</span> <span class="n">configure</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'llmendpoint'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">llmmodel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"llmmodel is required."</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">llmapikey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"llmapikey is required."</span><span class="p">)</span>
+            <span class="n">llmapikey</span> <span class="o">=</span> <span class="n">keystore</span><span class="o">.</span><span class="n">replace_value</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">string_value</span><span class="o">=</span><span class="n">llmapikey</span><span class="p">,</span>
+                                               <span class="n">key_usage</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">(),</span>
+                                               <span class="n">signin_user</span><span class="o">=</span><span class="n">signin_user</span><span class="p">,</span> <span class="n">signin_groups</span><span class="o">=</span><span class="n">signin_groups</span><span class="p">)</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">llmmodel</span><span class="p">,</span>
                 <span class="n">api_key</span><span class="o">=</span><span class="n">llmapikey</span><span class="p">,</span>
@@ -437,6 +447,9 @@
             <span class="k">if</span> <span class="n">llmapiversion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"llmapiversion is required."</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">llmmodel</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"azure/"</span><span class="p">):</span>
                 <span class="n">llmmodel</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"azure/</span><span class="si">{</span><span class="n">llmmodel</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">llmapikey</span> <span class="o">=</span> <span class="n">keystore</span><span class="o">.</span><span class="n">replace_value</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">string_value</span><span class="o">=</span><span class="n">llmapikey</span><span class="p">,</span>
+                                               <span class="n">key_usage</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">(),</span>
+                                               <span class="n">signin_user</span><span class="o">=</span><span class="n">signin_user</span><span class="p">,</span> <span class="n">signin_groups</span><span class="o">=</span><span class="n">signin_groups</span><span class="p">)</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">llmmodel</span><span class="p">,</span>
                 <span class="n">api_key</span><span class="o">=</span><span class="n">llmapikey</span><span class="p">,</span>
@@ -479,6 +492,9 @@
             <span class="k">if</span> <span class="n">llmmodel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"llmmodel is required."</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">llmendpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"llmendpoint is required."</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">llmapikey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"llmapikey is required."</span><span class="p">)</span>
+            <span class="n">llmapikey</span> <span class="o">=</span> <span class="n">keystore</span><span class="o">.</span><span class="n">replace_value</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">string_value</span><span class="o">=</span><span class="n">llmapikey</span><span class="p">,</span>
+                                               <span class="n">key_usage</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">(),</span>
+                                               <span class="n">signin_user</span><span class="o">=</span><span class="n">signin_user</span><span class="p">,</span> <span class="n">signin_groups</span><span class="o">=</span><span class="n">signin_groups</span><span class="p">)</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="sa">f</span><span class="s2">"litellm_proxy/</span><span class="si">{</span><span class="n">llmmodel</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">api_base</span><span class="o">=</span><span class="n">llmendpoint</span><span class="p">,</span>
