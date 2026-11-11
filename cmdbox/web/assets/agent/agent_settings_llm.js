@@ -82,7 +82,7 @@ agentView.list_llm = async () => {
                 $(`
                     <li class="sf-list-danger-item">
                         <div>
-                            <span class="d-block glow-text-magenta system-font" style="font-size: 0.9em;">${item.name}</span>
+                            <span class="d-block glow-text-magenta system-font">${item.name}</span>
                             <span class="text-danger">${JSON.stringify(res)}</span>
                         </div>
                     </li>
@@ -93,7 +93,7 @@ agentView.list_llm = async () => {
             const itemEl = $(`
                 <li class="sf-list-item" style="cursor: pointer;" data-priority="${config.llmpriority}">
                     <div>
-                        <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.llmname}</span>
+                        <span class="d-block glow-text-cyan system-font">${config.llmname}</span>
                         <span>( ${config.llmpriority} ) ${config.llmprov} / ${config.llmmodel}</span>
                     </div>
                 </li>

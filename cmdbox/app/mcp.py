@@ -182,7 +182,7 @@ class ToolListProvider(Provider):
                 raise TypeError(f"Expected FunctionTool, got {type(tool)}")
             self.tools.append(tool)
 
-    async def _list_tools(self):
+    async def _list_tools(self) -> List[Any]:
         """FastMCP provider が現在のツール一覧を取得するためのポイント。"""
         return list(self)
 
@@ -192,6 +192,34 @@ class ToolListProvider(Provider):
             if getattr(tool, 'name', None) == name:
                 return tool
         raise NotFoundError(f"Tool not found: {name}")
+
+    async def _list_resources(self, uri=None) -> List[Any]:
+        """FastMCP provider が現在のリソース一覧を取得するためのポイント。"""
+        from fastmcp.resources import TextResource
+        options = Options.getInstance()
+        resources = []
+        for tool in self:
+            resourceUri = tool.meta.get('ui', {}).get('resourceUri', {})
+            name = tool.name
+            description = tool.description
+            mode = tool.tags[0].replace("mode=", "")
+            cmd = tool.tags[1].replace("cmd=", "")
+            feat:feature.Feature = options.get_cmd_feature(mode, cmd)
+            mime, html = feat.get_renderer_html(resourceUri)
+            res = TextResource(uri=resourceUri, name=name, description=description,
+                                meta=dict(ui=dict(resourceUri=resourceUri,
+                                          csp=dict(resourceDomains=feat.get_renderer_domains()))),
+                                text=html, mime_type=mime)
+            if uri and resourceUri != uri:
+                continue
+            resources.append(res)
+        return resources
+
+    async def _get_resource(self, uri, version=None):
+        resources = await self._list_resources(uri=uri)
+        if resources:
+            return resources[0]
+        return None
 
     @property
     def extract_callable(self):
@@ -370,8 +398,10 @@ class ToolListProvider(Provider):
                 schema = feat.output_schema()
                 if schema is not None:
                     output_schema = schema.model_json_schema()
+            renderer_uri = feat.get_renderer_uri()
             func_tool = FunctionTool(fn=func_ctx[0], name=func_name, title=func_name.title(), description=description, 
                                      tags=[f"mode={mode}", f"cmd={cmd}"],
+                                     meta=dict(ui=dict(resourceUri=renderer_uri)) if renderer_uri else {},
                                      parameters=input_schema, output_schema=output_schema,)
             if func_name in _tools_fns:
                 # 既に同名の関数が存在する場合は差し替え

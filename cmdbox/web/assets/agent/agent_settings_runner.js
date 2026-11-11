@@ -88,7 +88,7 @@ agentView.list_runner = async () => {
                 $(`
                     <li class="sf-list-danger-item">
                         <div>
-                            <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${item.name}</span>
+                            <span class="d-block glow-text-cyan system-font">${item.name}</span>
                             <span class="text-danger">${JSON.stringify(res)}</span>
                         </div>
                     </li>
@@ -99,7 +99,7 @@ agentView.list_runner = async () => {
             const itemEl = $(`
                 <li class="sf-list-item" style="cursor: pointer;" data-priority="${config.runner_priority || 9999}">
                     <div>
-                        <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">
+                        <span class="d-block glow-text-cyan system-font">
                         ( ${config.runner_priority || '-'} ) ${config.runner_name}</span>
                         <span>
                             Agent: ${config.agent || 'None'},
@@ -246,7 +246,7 @@ agentView.show_runner_select_modal = async () => {
             if (!res || !res.success) {
                 const li = $(`<li class="d-flex sf-list-item"/>`).appendTo(ul);
                 const div1 = $(`<div class="d-inline-block"/>`).appendTo(li);
-                const head = $(`<span class="d-block glow-text-cyan system-font" style="font-size: 1em;"></span>`).appendTo(div1);
+                const head = $(`<span class="d-block glow-text-cyan system-font"></span>`).appendTo(div1);
                 head.html(`${item.name}`);
                 const body = $(`<span class="text-danger"></span>`).appendTo(div1);
                 body.html(`Failed to load`);
@@ -256,7 +256,7 @@ agentView.show_runner_select_modal = async () => {
 
             const li = $(`<li class="d-flex sf-list-item"/>`).appendTo(ul);
             const div1 = $(`<div class="d-inline-block"/>`).appendTo(li);
-            const head = $(`<span class="d-block glow-text-cyan system-font" style="font-size: 1em;"></span>`).appendTo(div1);
+            const head = $(`<span class="d-block glow-text-cyan system-font"></span>`).appendTo(div1);
             head.html(`( ${config.runner_priority || '-'} ) ${config.runner_name}`);
             const body = $(`<span></span>`).appendTo(div1);
             body.html(`Agent: ${config.agent || 'None'},

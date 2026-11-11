@@ -88,7 +88,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 0.85rem;
+    font-size: 1rem;
 }
 
 .nav-sidebar.expanded .btn-nav-action {
@@ -160,7 +160,7 @@ body.status-sidebar-expanded .status-main {
 .stat-title {
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: 1.02rem;
+    font-size: 1rem;
     letter-spacing: 0.02em;
     margin-bottom: 8px;
 }
@@ -180,7 +180,7 @@ body.status-sidebar-expanded .status-main {
 
 .stat-muted {
     color: var(--bs-secondary-color);
-    font-size: 0.88rem;
+    font-size: 1rem;
 }
 
 .menu-content {
@@ -278,7 +278,7 @@ body.status-sidebar-expanded .status-main {
 
 .storage-name {
     font-family: var(--font-body);
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .status-log-toolbar .form-select {
@@ -295,7 +295,7 @@ body.status-sidebar-expanded .status-main {
     color: var(--bs-body-color);
     padding: 10px;
     font-family: var(--font-body);
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     line-height: 1.45;
     white-space: pre-wrap;
     word-break: break-word;

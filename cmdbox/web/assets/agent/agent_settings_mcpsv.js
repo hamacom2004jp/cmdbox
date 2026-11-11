@@ -62,7 +62,7 @@ agentView.list_mcpsv = async () => {
                 $(`
                     <li class="sf-list-danger-item">
                         <div>
-                            <span class="d-block glow-text-magenta system-font" style="font-size: 0.9em;">${item.name}</span>
+                            <span class="d-block glow-text-magenta system-font">${item.name}</span>
                             <span class="text-danger">${JSON.stringify(res)}</span>
                         </div>
                     </li>
@@ -73,7 +73,7 @@ agentView.list_mcpsv = async () => {
             const itemEl = $(`
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
-                        <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.mcpserver_name}</span>
+                        <span class="d-block glow-text-cyan system-font">${config.mcpserver_name}</span>
                         <span>${config.mcpserver_url}</span>
                     </div>
                 </li>

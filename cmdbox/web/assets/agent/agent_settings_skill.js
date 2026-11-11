@@ -61,7 +61,7 @@ agentView.list_skill = async () => {
             const itemEl = $(
                 '<li class="sf-list-item" style="cursor: pointer;">'
                 + '<div>'
-                + `<span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${item.name}</span>`
+                + `<span class="d-block glow-text-cyan system-font">${item.name}</span>`
                 + `<span>${item.path || ''}</span>`
                 + '</div>'
                 + '</li>'

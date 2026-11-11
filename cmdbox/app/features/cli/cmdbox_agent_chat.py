@@ -483,6 +483,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
+                mode=agent_conf.get('subagent_mode', None),
                 planner=planner,
                 tools=tools,
                 sub_agents=subagents,
@@ -514,6 +515,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
+                mode=agent_conf.get('subagent_mode', None),
                 planner=planner,
                 tools=tools,
                 sub_agents=subagents,
@@ -544,6 +546,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
+                mode=agent_conf.get('subagent_mode', None),
                 planner=planner,
                 tools=tools,
                 sub_agents=subagents,
@@ -567,6 +570,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
+                mode=agent_conf.get('subagent_mode', None),
                 planner=planner,
                 tools=tools,
                 sub_agents=subagents,
@@ -591,6 +595,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
+                mode=agent_conf.get('subagent_mode', None),
                 planner=planner,
                 tools=tools,
                 sub_agents=subagents,
@@ -829,12 +834,12 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         Returns:
             Dict[str, Any]: 更新後のエージェント設定
         """
-        agent_instruction = payload.get('agent_instruction', '').strip()
-        agent_system_instruction = payload.get('agent_system_instruction', '').strip()
+        agent_instruction = payload.get('agent_instruction', '')
+        agent_system_instruction = payload.get('agent_system_instruction', '')
         if agent_instruction:
-            agent_conf['agent_instruction'] = agent_instruction
+            agent_conf['agent_instruction'] = agent_instruction.strip()
         if agent_system_instruction:
-            agent_conf['agent_system_instruction'] = agent_system_instruction
+            agent_conf['agent_system_instruction'] = agent_system_instruction.strip()
         return agent_conf
 
     async def before_chat_run(self, *, logger:logging.Logger, data_dir:Path, redis_cli:redis_client.RedisClient,

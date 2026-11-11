@@ -80,6 +80,9 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
                     choice_fn=self.choice_mcvpservers,
                     description_ja="Agentが利用するMCPサーバー名を指定します。",
                     description_en="Specify the MCP server name used by the Agent."),
+                dict(opt="subagent_mode", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['', "chat", "task", "single_turn"],
+                    description_ja="サブエージェントを持つ場合のデリゲーションモードを指定します。 ``chat``はサブエージェントにチャットを委任、 ``task``はサブエージェントにタスク達成を委任、 ``single_turn``はサブエージェントに単発処理の委任。",
+                    description_en="Specifies the delegation mode when using a subagent. ``chat`` delegates chat to the subagent, ``task`` delegates task completion to the subagent, and ``single_turn`` delegates a single-turn task to the subagent."),
                 dict(opt="subagents", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
                     choice_fn=self.choice_subagents,
                     description_ja="Agentが利用するサブエージェント名を指定します。",
@@ -229,6 +232,7 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
             a2asv_apikey=args.a2asv_apikey if hasattr(args, 'a2asv_apikey') else None,
             llm=args.llm if hasattr(args, 'llm') else None,
             mcpservers=list(set(args.mcpservers)) if hasattr(args, 'mcpservers') and args.mcpservers is not None else None,
+            subagent_mode=args.subagent_mode if hasattr(args, 'subagent_mode') and args.subagent_mode else None,
             subagents=list(set(args.subagents)) if hasattr(args, 'subagents') and args.subagents is not None else None,
             skill_names=list(set(args.skill_names)) if hasattr(args, 'skill_names') and args.skill_names is not None else None,
             agent_description=args.agent_description if hasattr(args, 'agent_description') else None,
@@ -290,6 +294,14 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
                             msg = dict(warn=f"An agent cannot include itself as a subagent.")
                             redis_cli.rpush(reskey, msg)
                             return self.RESP_WARN
+                    if configure.get('subagent_mode', None) is None:
+                        msg = dict(warn=f"Subagent mode must be specified when subagents are defined.")
+                        redis_cli.rpush(reskey, msg)
+                        return self.RESP_WARN
+                    if configure.get('subagent_mode', None) not in ["chat", "task", "single_turn"]:
+                        msg = dict(warn=f"Invalid subagent mode '{configure.get('subagent_mode', None)}'.")
+                        redis_cli.rpush(reskey, msg)
+                        return self.RESP_WARN
                 if configure.get('skill_names', None) is not None:
                     configure['skill_names'] = list(set(configure['skill_names']))
                     entries = self.list_skills(data_dir)

@@ -12,7 +12,7 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
     msg = agentView.cell_chop(msg, 300);
     const li = $(`<li id="${session_id}" class="d-flex sf-list-item"/>`).appendTo(agentView.chatHistories);
     const div1 = $(`<div class="d-inline-block" style="cursor: pointer;"/>`).appendTo(li);
-    const head = $(`<span class="d-block glow-text-cyan system-font" style="font-size: 1em;"></span>`).appendTo(div1);
+    const head = $(`<span class="d-block glow-text-cyan system-font"></span>`).appendTo(div1);
     head.html(`${update_time instanceof Date ? update_time.toLocaleString() : update_time} - ${runner_name} - ${user_name}`);
     const body = $(`<span></span>`).appendTo(div1);
     body.html(msg);

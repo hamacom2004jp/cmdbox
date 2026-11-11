@@ -82,6 +82,7 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             a2asv_apikey: Union[str, None] = pydantic.Field(default=None, description="A2AサーバーのAPIキー")
             llm: Union[str, None] = pydantic.Field(default=None, description="LLM名")
             mcpservers: Union[List[str], None] = pydantic.Field(default=None, description="MCPサーバーリスト")
+            subagent_mode: Union[str, None] = pydantic.Field(default=None, description="サブエージェントモード")
             subagents: Union[List[str], None] = pydantic.Field(default=None, description="サブエージェントリスト")
             skill_names: Union[List[str], None] = pydantic.Field(default=None, description="スキル名リスト")
             agent_description: Union[str, None] = pydantic.Field(default=None, description="エージェントの説明")

@@ -326,7 +326,7 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     color: var(--bs-body-bg);
 }
 .msg-label {
-    font-size: 0.75rem;
+    font-size: 1rem;
     font-family: var(--font-header);
     margin-bottom: 4px;
     display: block;
@@ -656,6 +656,7 @@ a.list-group-item.active {
 .message-thinking .msg-content {
     color: var(--text-white-50);
     font-style: italic;
+    font-size: 1.1em;
     animation: thinking-pulse 1.5s ease-in-out infinite;
 }
 

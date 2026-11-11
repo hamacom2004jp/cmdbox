@@ -1,4 +1,5 @@
 from cmdbox.app import common, mcp, web as _web
+from cmdbox.app.commons import keystore
 from cmdbox.app.options import Options
 from cmdbox.app.auth import signin
 from fastapi import FastAPI, Depends, HTTPException, Request, Response
@@ -94,7 +95,7 @@ class A2a(mcp.Mcp):
         mwparam = dict(path='/a2a', max_age=900, secret_key=common.random_string())
         app.add_middleware(SessionMiddleware, **mwparam)
         # エージェントを読込み
-        await self.reload_a2aserver(logger, args)
+        await self.reload_a2aserver(logger, args, None, None, web)
 
         @app.on_event("shutdown")
         async def _shutdown_a2a_apps():
@@ -130,7 +131,18 @@ class A2a(mcp.Mcp):
                                 scope['headers'] = list(scope['headers']) + [(b'Authorization', f"Bearer {apikey}".encode('utf-8'))]
                 # API Keyが設定されている場合、それを使用する
                 elif 'a2asv_apikey' in agent_conf and agent_conf['a2asv_apikey'] is not None:
-                    scope['headers'] = list(scope['headers']) + [(b'Authorization', f"Bearer {agent_conf['a2asv_apikey']}".encode('utf-8'))]
+                    apikey = agent_conf['a2asv_apikey']
+                    try:
+                        signin = web.signin.check_signin(req, res)
+                        session:Dict[str, Any] = req.session
+                        if signin is None and 'signin' in session:
+                            signin_user = session['signin'].get('name', None)
+                            signin_groups = session['signin'].get('groups', None)
+                            apikey = keystore.replace_value(data_dir=None, string_value=apikey, key_usage="agent_chat",
+                                                            signin_user=signin_user, signin_groups=signin_groups)
+                    except Exception as e:
+                        logger.warning(f"Failed to replace API key: {e}", exc_info=True)
+                    scope['headers'] = list(scope['headers']) + [(b'Authorization', f"Bearer {apikey}".encode('utf-8'))]
             # プロキシ先アプリケーションへ転送
             await target_app(scope, req.receive, req._send)
 
@@ -142,10 +154,10 @@ class A2a(mcp.Mcp):
             session:Dict[str, Any] = req.session
             if 'signin' not in session:
                 raise HTTPException(status_code=401, detail="Unauthorized")
-            return await self.reload_a2aserver(logger, args)
+            return await self.reload_a2aserver(logger, args, req, res, web)
         return app
 
-    async def reload_a2aserver(self, logger:logging.Logger, args:argparse.Namespace) -> None:
+    async def reload_a2aserver(self, logger:logging.Logger, args:argparse.Namespace, req:Request, res:Response, web:_web.Web) -> None:
         if logger.level == logging.DEBUG:
             logger.debug(f"google-adk a2a loading..")
         from google.adk.a2a.utils import agent_to_a2a, agent_card_builder
@@ -206,6 +218,19 @@ class A2a(mcp.Mcp):
                 if mcpsv_conf.get('mcpserver_apikey', None) is None and not mcpsv_conf.get('mcpserver_delegated_auth', False):
                     logger.warning(f"MCPServer config '{mcpserver_name}' does not have apikey.")
                     continue
+                if mcpsv_conf.get('mcpserver_apikey', None) is not None and req:
+                    try:
+                        mcpserver_apikey = mcpsv_conf['mcpserver_apikey']
+                        signin = web.signin.check_signin(req, res)
+                        session:Dict[str, Any] = req.session
+                        if signin is None and 'signin' in session:
+                            signin_user = session['signin'].get('name', None)
+                            signin_groups = session['signin'].get('groups', None)
+                            mcpsv_conf['mcpserver_apikey'] = keystore.replace_value(data_dir=None, string_value=mcpserver_apikey, key_usage="agent_chat",
+                                                                                     signin_user=signin_user, signin_groups=signin_groups)
+                    except Exception as e:
+                        logger.warning(f"Failed to replace MCPServer API key: {e}", exc_info=True)
+
                 mcpsv_confs.append(mcpsv_conf)
             if len(mcpsv_confs) <= 0:
                 logger.warning(f"Agent '{agent['name']}' has no valid MCPServer config.")

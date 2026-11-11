@@ -1394,7 +1394,7 @@ cmdbox.load_server_list = (parent_elem, call_back_func, server_only, current_onl
                 const svname = elem['svname'].split('-')[0];
                 if (svnames[svname]) return;
                 svnames[svname] = true;
-                const a_elem = $(`<a class="dropdown-item" href="#" data-client_data="">${svname} ( ${opt['host']}:${opt['port']} )</a>`);
+                const a_elem = $(`<a class="dropdown-item" href="#" data-client_data="">server ( ${svname} )</a>`);
                 a_elem.attr('data-host', opt['host']);
                 a_elem.attr('data-port', opt['port']);
                 a_elem.attr('data-password', opt['password']);

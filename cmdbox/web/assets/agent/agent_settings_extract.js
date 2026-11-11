@@ -69,7 +69,7 @@ agentView.list_extract = async () => {
                 $(`
                     <li class="sf-list-danger-item">
                         <div>
-                            <span class="d-block glow-text-magenta system-font" style="font-size: 0.9em;">${item.title}</span>
+                            <span class="d-block glow-text-magenta system-font">${item.title}</span>
                             <span class="text-danger">${JSON.stringify(res)}</span>
                         </div>
                     </li>
@@ -81,7 +81,7 @@ agentView.list_extract = async () => {
             const itemEl = $(`
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
-                        <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.extract_name}</span>
+                        <span class="d-block glow-text-cyan system-font">${config.extract_name}</span>
                         <span>${config.extract_type} / ${config.extract_cmd}</span>
                     </div>
                 </li>

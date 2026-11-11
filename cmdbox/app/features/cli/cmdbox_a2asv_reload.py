@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import resdata, validator
+from cmdbox.app.commons import keystore, resdata, validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -69,7 +69,13 @@ class A2asvReload(feature.OneshotResultEdgeFeature, validator.Validator):
         url = str(args.a2asv_reload_url).rstrip("/")
         headers = {}
         if getattr(args, "a2asv_apikey", None):
-            headers["Authorization"] = f"Bearer {args.a2asv_apikey}"
+            apikey = args.a2asv_apikey
+            try:
+                apikey = keystore.replace_value(data_dir=None, string_value=apikey, key_usage="agent_chat",
+                                                signin_user=args.signin_user, signin_groups=args.signin_groups)
+            except Exception as e:
+                logger.warning(f"Failed to replace API key: {e}", exc_info=True)
+            headers["Authorization"] = f"Bearer {apikey}"
         try:
             res = requests.request(method=args.send_method, url=url, headers=headers,
                                    verify=args.send_verify, timeout=args.send_timeout)
