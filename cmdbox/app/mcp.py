@@ -56,7 +56,6 @@ class Mcp:
             Any: FastMCP
         """
         cls = self.signin.__class__
-        tool_provider = self.create_tools(logger, args, False)
         publickey_str = cls.verify_jwt_publickey_str if hasattr(cls, 'verify_jwt_publickey_str') else None
         issuer = cls.verify_jwt_issuer if hasattr(cls, 'verify_jwt_issuer') else None
         audience = cls.verify_jwt_audience if hasattr(cls, 'verify_jwt_audience') else None
@@ -67,15 +66,16 @@ class Mcp:
                 issuer=issuer,
                 audience=audience
             )
-            mcp = FastMCP(name=self.ver.__appid__, auth=auth, providers=[tool_provider])
+            mcp = FastMCP(name=self.ver.__appid__, auth=auth)
         else:
             self.logger.info(f"Using JWTVerifier without public key, issuer, or audience.")
-            mcp = FastMCP(name=self.ver.__appid__, providers=[tool_provider])
+            mcp = FastMCP(name=self.ver.__appid__)
         mcp.add_middleware(self.create_mw_logging(self.logger, args))
         mcp.add_middleware(self.create_mw_reqscope(self.logger, args))
+        mcp.add_provider(self.create_tools(logger, args, False, mcp))
         return mcp
 
-    def create_tools(self, logger:logging.Logger, args:argparse.Namespace, extract_callable:bool) -> Any:
+    def create_tools(self, logger:logging.Logger, args:argparse.Namespace, extract_callable:bool, mcp:FastMCP) -> Any:
         """
         ツールリストを作成します
         
@@ -87,7 +87,7 @@ class Mcp:
         Returns:
             ToolList: ToolListのリスト
         """
-        tool_list = ToolListProvider(logger, self.data, appcls=self.appcls, ver=self.ver, language=self.language)
+        tool_list = ToolListProvider(logger, self.data, mcp=mcp, appcls=self.appcls, ver=self.ver, language=self.language)
         tool_list.extract_callable = extract_callable
         return tool_list
 
@@ -154,7 +154,7 @@ class Mcp:
 
 
 class ToolListProvider(Provider):
-    def __init__(self, logger:logging.Logger, data:Path, *tools:List, appcls=None, ver=None, language:str=None):
+    def __init__(self, logger:logging.Logger, data:Path, *tools:List, mcp:FastMCP=None, appcls=None, ver=None, language:str=None):
         """
         ツールリストを初期化します
 
@@ -162,6 +162,7 @@ class ToolListProvider(Provider):
             logger (logging.Logger): ロガー
             data (Path): データパス
             *tools (List): 追加するツールのリスト
+            mcp (FastMCP, optional): FastMCP インスタンス. Defaults to None.
             appcls ([type], optional): アプリケーションクラス. Defaults to None.
             ver ([type], optional): バージョン. Defaults to None.
             language (str, optional): 言語. Defaults to None.
@@ -174,6 +175,7 @@ class ToolListProvider(Provider):
         self.appcls = appcls
         self.ver = ver
         self.language = language
+        self.mcp = mcp
         for tool in tools:
             if isinstance(tool, FunctionTool):
                 if self.logger.level == logging.DEBUG:
@@ -200,16 +202,19 @@ class ToolListProvider(Provider):
         resources = []
         for tool in self:
             resourceUri = tool.meta.get('ui', {}).get('resourceUri', {})
-            name = tool.name
-            description = tool.description
-            mode = tool.tags[0].replace("mode=", "")
-            cmd = tool.tags[1].replace("cmd=", "")
+            for tag in tool.tags:
+                if tag.startswith("mode="):
+                    mode = tag.replace("mode=", "")
+                elif tag.startswith("cmd="):
+                    cmd = tag.replace("cmd=", "")
             feat:feature.Feature = options.get_cmd_feature(mode, cmd)
             mime, html = feat.get_renderer_html(resourceUri)
-            res = TextResource(uri=resourceUri, name=name, description=description,
-                                meta=dict(ui=dict(resourceUri=resourceUri,
-                                          csp=dict(resourceDomains=feat.get_renderer_domains()))),
-                                text=html, mime_type=mime)
+            if not html: continue
+            res = TextResource(uri=resourceUri, name=tool.name, title=tool.title,
+                               description=f'Screen displaying the results of running {tool.name}.',
+                               tags=tool.tags, text=html, mime_type=mime,
+                               meta=dict(ui=dict(resourceUri=resourceUri,
+                                          csp=dict(resourceDomains=feat.get_renderer_domains()))))
             if uri and resourceUri != uri:
                 continue
             resources.append(res)

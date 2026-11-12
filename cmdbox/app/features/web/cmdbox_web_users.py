@@ -104,15 +104,26 @@ class Users(feature.WebFeature):
                 return dict(warn=str(e))
 
         @app.post('/gui/apikey/add', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        async def gui_apikey_add(req:Request, res:Response):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            return await apikey_add(req, res, req.session['signin']['uid'])
+
         @app.post('/users/apikey/add', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def users_apikey_add(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
+            return await apikey_add(req, res)
+
+        async def apikey_add(req:Request, res:Response, uid:str=None):
             if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
+                if req.session['signin']['name'] != form.get('name', None):
+                    raise ValueError('You can only use your API key.')
                 apikey = web.apikey_add(req, form)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
@@ -121,15 +132,25 @@ class Users(feature.WebFeature):
                 return dict(warn=str(e))
 
         @app.post('/gui/apikey/del', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        async def gui_apikey_del(req:Request, res:Response):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            return await apikey_del(req, res, req.session['signin']['uid'])
         @app.post('/users/apikey/del', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def users_apikey_del(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
+            return await apikey_del(req, res)
+
+        async def apikey_del(req:Request, res:Response, uid:str=None):
             if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
+                if req.session['signin']['name'] != form.get('name', None):
+                    raise ValueError('You can only use your API key.')
                 apikey = web.apikey_del(req, form)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)

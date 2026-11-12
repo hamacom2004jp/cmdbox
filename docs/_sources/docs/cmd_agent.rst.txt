@@ -179,6 +179,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
         "mcpservers": [
           "string"
         ],
+        "subagent_mode": "string",
         "subagents": [
           "string"
         ],
@@ -212,6 +213,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.a2asv_apikey","str | null","no","null","A2AサーバーのAPIキー"
     "success.llm","str | null","no","null","LLM名"
     "success.mcpservers","list[str] | null","no","null","MCPサーバーリスト"
+    "success.subagent_mode","str | null","no","null","サブエージェントモード"
     "success.subagents","list[str] | null","no","null","サブエージェントリスト"
     "success.skill_names","list[str] | null","no","null","スキル名リスト"
     "success.agent_description","str | null","no","null","エージェントの説明"
@@ -250,6 +252,7 @@ agent ( agent_save ) : ``cmdbox -m agent -c agent_save <Option>``
     "--reasoning_effort <reasoning_effort>","str","","","off","off | on | low | medium | high | xhigh","Specify the depth of the thought chain in the agent. Depending on the model you are using, this feature may not be supported."
     "--llm <llm>","str","","","","","Specify the LLM configuration name referenced by the Agent."
     "--mcpservers <mcpservers>","str","multi","","","","Specify the MCP server name used by the Agent."
+    "--subagent_mode <subagent_mode>","str","","",""," | chat | task | single_turn","Specifies the delegation mode when using a subagent. ``chat`` delegates chat to the subagent, ``task`` delegates task completion to the subagent, and ``single_turn`` delegates a single-turn task to the subagent."
     "--subagents <subagents>","str","multi","","","","Specify the subagent name used by the agent."
     "--skill_names <skill_names>","str","multi","","","","Specify skill names used by the agent. Multiple values are allowed."
     "--a2asv_baseurl <a2asv_baseurl>","str","","","http://localhost:8071/a2a/<target_agent_name>","","Specify the URL of the A2A Server. <target_agent_name> specifies the name of the agent to be called."

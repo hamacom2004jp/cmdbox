@@ -238,63 +238,13 @@ class Feature(object):
         return len(set(normalized_request).intersection(set(normalized_allowed))) > 0
 
     def get_renderer_uri(self, suffix:str="") -> str:
-        return f"ui://mcpapps/{self.ver.__appid__}/{self.get_mode()}{'' if not suffix else '/' + suffix}"
+        return f"ui://mcpapps/{self.ver.__appid__}/{self.get_mode()}/{self.get_cmd()}{'' if not suffix else '/' + suffix}"
 
     def get_renderer_domains(self) -> List[str]:
         return ["https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"]
 
     def get_renderer_html(self, uri) -> Tuple[str, str]:
-        html = '''
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard App</title>
-    <style>
-        body { font-family: sans-serif; padding: 16px; background: #f9f9f9; color: #333; }
-        .card { background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        button { background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-    </style>
-</head>
-    <body>
-        <div class="card">
-            <h3>📊 インタラクティブ・ダッシュボード</h3>
-            <p id="output">データを読み込み中...</p>
-            <button onclick="updateData()">データを更新</button>
-        </div>
-
-        <!-- MCP Apps SDKの読み込み（ホスト環境との通信用） -->
-        <script type="module">
-            import { App } from "https://unpkg.com/@modelcontextprotocol/ext-apps@0.4.0/app-with-deps";
-            
-            const app = new App({ name: "DashboardApp", version: "1.0.0" });
-
-            // ツール実行結果やサーバーからの初期データを受け取る
-            app.ontoolresult = ({ content }) => {
-                const text = content?.find(c => c.type === 'text');
-                if (text) {
-                    try {
-                        const data = JSON.parse(text.text);
-                        document.getElementById('output').textContent = `現在値: ${data.value} (更新時刻: ${data.time})`;
-                    } catch (e) {
-                        document.getElementById('output').textContent = text.text;
-                    }
-                }
-            };
-
-            // ホストへの接続を初期化
-            await app.connect();
-
-            // 必要に応じてツールを逆呼び出し（インタラクティブな操作）する関数
-            window.updateData = async () => {
-                document.getElementById('output').textContent = "更新中...";
-                // app.callServerTool などを通じてサーバー側の処理を再度呼び出すことも可能
-            };
-        </script>
-    </body>
-</html>
-        '''
+        html = None
         return 'text/html;profile=mcp-app', html
 
 class OneshotEdgeFeature(Feature):

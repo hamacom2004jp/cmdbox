@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/11/08 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/11/12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e88c2e44"></script>
+      <script src="../_static/documentation_options.js?v=3c50c37c"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -668,6 +668,7 @@
 <span class="w">    </span><span class="nt">"mcpservers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="s2">"string"</span>
 <span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"subagent_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">"subagents"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="s2">"string"</span>
 <span class="w">    </span><span class="p">],</span>
@@ -769,85 +770,91 @@
 <td><p>null</p></td>
 <td><p>MCPサーバーリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.subagents</p></td>
+<tr class="row-odd"><td><p>success.subagent_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>サブエージェントモード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.subagents</p></td>
 <td><p>list[str] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>サブエージェントリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.skill_names</p></td>
+<tr class="row-odd"><td><p>success.skill_names</p></td>
 <td><p>list[str] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキル名リスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.agent_description</p></td>
+<tr class="row-even"><td><p>success.agent_description</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エージェントの説明</p></td>
 </tr>
-<tr class="row-even"><td><p>success.agent_instruction</p></td>
+<tr class="row-odd"><td><p>success.agent_instruction</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エージェントへの指示</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.agent_system_instruction</p></td>
+<tr class="row-even"><td><p>success.agent_system_instruction</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>サービス提供側が内部的に設定するシステムプロンプト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.prompt_param</p></td>
+<tr class="row-odd"><td><p>success.prompt_param</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プレースホルダーに対応するパラメータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>warn.save_mode</p></td>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>保存モード</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn.performance</p></td>
+<tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>error</p></td>
+<tr class="row-odd"><td><p>error</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>error.save_mode</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>保存モード</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -978,7 +985,20 @@
 <td></td>
 <td><p>Specify the MCP server name used by the Agent.</p></td>
 </tr>
-<tr class="row-even"><td><p>--subagents &lt;subagents&gt;</p></td>
+<tr class="row-even"><td><p>--subagent_mode &lt;subagent_mode&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">chat | task | single_turn</div>
+</div>
+</div></blockquote>
+</td>
+<td><p>Specifies the delegation mode when using a subagent. <code class="docutils literal notranslate"><span class="pre">chat</span></code> delegates chat to the subagent, <code class="docutils literal notranslate"><span class="pre">task</span></code> delegates task completion to the subagent, and <code class="docutils literal notranslate"><span class="pre">single_turn</span></code> delegates a single-turn task to the subagent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--subagents &lt;subagents&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -986,7 +1006,7 @@
 <td></td>
 <td><p>Specify the subagent name used by the agent.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--skill_names &lt;skill_names&gt;</p></td>
+<tr class="row-even"><td><p>--skill_names &lt;skill_names&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -994,7 +1014,7 @@
 <td></td>
 <td><p>Specify skill names used by the agent. Multiple values are allowed.</p></td>
 </tr>
-<tr class="row-even"><td><p>--a2asv_baseurl &lt;a2asv_baseurl&gt;</p></td>
+<tr class="row-odd"><td><p>--a2asv_baseurl &lt;a2asv_baseurl&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1002,7 +1022,7 @@
 <td></td>
 <td><p>Specify the URL of the A2A Server. &lt;target_agent_name&gt; specifies the name of the agent to be called.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--a2asv_delegated_auth &lt;a2asv_delegated_auth&gt;</p></td>
+<tr class="row-even"><td><p>--a2asv_delegated_auth &lt;a2asv_delegated_auth&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td></td>
@@ -1010,7 +1030,7 @@
 <td><p>True | False</p></td>
 <td><p>Authenticate the A2A Server using the API Key of the currently logged-in user.</p></td>
 </tr>
-<tr class="row-even"><td><p>--a2asv_apikey &lt;a2asv_apikey&gt;</p></td>
+<tr class="row-odd"><td><p>--a2asv_apikey &lt;a2asv_apikey&gt;</p></td>
 <td><p>passwd</p></td>
 <td></td>
 <td></td>
@@ -1018,7 +1038,7 @@
 <td></td>
 <td><p>Specify the API Key when starting the A2A Server. Additionally, if <cite>a2asv_delegated_auth</cite> is disabled, it will also be used when running the Agent.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--agent_description &lt;agent_description&gt;</p></td>
+<tr class="row-even"><td><p>--agent_description &lt;agent_description&gt;</p></td>
 <td><p>text</p></td>
 <td></td>
 <td></td>
@@ -1026,7 +1046,7 @@
 <td></td>
 <td><p>Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_instruction &lt;agent_instruction&gt;</p></td>
+<tr class="row-odd"><td><p>--agent_instruction &lt;agent_instruction&gt;</p></td>
 <td><p>text</p></td>
 <td></td>
 <td></td>
@@ -1034,7 +1054,7 @@
 <td></td>
 <td><p>Specify instructions for the LLM model used by the agent. These will guide the agent's behavior.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--agent_system_instruction &lt;agent_system_instruction&gt;</p></td>
+<tr class="row-even"><td><p>--agent_system_instruction &lt;agent_system_instruction&gt;</p></td>
 <td><p>text</p></td>
 <td></td>
 <td></td>
@@ -1042,7 +1062,7 @@
 <td></td>
 <td><p>Specify a system prompt set internally by the service provider without exposing it to end users. Like <cite>agent_instruction</cite>, it is passed to the Agent, but this one is private.</p></td>
 </tr>
-<tr class="row-even"><td><p>--prompt_param &lt;prompt_param&gt;</p></td>
+<tr class="row-odd"><td><p>--prompt_param &lt;prompt_param&gt;</p></td>
 <td><p>dict</p></td>
 <td><p>multi</p></td>
 <td></td>

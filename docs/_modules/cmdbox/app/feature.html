@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.feature &mdash; cmdbox 2026/10/17 documentation</title>
+  <title>cmdbox.app.feature &mdash; cmdbox 2026/11/12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=769f61d8"></script>
+      <script src="../../../_static/documentation_options.js?v=3c50c37c"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../resources/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">License</a></li>
 </ul>
 
@@ -357,6 +358,25 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">normalized_request</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">normalized_request</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">normalized_allowed</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="Feature.get_renderer_uri">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_uri">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"ui://mcpapps/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mode</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cmd</span><span class="p">()</span><span class="si">}{</span><span class="s1">''</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">suffix</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">suffix</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+<div class="viewcode-block" id="Feature.get_renderer_domains">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_domains">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">"https://cdn.jsdelivr.net"</span><span class="p">,</span> <span class="s2">"https://cdnjs.cloudflare.com"</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Feature.get_renderer_html">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_html">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="s1">'text/html;profile=mcp-app'</span><span class="p">,</span> <span class="n">html</span></div>
 </div>
 
 
