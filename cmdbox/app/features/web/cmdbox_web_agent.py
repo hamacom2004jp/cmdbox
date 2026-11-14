@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse
 from starlette.websockets import WebSocketDisconnect
 from typing import Dict, Any, Tuple, List, Union
 import argparse
+import asyncio
 import logging
 import json
 import jwt
@@ -93,7 +94,7 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                 try:
                     query = await receive_text()
                     if query is None or query == '' or query == 'ping':
-                        time.sleep(0.5)
+                        await asyncio.sleep(0.5)
                         continue
                     if query=='call_tts_on':
                         call_tts = True
@@ -106,7 +107,7 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                         continue
 
                     web.options.audit_exec(sock, web, body=dict(agent_session=session_id, user=user_name, groups=groups, query=query))
-                    for st, result in agent_chat.apprun_generate(web.logger, host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
+                    async for st, result in agent_chat.async_apprun_generate(web.logger, host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
                                                               retry_interval=retry_interval, retry_count=retry_count, timeout=timeout,
                                                               runner_name=runner_name, user_name=user_name, session_id=session_id,
                                                               mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey,

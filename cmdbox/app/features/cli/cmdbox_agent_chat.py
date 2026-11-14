@@ -135,13 +135,13 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             ]
         )
 
-    @limiter.apprun_check_limit
-    @validator.apprun_check
-    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+    @limiter.async_apprun_check_limit
+    @validator.async_apprun_check
+    async def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         msg = dict(success=[], warn=[])
-        for st, res in self.apprun_generate(logger, host=args.host, port=args.port, password=args.password, svname=args.svname,
+        async for st, res in self.async_apprun_generate(logger,host=args.host, port=args.port, password=args.password, svname=args.svname,
                                             retry_interval=args.retry_interval, retry_count=args.retry_count, timeout=args.timeout,
                                             runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
                                             a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message,
@@ -160,7 +160,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             return self.RESP_WARN, msg, cl
         return self.RESP_SUCCESS, msg, cl
 
-    def apprun_generate(self, logger:logging.Logger, host:str, port:int, password:str, svname:str, retry_interval:int, retry_count:int, timeout:int,
+    async def async_apprun_generate(self, logger:logging.Logger, host:str, port:int, password:str, svname:str, retry_interval:int, retry_count:int, timeout:int,
                         runner_name:str, user_name:str, session_id:str, a2asv_apikey:str, mcpserver_apikey:str, message:str,
                         call_tts:bool, reasoning_effort:str, signin_user:str=None, signin_groups:List[str]=[],
                         agent_instruction:str=None, agent_system_instruction:str=None):
@@ -199,19 +199,25 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
-        for res in cl.redis_cli.send_cmd_sse(self.get_svcmd(), [payload_b64],
-                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout, nowait=False):
-            cls = self.output_schema()
-            try:
-                cls.model_validate(res)  # 結果のスキーマ検証
-            except Exception as e:
-                info = cls.get_model_info()
-                res = dict(warn=dict(msg=f"Invalid result format: {e}.", output=res, output_schema=info))
-                logger.warning(f"Invalid result format: {res}", exc_info=True)
-            if 'success' in res:
-                yield self.RESP_SUCCESS, res
-            else:
-                yield self.RESP_WARN, res
+        try:
+            # asend_cmd_sseにするとWebSocket側が切断されるため、send_cmd_sseを使用する
+            for res in cl.redis_cli.send_cmd_sse(self.get_svcmd(), [payload_b64],
+                                                 retry_count=retry_count, retry_interval=retry_interval, timeout=timeout, nowait=False):
+                cls = self.output_schema()
+                try:
+                    cls.model_validate(res)  # 結果のスキーマ検証
+                except Exception as e:
+                    info = cls.get_model_info()
+                    res = dict(warn=dict(msg=f"Invalid result format: {e}.", output=res, output_schema=info))
+                    logger.warning(f"Invalid result format: {res}", exc_info=True)
+                if 'success' in res:
+                    yield self.RESP_SUCCESS, res
+                else:
+                    yield self.RESP_WARN, res
+        except Exception as e:
+            logger.warning(f"Error during async_apprun_generate: {e}", exc_info=True)
+        finally:
+            pass
 
     def output_schema(self) -> type:
         class Ids(resdata.Base):
@@ -239,6 +245,10 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             mime_type: Union[str, None] = pydantic.Field(default=None, description="MIMEタイプ")
             inline_data_size: Union[int, None] = pydantic.Field(default=None, description="inline_dataサイズ")
             file_uri: Union[str, None] = pydantic.Field(default=None, description="ファイルURI")
+        class UiWidget(resdata.Base):
+            id: Union[str, None] = pydantic.Field(default=None, description="UIウィジェットID")
+            provider: Union[str, None] = pydantic.Field(default=None, description="UIウィジェットプロバイダー")
+            payload: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="UIウィジェットペイロード")
         class Message(resdata.Base):
             role: Union[str, None] = pydantic.Field(default=None, description="メッセージの役割")
             content: Union[str, None] = pydantic.Field(default=None, description="メッセージの内容")
@@ -250,6 +260,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             function_responses: Union[List[FunctionResponse], None] = pydantic.Field(default=None, description="関数応答一覧")
             artifact_delta: Union[Dict[str, int], None] = pydantic.Field(default=None, description="更新されたアーティファクト一覧")
             artifacts: Union[List[Artifact], None] = pydantic.Field(default=None, description="アーティファクト内容")
+            render_ui_widgets: Union[List[UiWidget], None] = pydantic.Field(default=None, description="表示対象のUIウィジェット一覧")
             wav_b64: Union[str, None] = pydantic.Field(default=None, description="Base64エンコードされたWAVデータ")
             ressize: Union[int, None] = pydantic.Field(default=None, description="Agentが返したレスポンスのサイズ")
             token_usage: Union[Dict[str, int], None] = pydantic.Field(default=None, description="トークン使用量")
@@ -699,7 +710,9 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     timeout=120,
                     sse_read_timeout=600,
                 )
-            if self.call_a2asv_start and mcpserver_apikey is not None:
+            # load_mcp_resource が呼ばれる経路では readonly_context が渡らず
+            # header_provider が使われない場合があるため、初期ヘッダーにも設定する。
+            if mcpserver_apikey is not None:
                 conn_params.headers = dict(Authorization=f"Bearer {mcpserver_apikey}")
             def _warp(mcpserver_apikey:str, mcpserver_delegated_auth:bool):
                 # mcpserver_delegated_auth=Trueの場合、chatコマンド実行時に、
@@ -725,6 +738,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 auth_scheme=auth_scheme,
                 auth_credential=auth_cred,
                 header_provider=_warp(mcpserver_apikey, mcpserver_delegated_auth),
+                use_mcp_resources=True
             )
             tools.append(toolset)
         return tools
@@ -1249,6 +1263,16 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     if responses:
                         success['function_responses'] = [self._serialize_function_response(r) for r in responses]
 
+                    if ev.actions and getattr(ev.actions, 'render_ui_widgets', None):
+                        success['render_ui_widgets'] = [
+                            dict(
+                                id=getattr(w, 'id', None),
+                                provider=getattr(w, 'provider', None),
+                                payload=self._to_primitive(getattr(w, 'payload', None)),
+                            )
+                            for w in ev.actions.render_ui_widgets
+                        ]
+
                     artifacts = []
                     if ev.actions and ev.actions.artifact_delta:
                         success['artifact_delta'] = dict(ev.actions.artifact_delta)
@@ -1386,6 +1410,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             success.get('message') is not None and str(success.get('message')).strip() != '',
             bool(success.get('function_calls')),
             bool(success.get('function_responses')),
+            bool(success.get('render_ui_widgets')),
             bool(success.get('artifact_delta')),
             bool(success.get('artifacts')),
         ])

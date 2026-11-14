@@ -292,31 +292,48 @@ class RedisClient(object):
                     timeout = int(timeout)
                 if timeout <= 0:
                     raise ValueError(f"timeout must be greater than 0. timeout={timeout}")
-                if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
+
+                server_ok = await asyncio.to_thread(
+                    self.check_server,
+                    find_svname=True,
+                    retry_count=retry_count,
+                    retry_interval=retry_interval,
+                    outstatus=outstatus,
+                )
+                if not server_ok:
                     yield dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
                     return
+
                 reskey = common.random_string()
                 reskey = f"cl-{reskey}-{int(time.time())}"
-                self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
-                if nowait: return
-                stime = time.time()
+                await asyncio.to_thread(
+                    self.redis_cli.rpush,
+                    self.svname,
+                    f"{cmd} {reskey} {' '.join([str(p) for p in params])}",
+                )
+                if nowait:
+                    return
+
+                stime = time.monotonic()
                 while True:
-                    ctime = time.time()
-                    if ctime - stime > timeout:
+                    if time.monotonic() - stime > timeout:
                         raise Exception(f"Response timed out.")
-                    res = self.redis_cli.lpop(reskey)
+
+                    res = await asyncio.to_thread(self.redis_cli.lpop, reskey)
                     if res is None or len(res) <= 0:
                         await asyncio.sleep(0.001)
                         continue
-                    stime = time.time()
+
+                    stime = time.monotonic()
                     if sse:
-                        msg = self._res_cmd(reskey, res, True)
+                        msg = await asyncio.to_thread(self._res_cmd, reskey, res, True)
                         yield msg
                         if 'end' in msg:
                             return
                     else:
-                        yield self._res_cmd(reskey, res)
+                        yield await asyncio.to_thread(self._res_cmd, reskey, res, False)
                         return
+
                 raise KeyboardInterrupt(f"Stop command.")
             except KeyboardInterrupt as e:
                 self.logger.warning(f"Stop command. cmd={cmd}", exc_info=True)
@@ -326,6 +343,7 @@ class RedisClient(object):
                 self.logger.warning(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
                 yield dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
                 return
+
         if not nowait:
             async for msg in send(nowait, timeout):
                 yield msg
