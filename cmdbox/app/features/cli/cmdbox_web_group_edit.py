@@ -103,11 +103,11 @@ class WebGroupEdit(feature.UnsupportEdgeFeature, validator.Validator):
             group = dict(gid=args.group_id, name=args.group_name, parent=args.group_parent, startpage=args.startpage)
             w.group_edit(group)
             msg = dict(success=f"group ID {args.group_id} has been edited.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w
         except Exception as e:
             msg = dict(warn=f"{e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, w
 
     def output_schema(self) -> type:

@@ -94,11 +94,11 @@ class WebUserList(feature.UnsupportEdgeFeature, validator.Validator):
                         signin_file=args.signin_file)
             users = w.user_list(args.user_name)
             msg = dict(success=users)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w
         except Exception as e:
             msg = dict(warn=f"{e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, w
 
     def output_schema(self) -> type:

@@ -11,6 +11,7 @@ import argparse
 import functools
 import logging
 import re
+import shlex
 import uuid
 
 
@@ -253,24 +254,16 @@ class Options:
                     if v is None or v == '':
                         continue
                     opt_list.append(f"--{key}")
-                    if str(v).find(' ') >= 0:
-                        opt_list.append(f'"{v}"')
-                    else:
-                        opt_list.append(str(v))
+                    opt_list.append(shlex.quote(str(v)))
             elif type(val) == dict:
                 for k,v in val.items():
                     if k is None or k == '' or v is None or v == '':
                         continue
                     opt_list.append(f"--{key}")
-                    k = f'"{k}"' if str(k).find(' ') >= 0 else str(k)
-                    v = f'"{v}"' if str(v).find(' ') >= 0 else str(v)
-                    opt_list.append(f'{k}={v}')
+                    opt_list.append(f'{shlex.quote(str(k))}={shlex.quote(str(v))}')
             elif val is not None and val != '':
                 opt_list.append(f"--{key}")
-                if str(val).find(' ') >= 0:
-                    opt_list.append(f'"{val}"')
-                else:
-                    opt_list.append(str(val))
+                opt_list.append(shlex.quote(str(val)))
             if 'fileio' in schema[0] and schema[0]['fileio'] == 'in' and type(val) != str:
                 file_dict[key] = val
         return opt_list, file_dict
@@ -343,12 +336,12 @@ class Options:
             description_en="If the operation is successful, the result is output to standard output in base64-decoded form. If multiple results are returned, only the first one is output.",)
         self._options["output_json"] = dict(
             short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
-            description_ja="処理結果jsonの保存先ファイルを指定。",
-            description_en="Specify the destination file for saving the processing result json.",)
+            description_ja="使用不可：処理結果jsonの保存先ファイルを指定。",
+            description_en="Unavailable: Specify the destination file for saving the processing result json.",)
         self._options["output_json_append"] = dict(
             short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
-            description_ja="処理結果jsonファイルを追記保存します。",
-            description_en="Save the processing result json file by appending.",)
+            description_ja="使用不可：処理結果jsonファイルを追記保存します。",
+            description_en="Unavailable: Save the processing result json file by appending.",)
         self._options["output_no_validate"] = dict(
             type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
             description_ja="処理結果のバリデーションを無効にします。",

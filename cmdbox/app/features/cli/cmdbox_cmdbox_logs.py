@@ -68,7 +68,7 @@ class CmdboxLogs(cmdbox_base.CmdboxBase, validator.Validator):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         ret = self.logs(logger, args.compose_path, args.container, args.follow, args.number)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None

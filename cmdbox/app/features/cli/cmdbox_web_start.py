@@ -178,7 +178,7 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
         signin_file = Path(args.signin_file)
         if signin_file is not None and not signin_file.is_file():
             msg = dict(warn=f"Signin file '{signin_file}' is not found.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         w = None
         try:
@@ -189,12 +189,12 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
             args.ssl_ca_certs = None if args.ssl_ca_certs is None else Path(args.ssl_ca_certs)
             self.start(w, logger, args)
             msg = dict(success="web complate.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w
         except Exception as e:
             logger.error(f"Web server start error. {e}", exc_info=True)
             msg = dict(warn=f"Web server start error. {e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, w
 
     def createWeb(self, logger:logging.Logger, args:argparse.Namespace) -> web.Web:

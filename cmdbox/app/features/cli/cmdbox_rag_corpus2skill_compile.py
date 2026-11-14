@@ -184,7 +184,7 @@ class RagCorpus2skillCompile(feature.OneshotResultEdgeFeature, validator.Validat
             if scope in ["current", "client"]:
                 msg = dict(warn=f"Scope '{scope}' is not supported for corpus2skill_compile. Only 'server' scope is supported.")
                 logger.warning(f"corpus2skill_compile: {msg['warn']}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
             args.fwpath = args.fwpath if isinstance(args.fwpath, list) else [args.fwpath] if args.fwpath is not None and args.fwpath != "********" else []
@@ -214,7 +214,7 @@ class RagCorpus2skillCompile(feature.OneshotResultEdgeFeature, validator.Validat
             cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
             ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, cl
             return self.RESP_SUCCESS, ret, cl
@@ -222,7 +222,7 @@ class RagCorpus2skillCompile(feature.OneshotResultEdgeFeature, validator.Validat
         except Exception as e:
             logger.warning(f"corpus2skill_compile apprun failed: {e}", exc_info=True)
             msg = dict(warn=dict(message=str(e)))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],

@@ -118,13 +118,13 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
         """
         if args.vision_engine is None:
             msg = dict(warn=f"Please specify the --vision_engine option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, False, tm, pf=pf)
             return self.RESP_WARN, msg, None
         model_param = dict()
         if args.vision_engine == 'sam2':
             if args.sam2_model is None:
                 msg = dict(warn=f"Please specify the --sam2_model option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             try:
                 model_param['sam2_model'] = args.sam2_model
@@ -132,11 +132,11 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                 model_param['sam2_label'] = args.sam2_label
             except Exception as e:
                 msg = dict(warn=f"Invalid --sam2_point option. {str(e)}")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
         else:
             msg = dict(warn=f"Unsupported vision engine: {args.vision_engine}")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, False, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -149,18 +149,18 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                                 logger=logger)
             if type(ret) is list:
                 for r in ret:
-                    common.print_format(r, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(r, args.format, tm, pf=pf)
                     if logger.level == logging.DEBUG:
                         ret_str = common.to_str(r, slise=100)
                         logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
                     tm = common.perf_counter()
                     args.output_json_append = True
             else:
-                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(ret, args.format, tm, pf=pf)
         elif args.stdin:
             if args.img_input_type is None:
                 msg = {"warn":f"Please specify the --img_input_type option."}
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 if logger.level == logging.DEBUG:
                     msg_str = common.to_str(msg, slise=100)
                     logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, msg={msg_str}")
@@ -174,7 +174,7 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                                         img_output_file=args.img_output_file, nodraw=args.nodraw,
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                                         logger=logger)
-                    common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(ret, args.format, tm, pf=pf)
                     if logger.level == logging.DEBUG:
                         ret_str = common.to_str(ret, slise=100)
                         logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
@@ -192,20 +192,20 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                                     img_output_file=args.img_output_file, nodraw=args.nodraw,
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                                     logger=logger)
-                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(ret, args.format, tm, pf=pf)
                 if logger.level == logging.DEBUG:
                     ret_str = common.to_str(ret, slise=100)
                     logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
                 tm = common.perf_counter()
         else:
             msg = {"warn":f"Image file or stdin is empty."}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             if logger.level == logging.DEBUG:
                 msg_str = common.to_str(msg, slise=100)
                 logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, msg={msg_str}")
             return self.RESP_WARN, msg, None
 
-        common.print_format(ret, False, tm, None, False, pf=pf)
+        common.print_format(ret, False, tm, pf=pf)
         if 'success' not in ret:
                 return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None

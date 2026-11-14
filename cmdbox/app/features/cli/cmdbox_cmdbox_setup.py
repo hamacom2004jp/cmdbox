@@ -109,7 +109,7 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
             setup_file = Path(args.setup_file)
             if not setup_file.exists():
                 ret = dict(warn=f"Setup file not found: '{setup_file}'")
-                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(ret, args.format, tm, pf=pf)
                 return self.RESP_WARN, ret, None
 
             with open(setup_file, 'r', encoding='utf-8') as f:
@@ -117,13 +117,13 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
 
             if not setup_data or 'setups' not in setup_data:
                 ret = dict(warn=f"No 'setups' key found in setup file: '{setup_file}'")
-                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(ret, args.format, tm, pf=pf)
                 return self.RESP_WARN, ret, None
 
             setups = setup_data['setups']
             if not isinstance(setups, list):
                 ret = dict(warn=f"'setups' must be a list in setup file: '{setup_file}'")
-                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(ret, args.format, tm, pf=pf)
                 return self.RESP_WARN, ret, None
 
             # セットアップを順番に実行
@@ -164,7 +164,7 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
         except Exception as e:
             logger.error(f"Exception during setup execution: {e}", exc_info=True)
             ret = dict(error=str(e))
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             return self.RESP_ERROR, ret, None
         finally:
             # すべてのサーバーが停止するまで待つ
@@ -179,7 +179,7 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
             ret = dict(success=dict(data=results))
         else:
             ret = dict(warn=dict(data=results))
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if has_warn:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None

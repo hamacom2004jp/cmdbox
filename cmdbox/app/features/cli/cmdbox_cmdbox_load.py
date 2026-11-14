@@ -90,7 +90,7 @@ class CmdboxLoad(cmdbox_base.CmdboxBase, validator.Validator):
             with open(docker_compose_path, 'w', encoding='utf-8') as fp:
                 yaml.dump(comp, fp)
             ret = self.load(logger, args.compose_path, args.container, args.install_tag, args.image_file)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, None
             return self.RESP_SUCCESS, ret, None

@@ -77,15 +77,15 @@ class WebGenpass(feature.OneshotResultEdgeFeature, validator.Validator):
         """
         if args.pass_length < 1:
             msg = dict(warn="The password length must be 1 or more.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if args.pass_count < 1:
             msg = dict(warn="The number of passwords to generate must be 1 or more.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if args.pass_count >= 40:
             msg = dict(warn="The number of passwords to generate must be less than 40.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         ret = {}
         try:
@@ -105,10 +105,10 @@ class WebGenpass(feature.OneshotResultEdgeFeature, validator.Validator):
             for i in range(args.pass_count):
                 passwords.append(dict(password=common.random_string(args.pass_length, chars)))
             ret = dict(success=dict(passwords=passwords))
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
         except Exception as e:
             msg = dict(error=f"Failed to generate password. {e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         return self.RESP_SUCCESS, ret, None
 

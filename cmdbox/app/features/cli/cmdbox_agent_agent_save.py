@@ -210,16 +210,16 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
         if args.agent_type == 'local':
             if not hasattr(args, 'llm') or args.llm is None:
                 msg = dict(warn="Please specify --llm for local agent")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
         elif args.agent_type == 'remote':
             if not hasattr(args, 'a2asv_baseurl') or args.a2asv_baseurl is None:
                 msg = dict(warn="Please specify --a2asv_baseurl for remote agent")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
         if not args.a2asv_delegated_auth and args.agent_type == 'remote' and (not getattr(args, 'a2asv_apikey', None) or args.a2asv_apikey is None):
             msg = dict(warn="Please specify --a2asv_apikey or enable --a2asv_delegated_auth")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if hasattr(args, 'llm') and isinstance(args.llm, list) and len(args.llm) > 0:
             args.llm = args.llm[0]
@@ -248,7 +248,7 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl

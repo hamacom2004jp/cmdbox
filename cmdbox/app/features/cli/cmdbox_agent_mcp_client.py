@@ -143,7 +143,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                     ret = result.structured_content
                 else:
                     raise ValueError(f"Unknown operation: {args.operation}")
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, ret, None
         except Exception as e:
             logger.setLevel(logging.ERROR)
@@ -151,7 +151,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                 h.setLevel(logging.ERROR)
             logger.error(f"Failed to start MCP client: {e}", exc_info=True)
             msg = dict(warn=f"Failed to start MCP client: {e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_ERROR, msg, None
 
     def output_schema(self) -> type:

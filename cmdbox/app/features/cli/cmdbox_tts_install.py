@@ -147,32 +147,32 @@ class TtsInstall(feature.UnsupportEdgeFeature, validator.Validator):
         """
         if args.data is None and not args.client_only:
             msg = dict(warn=f"Please specify the --data option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, False, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if args.tts_engine == 'voicevox':
             if args.voicevox_ver is None:
                 msg = dict(warn=f"Please specify the --voicevox_ver option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             if args.voicevox_whl is None:
                 msg = dict(warn=f"Please specify the --voicevox_whl option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             if args.openjtalk_ver is None:
                 msg = dict(warn=f"Please specify the --openjtalk_ver option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             if args.openjtalk_dic is None:
                 msg = dict(warn=f"Please specify the --openjtalk_dic option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             if args.onnxruntime_ver is None:
                 msg = dict(warn=f"Please specify the --onnxruntime_ver option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             if args.onnxruntime_lib is None:
                 msg = dict(warn=f"Please specify the --onnxruntime_lib option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         data = Path(args.data) if args.data is not None else None

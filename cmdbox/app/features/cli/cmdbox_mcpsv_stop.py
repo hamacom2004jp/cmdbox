@@ -69,13 +69,13 @@ class McpsvStop(feature.UnsupportEdgeFeature, validator.Validator):
             common.load_file("mcpsv.pid", _r, nolock=True)
             Path("mcpsv.pid").unlink(missing_ok=True)
             msg = dict(success="mcpsv complate.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, None
         except Exception:
             traceback.print_exc()
             logger.error("Exit mcpsv.")
             msg = dict(warn="mcpsv stop error.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:

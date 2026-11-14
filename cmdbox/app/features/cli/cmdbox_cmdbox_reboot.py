@@ -63,7 +63,7 @@ class CmdboxReboot(cmdbox_base.CmdboxBase, validator.Validator):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         reboot_ret = self.reboot(logger, args, args.container, tm, pf)
-        common.print_format(reboot_ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(reboot_ret, args.format, tm, pf=pf)
         if 'success' not in reboot_ret:
             return self.RESP_WARN, reboot_ret, None
         return self.RESP_SUCCESS, reboot_ret, None

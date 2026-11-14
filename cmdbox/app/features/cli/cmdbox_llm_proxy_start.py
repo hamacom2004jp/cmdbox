@@ -142,7 +142,7 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
         """
         if args.proxy_apikey is None or not args.proxy_apikey.startswith("sk-"):
             msg = dict(warn="Please specify a valid LiteLLM Proxy API key starting with 'sk-'.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         # 設定ファイルが直接指定されているかどうかを確認する
@@ -152,7 +152,7 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
             config_path = Path(args.llm_config)
             if not config_path.is_file():
                 msg = dict(warn=f"Specified config file does not exist: {args.llm_config}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
         else:
             # LLM オプションから設定を構築する
@@ -161,13 +161,13 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
 
             if len(llm_names) <= 0:
                 msg = dict(warn="Please specify one or more --llm options or use --llm_config to specify a config file.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         litellm_exe = shutil.which("litellm")
         if litellm_exe is None:
             msg = dict(warn="LiteLLM command was not found. Install litellm and ensure `litellm` is in PATH.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         try:
             data_dir = Path(args.data)
@@ -206,7 +206,7 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
                                     is_running = False
                             if is_running:
                                 msg = dict(warn=f"LiteLLM Proxy is already running on port {args.proxy_listen_port}. pid={existing_pid}")
-                                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                common.print_format(msg, args.format, tm, pf=pf)
                                 return self.RESP_WARN, msg, None
                         except ValueError:
                             # PID が数値でない場合はスキップ
@@ -232,7 +232,7 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
                 proxy_workers=int(args.proxy_workers),
                 llm=llm_names,
             ))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             try:
                 while proc.poll() is None:
                     time.sleep(1)
@@ -247,7 +247,7 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
         except Exception as e:
             logger.warning(f"Failed to start LiteLLM Proxy. {e}", exc_info=True)
             msg = dict(warn=f"Failed to start LiteLLM Proxy. {e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def _build_proxy_config(self, logger:logging.Logger, data_dir:Path, llm_names:List[str], args:argparse.Namespace) -> Dict[str, Any]:

@@ -24,16 +24,17 @@ class SaveCmd(feature.WebFeature):
             opt = form.get('opt')
             if not title or not opt:
                 return dict(warn='Title and opt are required.')
-            ret = self.save_cmd(web, title, json.loads(opt))
+            ret = self.save_cmd(web, req, title, json.loads(opt))
             web.options.audit_exec(req, res, web, body=form)
             return ret
 
-    def save_cmd(self, web:Web, title:str, opt:Dict[str, Any]) -> Dict[str, str]:
+    def save_cmd(self, web:Web, req:Request, title:str, opt:Dict[str, Any]) -> Dict[str, str]:
         """
         コマンドファイルを保存する
 
         Args:
             web (Web): Webオブジェクト
+            req (Request): リクエスト
             title (str): タイトル
             opt (dict): オプション
         
@@ -47,6 +48,29 @@ class SaveCmd(feature.WebFeature):
         modal_mode = opt.get('modal_mode', False)
         if modal_mode == 'add' and opt_path.exists():
             return dict(warn=f'Command "{title}" already exists')
+
+        signin_groups = []
+        if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
+            if 'groups' in req.session['signin'] and req.session['signin']['groups'] is not None:
+                signin_groups = req.session['signin']['groups']
+
+        allow_groups = opt['allow_groups']
+        if isinstance(allow_groups, str):
+            allow_groups = [allow_groups]
+        allow_groups = [group for group in allow_groups if group and group.strip()]
+        if allow_groups and not any(group in signin_groups for group in allow_groups):
+            return dict(warn=f'Your own group has not been set up. (your groups: {signin_groups})')
+
+        if modal_mode == 'edit' and opt_path.exists():
+            org_opt = common.loadopt(opt_path, False)
+            if 'allow_groups' in org_opt and org_opt['allow_groups']:
+                org_allow_groups = org_opt['allow_groups']
+                if isinstance(org_allow_groups, str):
+                    org_allow_groups = [org_allow_groups]
+                org_allow_groups = [group for group in org_allow_groups if group and group.strip()]
+                if org_allow_groups and not any(group in signin_groups for group in org_allow_groups):
+                    return dict(warn=f'You do not have permission to save this command. (your groups: {signin_groups})')
+
         if 'title_disabled' in opt: del opt['title_disabled']
         if 'mode_disabled' in opt: del opt['mode_disabled']
         if 'cmd_disabled' in opt: del opt['cmd_disabled']

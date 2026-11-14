@@ -510,11 +510,13 @@ class ToolListProvider(Provider):
         if "description" in params and params["description"]:
             description += '\n' + params["description"]
 
+        description_escaped = description.replace('\\', '\\\\').replace('"""', r'\"\"\"')
+
         func_doc_args = "\n".join([self._doc_arg(o, is_japan) for o in choices])
         func_txt  = f"def {func_name}(*args, **kwargs):\n"
         func_txt += f'    """\n'
         func_txt += f'    {func_name} - MCP Tool Function\n'
-        func_txt += f'    {description}\n'
+        func_txt += f'    {description_escaped}\n'
         func_txt += f'\n'
         func_txt += f'    Args:\n'
         func_txt += f'        {func_doc_args}\n'

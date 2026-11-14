@@ -139,7 +139,7 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             # クライアントのみの場合は、サーバーへの接続を行わない
             logger.warning(f"client_only is True. Not connecting to server. Skip writing the audit log.")
             ret = dict(success={k:v for k, v in vars(args).items() if v})
-            common.print_format(ret, False, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, False, tm, pf=pf)
             return self.RESP_SUCCESS, ret, None
 
         # 除外条件のチェック

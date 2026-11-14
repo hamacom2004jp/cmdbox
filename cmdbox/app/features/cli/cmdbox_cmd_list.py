@@ -113,12 +113,9 @@ class CmdList(feature.OneshotResultEdgeFeature, validator.Validator, testable.Un
                        tag=r.get('tag',[]))
             ret_list.append(row)
         ret = dict(success=dict(data=ret_list))
-
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
-
         return self.RESP_SUCCESS, ret, None
 
     def output_schema(self) -> type:

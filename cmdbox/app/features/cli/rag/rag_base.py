@@ -45,12 +45,12 @@ class RAGBase(feature.ResultEdgeFeature):
         ragload_res = await cl.redis_cli.asend_cmd(self.ragload.get_svcmd(), [ragload_payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         if 'success' not in ragload_res:
-            common.print_format(ragload_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ragload_res, args.format, tm, pf=pf)
             return self.RESP_WARN, ragload_res, cl
         rag_config = ragload_res['success']
         if 'extract' not in rag_config or not rag_config['extract'] or len(rag_config['extract']) == 0:
             msg = dict(warn=f"RAG configuration '{args.rag_name}' does not contain any extract names.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, cl
         return self.RESP_SUCCESS, rag_config, cl
 
@@ -69,7 +69,7 @@ class RAGBase(feature.ResultEdgeFeature):
         """
         st, res, _ = await self.ds_load.apprun(logger, args, tm, pf)
         if st != self.RESP_SUCCESS:
-            common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(res, args.format, tm, pf=pf)
             return st, res, cl
         conf = res.get('success',{}).get('data',{})
         return self.RESP_SUCCESS, conf, cl
@@ -92,13 +92,13 @@ class RAGBase(feature.ResultEdgeFeature):
         req = scope.get("req") if scope.get("req") is not None else scope.get("websocket")
         if req is None:
             msg = dict(warn=f"Request information cannot be retrieved. This command is only available in web mode.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         web = scope.get("web")
         sign = web.signin._check_signin(req, scope.get("res"), signin_data, logger)
         if sign is not None or "signin" not in req.session or "groups" not in req.session["signin"]:
             msg = dict(warn=f"Login information cannot be retrieved.This command is only available in web mode.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         user_name = req.session["signin"]["name"]
         msg = dict(success=dict(user_name=user_name, scope=scope, signin_data=signin_data))
@@ -121,18 +121,18 @@ class RAGBase(feature.ResultEdgeFeature):
         """
         if 'llm_name' not in rag_config or rag_config['llm_name'] is None:
             msg = dict(warn=f"RAG configuration does not specify llm_name for embedding.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, cl
         if original_data is None:
             msg = dict(warn=f"Original data for embedding is None.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, cl
         embedding_payload = dict(llmname=rag_config.get('llm_name'), input_text=original_data)
         embedding_payload_b64 = convert.str2b64str(common.to_str(embedding_payload))
         embedding_res = await cl.redis_cli.asend_cmd(self.llmembed.get_svcmd(), [embedding_payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         if 'success' not in embedding_res:
-            common.print_format(embedding_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(embedding_res, args.format, tm, pf=pf)
             return self.RESP_WARN, embedding_res, cl
         return self.RESP_SUCCESS, embedding_res['success'], cl
 
@@ -155,7 +155,7 @@ class RAGBase(feature.ResultEdgeFeature):
         extractload_res =  await cl.redis_cli.asend_cmd(self.extractload.get_svcmd(), [extractload_payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         if 'success' not in extractload_res:
-            common.print_format(extractload_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(extractload_res, args.format, tm, pf=pf)
             return self.RESP_WARN, extractload_res, cl
         return self.RESP_SUCCESS, extractload_res['success'], cl
 
@@ -179,7 +179,7 @@ class RAGBase(feature.ResultEdgeFeature):
                                     format=args.format, output_json=args.output_json, output_json_append=args.output_json_append)
         st, cmd_res, _ = self.cmdload.apprun(logger, cmd_args, tm, pf)
         if 'success' not in cmd_res:
-            common.print_format(cmd_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(cmd_res, args.format, tm, pf=pf)
             return self.RESP_WARN, cmd_res, cl
         extract_opt:dict = cmd_res['success']['data']
         extract_feat = options.get_cmd_feature(extract_opt.get('mode'), extract_opt.get('cmd'))
@@ -216,7 +216,7 @@ class RAGBase(feature.ResultEdgeFeature):
         if not sign:
             msg = dict(warn=f"You do not have permission to execute the extract command '{extract_opt.get('title')}' required for RAG registration."
                             f" mode={extract_opt.get('mode')}, cmd={extract_opt.get('cmd')}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         return self.RESP_SUCCESS, None, None
 
@@ -239,7 +239,7 @@ class RAGBase(feature.ResultEdgeFeature):
         file_list_args = argparse.Namespace(**file_list_opt)
         st, list_file_res, _ = self.client_file_list.apprun(logger, file_list_args, tm, pf)
         if 'success' not in list_file_res:
-            common.print_format(list_file_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(list_file_res, args.format, tm, pf=pf)
             return self.RESP_WARN, list_file_res, None
         return self.RESP_SUCCESS, list_file_res['success'], None
 
@@ -263,9 +263,9 @@ class RAGBase(feature.ResultEdgeFeature):
             _, extract_res, _ = common.exec_sync(extract_feat.apprun, logger, extract_args, tm, pf, True)
         else:
             msg = dict(warn=f"Not Found feature. mode={extract_args.mode}, cmd={extract_args.cmd}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if 'success' not in extract_res:
-            common.print_format(extract_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(extract_res, args.format, tm, pf=pf)
             return self.RESP_WARN, extract_res, None
         return self.RESP_SUCCESS, extract_res['success'].get('data', []), None

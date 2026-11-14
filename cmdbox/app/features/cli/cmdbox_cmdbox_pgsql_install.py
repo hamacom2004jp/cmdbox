@@ -94,7 +94,7 @@ class CmdboxPgSQLInstall(cmdbox_base.CmdboxBase, validator.Validator):
         common.set_debug(logger, True)
         try:
             ret = self.pgsql_install(logger, args)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
 
             if 'success' not in ret:
                 return self.RESP_WARN, ret, None

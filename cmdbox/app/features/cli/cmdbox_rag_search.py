@@ -146,7 +146,7 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
                     st, embed_res, _ = await self.embedding(rag_config, [args.query], args, cl, tm, pf, logger)
                     if st != self.RESP_SUCCESS:
                         msg = dict(warn=f"Failed to execute embedding for query '{args.query}'.", res=embed_res)
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        common.print_format(msg, args.format, tm, pf=pf)
                         return st, embed_res, cl
                     embed_data = embed_res['data'][0]
                     vec_data = common.to_str(embed_data['embedding'])
@@ -157,14 +157,14 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
                                            vec_data=vec_data, kcount=args.kcount, metadata=filter_dict)
                 res = [record for record in recodes]
                 ret = dict(success=res)
-                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(ret, args.format, tm, pf=pf)
                 if 'success' not in ret:
                     return self.RESP_WARN, ret, cl
                 return self.RESP_SUCCESS, ret, cl
         except Exception as e:
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, cl
 
     def output_schema(self) -> type:

@@ -76,6 +76,16 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                             self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
                             raise HTTPException(401, detail=msg)
                 opt['capture_stdout'] = nothread = False
+                # Re-check command rules after possible modifications from raw_pipe
+                for cmd_title in opt['pipe_cmd']:
+                    if cmd_title == '':
+                        continue
+                    cmd_opt = self.load_cmd(web, cmd_title)
+                    if 'mode' in cmd_opt and 'cmd' in cmd_opt:
+                        if not web.signin.check_cmd(req, res, cmd_opt['mode'], cmd_opt['cmd'], opt):
+                            msg = f'Command "{cmd_title}" failed. Execute command denyed after parameter override. mode={cmd_opt["mode"]}, cmd={cmd_opt["cmd"]}'
+                            self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
+                            raise HTTPException(401, detail=msg)
                 return common.to_str(self.exec_pipe(req, res, web, title, opt, nothread))
             except:
                 return common.to_str(dict(warn=f'Pipeline "{title}" failed. {traceback.format_exc()}'))

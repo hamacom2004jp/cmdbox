@@ -56,8 +56,8 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
                 upload_file:Path = Path(tmpdir) / raw_filename
                 if not upload_file.parent.exists():
                     upload_file.parent.mkdir(parents=True)
-                opt['svpath'] = str(svpath / Path(raw_filename).parent)
-                opt['upload_file'] = str(upload_file).replace('"','')
+                opt['svpath'] = str(svpath / Path(raw_filename).parent).replace('\\','/')
+                opt['upload_file'] = str(upload_file).replace('"','').replace('\\','/')
                 shutil.copyfileobj(fv.file, Path(opt['upload_file']).open('wb'))
                 web.options.audit_exec(req, res, web,
                                        body=dict(scope=opt.get('scope'), svpath=svpath, upload_file=opt.get('upload_file')))

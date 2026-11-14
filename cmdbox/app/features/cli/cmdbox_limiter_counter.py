@@ -70,7 +70,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
         if scope not in ['client', 'server']:
             result = dict(warn="Limiters are supported only in the 'client' and 'server' scopes.")
             logger.warning("Limiters are supported only in the 'client' and 'server' scopes.")
-            common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(result, args.format, tm, pf=pf)
             return self.RESP_WARN, result, None
 
         if scope == 'client':
@@ -78,7 +78,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
             if not client_data:
                 result = dict(warn="client_data is required when scope is 'client'.")
                 logger.warning("client_data is required when scope is 'client'.")
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
             client_data = Path(client_data)
             redis_cli = redis_client.RedisClient(logger, host=args.host, port=args.port, password=args.password, svname=args.svname)
@@ -87,7 +87,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                 self._reflesh_counter(lmt, client_data, args.limiter_name, scope=scope, logger=logger, args=args)
             counter = lmt.load_counter(client_data, args.limiter_name, scope=scope)
             out = dict(success=dict(data=counter))
-            common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(out, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, out, None
 
         # scope == 'server'
@@ -96,7 +96,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl

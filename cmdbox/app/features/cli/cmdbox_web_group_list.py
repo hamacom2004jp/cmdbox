@@ -97,11 +97,11 @@ class WebGroupList(feature.UnsupportEdgeFeature, validator.Validator):
                         signin_file=args.signin_file)
             groups = w.group_list(args.group_name, ret_hidden=args.ret_hidden)
             msg = dict(success=groups)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w
         except Exception as e:
             msg = dict(warn=f"{e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, w
 
     def output_schema(self) -> type:

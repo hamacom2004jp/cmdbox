@@ -104,7 +104,7 @@ class ClientFileRemove(feature.UnsupportEdgeFeature, validator.Validator):
         ret = cl.file_remove(str(args.svpath).replace('"',''), scope=args.scope, client_data=client_data,
                              fwpaths=fwpaths, rjpaths=rjpaths, notexist_ok=args.notexist_ok,
                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

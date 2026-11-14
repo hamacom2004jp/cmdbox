@@ -93,11 +93,11 @@ class WebGroupDel(feature.UnsupportEdgeFeature, validator.Validator):
                         signin_file=args.signin_file)
             w.group_del(args.group_id)
             msg = dict(success=f"group ID {args.group_id} has been deleted.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w
         except Exception as e:
             msg = dict(warn=f"{e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, w
 
     def output_schema(self) -> type:

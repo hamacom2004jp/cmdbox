@@ -80,7 +80,7 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         input_json = Path(args.input_json)
         if not input_json.exists():
             msg = dict(warn=f"input_json not found: {input_json}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         mode_filter = args.mode_filter or None
@@ -106,7 +106,7 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 appcls = getattr(mod, class_name)
             except Exception as e:
                 msg = dict(warn=f"Failed to load app_class '{args.app_class}': {e}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         # ver_module の解決
@@ -116,7 +116,7 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 ver = importlib.import_module(args.ver_module)
             except Exception as e:
                 msg = dict(warn=f"Failed to import ver_module '{args.ver_module}': {e}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         try:
@@ -133,7 +133,7 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         except Exception as e:
             logger.warning(f"run_spec failed: {e}", exc_info=True)
             msg = dict(warn=str(e))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         summary = result["summary"]
@@ -153,7 +153,7 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         if failed_count > 0:
             msg["warn"] = f"{failed_count} test case(s) failed."
 
-        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(msg, args.format, tm, pf=pf)
         return self.RESP_SUCCESS if failed_count == 0 else self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:

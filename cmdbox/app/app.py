@@ -148,7 +148,7 @@ class CmdBoxApp:
         if args.saveopt:
             if args.useopt is None:
                 msg = dict(warn=f"Please specify the --useopt option.")
-                common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
+                common.print_format(msg, args.format, smaintime)
                 if resqueue is not None: resqueue.put(msg)
                 return feature.Feature.RESP_WARN, msg, None
             common.saveopt(opt, args.useopt)
@@ -160,12 +160,12 @@ class CmdBoxApp:
 
         if args.version:
             v = self.ver.__logo__ + '\n' + self.ver.__description__
-            common.print_format(v, False, smaintime, None, False)
+            common.print_format(v, False, smaintime)
             return feature.Feature.RESP_SUCCESS, v, None
 
         if args.mode is None:
             msg = dict(warn=f"mode is None. Please specify the --help option.")
-            common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, smaintime)
             if resqueue is not None: resqueue.put(msg)
             return feature.Feature.RESP_WARN, msg, None
 
@@ -197,7 +197,7 @@ class CmdBoxApp:
             else:
                 msg = dict(warn=f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}")
                 if resqueue is not None: resqueue.put(msg)
-                common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
+                common.print_format(msg, args.format, smaintime)
                 return feature.Feature.RESP_WARN, msg, None
         finally:
             # ログの状態をwebcallから戻す

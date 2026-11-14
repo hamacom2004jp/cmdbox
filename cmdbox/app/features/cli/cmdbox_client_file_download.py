@@ -116,7 +116,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
         """
         if args.etag is not None and args.download_file is not None:
             msg = dict(warn=f"Cannot specify both --etag and --download_file options.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
@@ -129,7 +129,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
                                meta_chk=self.meta_chk, meta=args.meta,
                                etag=args.etag, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

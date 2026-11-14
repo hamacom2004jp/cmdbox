@@ -82,7 +82,7 @@ class ServerTime(feature.OneshotResultEdgeFeature, validator.Validator):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [str(args.timedelta)],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None

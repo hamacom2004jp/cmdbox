@@ -91,38 +91,38 @@ class ExcelBase(feature.ResultEdgeFeature, validator.Validator):
                     f = filer.Filer(client_data, logger)
                     chk, abspath, msg = f._file_exists(args.svpath)
                     if not chk:
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        common.print_format(msg, args.format, tm, pf=pf)
                         return self.RESP_WARN, msg, None
                     res = self.excel_proc(abspath, args, logger, tm, pf)
                     if 'success' not in res:
-                        common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        common.print_format(res, args.format, tm, pf=pf)
                         return self.RESP_WARN, res, None
-                    common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(res, args.format, tm, pf=pf)
                     return self.RESP_SUCCESS, res, None
                 else:
                     msg = dict(warn=f"client_data is empty.")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(msg, args.format, tm, pf=pf)
                     return self.RESP_WARN, msg, None
             elif args.scope == "current":
                 f = filer.Filer(Path.cwd(), logger)
                 chk, abspath, msg = f._file_exists(args.svpath)
                 if not chk:
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(msg, args.format, tm, pf=pf)
                     return self.RESP_WARN, msg, None
                 res = self.excel_proc(abspath, args, logger, tm, pf)
                 if 'success' not in res:
-                    common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(res, args.format, tm, pf=pf)
                     return self.RESP_WARN, res, None
-                common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(res, args.format, tm, pf=pf)
                 return self.RESP_SUCCESS, res, None
             elif args.scope == "server":
                 cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
                 res = await cl.redis_cli.asend_cmd(self.get_svcmd(), self.get_svparam(args),
                                                 retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 if 'success' not in res:
-                    common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(res, args.format, tm, pf=pf)
                     return self.RESP_WARN, res, None
-                common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(res, args.format, tm, pf=pf)
                 return self.RESP_SUCCESS, res, None
             else:
                 logger.warning(f"scope is invalid. {args.scope}")

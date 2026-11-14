@@ -56,7 +56,7 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         input_json = Path(args.input_json)
         if not input_json.exists():
             msg = dict(warn=f"input_json not found: {input_json}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         root_dir = Path(args.root_dir) if args.root_dir else Path.cwd()
@@ -66,7 +66,7 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         if output_dir.exists():
             if not clear_output_dir:
                 msg = dict(warn=f"Output directory already exists: '{output_dir}'. Use --clear_output_dir True to overwrite.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             shutil.rmtree(output_dir)
 
@@ -81,7 +81,7 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         except Exception as e:
             logger.warning(f"gen_unit_test_spec failed: {e}", exc_info=True)
             msg = dict(warn=str(e))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         msg = dict(
@@ -92,7 +92,7 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 count=len(documents),
             )
         )
-        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(msg, args.format, tm, pf=pf)
         return self.RESP_SUCCESS, msg, None
 
     def output_schema(self) -> type:

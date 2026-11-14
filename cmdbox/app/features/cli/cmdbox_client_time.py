@@ -61,7 +61,7 @@ class ClientTime(feature.OneshotResultEdgeFeature, validator.Validator):
         tz = datetime.timezone(datetime.timedelta(hours=args.timedelta))
         dt = datetime.datetime.now(tz)
         ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S'), timezone=str(dt.tzinfo), timestamp=dt.timestamp()))
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None

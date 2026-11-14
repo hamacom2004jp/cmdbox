@@ -65,7 +65,7 @@ class LlmProxyStop(feature.UnsupportEdgeFeature, validator.Validator):
             pid_path = proxy_dir / "llmproxy.pid"
             if not pid_path.is_file():
                 msg = dict(warn=f"LiteLLM Proxy pid file is not found. path={pid_path}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
             def _r(f):
@@ -74,7 +74,7 @@ class LlmProxyStop(feature.UnsupportEdgeFeature, validator.Validator):
             pid = common.load_file(pid_path, _r, nolock=True)
             if pid == "":
                 msg = dict(warn=f"LiteLLM Proxy pid is empty. path={pid_path}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
             try:
@@ -93,13 +93,13 @@ class LlmProxyStop(feature.UnsupportEdgeFeature, validator.Validator):
                 proxy_listen_port=int(args.proxy_listen_port),
                 pid_path=str(pid_path),
             ))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, None
         except Exception:
             traceback.print_exc()
             logger.error("Exit LiteLLM Proxy stop.")
             msg = dict(warn="LiteLLM Proxy stop error.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:

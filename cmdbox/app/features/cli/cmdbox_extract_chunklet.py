@@ -131,33 +131,33 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator, lim
                     f = filer.Filer(client_data, logger)
                     chk, abspath, msg = f._file_exists(args.loadpath)
                     if not chk:
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        common.print_format(msg, args.format, tm, pf=pf)
                         return self.RESP_WARN, msg, None
                     chk, msg = f.check_fwpath(args.loadpath, args.fwpath, args.rjpath)
                     if not chk:
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        common.print_format(msg, args.format, tm, pf=pf)
                         return self.RESP_WARN, msg, None
                     res = self.extract(abspath, args, logger, tm, pf)
-                    common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(res, args.format, tm, pf=pf)
                     if 'success' not in res:
                         return self.RESP_WARN, res, None
                     return self.RESP_SUCCESS, res, None
                 else:
                     msg = dict(warn=f"client_data is empty.")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(msg, args.format, tm, pf=pf)
                     return self.RESP_WARN, msg, None
             elif args.scope == "current":
                 f = filer.Filer(Path.cwd(), logger)
                 chk, abspath, msg = f._file_exists(args.loadpath)
                 if not chk:
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(msg, args.format, tm, pf=pf)
                     return self.RESP_WARN, msg, None
                 chk, msg = f.check_fwpath(args.loadpath, args.fwpath, args.rjpath)
                 if not chk:
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(msg, args.format, tm, pf=pf)
                     return self.RESP_WARN, msg, None
                 res = self.extract(abspath, args, logger, tm, pf)
-                common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(res, args.format, tm, pf=pf)
                 if 'success' not in res:
                     return self.RESP_WARN, res, None
                 return self.RESP_SUCCESS, res, None
@@ -176,7 +176,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator, lim
                 payload_b64 = convert.str2b64str(common.to_str(payload))
                 res = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-                common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(res, args.format, tm, pf=pf)
                 if 'success' not in res:
                     return self.RESP_WARN, res, None
                 return self.RESP_SUCCESS, res, None

@@ -150,19 +150,19 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
             if args.billing_unit_price is None:
                 result = dict(warn="For period-based billing, billing_unit_price is required.")
                 logger.warning("For period-based billing, billing_unit_price is required.")
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
         elif args.billing_type == 'metered':
             if not args.billing_limiter or args.billing_unit_price is None or not args.billing_currency:
                 result = dict(warn="For metered billing, billing_limiter, billing_unit_price, and billing_currency are required.")
                 logger.warning("For metered billing, billing_limiter, billing_unit_price, and billing_currency are required.")
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
         # リミッターリストの中に請求リミッターが無い場合は警告
         if args.billing_type == 'metered' and args.billing_limiter not in args.limiters:
             result = dict(warn=f"The billing_limiter '{args.billing_limiter}' is not included in the limiters list. Please include it in the limiters list.")
             logger.warning(f"The billing_limiter '{args.billing_limiter}' is not included in the limiters list. Please include it in the limiters list.")
-            common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(result, args.format, tm, pf=pf)
             return self.RESP_WARN, result, None
 
         # リミッターリストの処理
@@ -200,7 +200,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [configure_b64],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl

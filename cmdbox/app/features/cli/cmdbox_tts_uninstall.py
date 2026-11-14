@@ -91,7 +91,7 @@ class TtsUninstall(feature.UnsupportEdgeFeature, validator.Validator):
         """
         if args.data is None and not args.client_only:
             msg = dict(warn=f"Please specify the --data option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, False, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         data = Path(args.data) if args.data is not None else None

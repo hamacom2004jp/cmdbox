@@ -93,7 +93,7 @@ class VisionInstall(cmdbox_vision_start.VisionStart):
         """
         if args.vision_engine is None:
             msg = dict(warn=f"Please specify the --vision_engine option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, False, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if args.vision_engine == 'sam2':
             vision_engine_b64 = convert.str2b64str(args.vision_engine)
@@ -104,13 +104,13 @@ class VisionInstall(cmdbox_vision_start.VisionStart):
                 cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
                 ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [vision_engine_b64],
                                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-            common.print_format(ret, False, tm, None, False, pf=pf)
+            common.print_format(ret, False, tm, pf=pf)
             if 'success' not in ret:
                     return self.RESP_WARN, ret, None
             return self.RESP_SUCCESS, ret, None
 
         msg = dict(warn=f"Unsupported vision engine: {args.vision_engine}")
-        common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(msg, False, tm, pf=pf)
         return self.RESP_WARN, msg, None
 
     def is_cluster_redirect(self):

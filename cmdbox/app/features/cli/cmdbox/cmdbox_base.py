@@ -146,9 +146,9 @@ class CmdboxBase(feature.OneshotEdgeFeature):
         common.set_debug(logger, True)
         try:
             down_ret = self.down(logger, container)
-            common.print_format(down_ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(down_ret, args.format, tm, pf=pf)
             up_ret = self.up(logger, args.compose_path, container)
-            common.print_format(up_ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(up_ret, args.format, tm, pf=pf)
             if 'success' not in up_ret:
                 return up_ret
             return up_ret

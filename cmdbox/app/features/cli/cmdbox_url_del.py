@@ -65,13 +65,22 @@ class UrlDel(feature.OneshotResultEdgeFeature, validator.Validator):
         try:
             # JSONファイルのパスを指定
             urls_dir = Path(self.default_data) / '.urls'
+            
+            # パストラバーサル対策: url_idが.urls内に留まることを確認
+            is_safe, error_msg = validator.Validator.validate_safe_path(urls_dir, f"{args.url_id}.json")
+            if not is_safe:
+                msg = dict(warn=error_msg)
+                logger.warning(msg['warn'])
+                common.print_format(msg, args.format, tm, pf=pf)
+                return self.RESP_WARN, msg, None
+            
             json_file = urls_dir / f"{args.url_id}.json"
             
             # ファイルが存在するか確認
             if not json_file.exists():
                 msg = dict(warn=f"Short URL '{args.url_id}' not found at '{json_file}'.")
                 logger.warning(msg['warn'])
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             
             # ファイルを削除
@@ -82,12 +91,12 @@ class UrlDel(feature.OneshotResultEdgeFeature, validator.Validator):
                 url_id=args.url_id,
                 msg=f"Short URL '{args.url_id}' deleted."
             ))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, None
         except Exception as e:
             msg = dict(warn=f"{e}")
             logger.error(f"Error in url_del: {e}", exc_info=True)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:

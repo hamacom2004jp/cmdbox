@@ -124,7 +124,7 @@ class ClientFileTail(feature.OneshotResultEdgeFeature, validator.Validator):
             retry_interval=args.retry_interval,
             timeout=args.timeout,
         )
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

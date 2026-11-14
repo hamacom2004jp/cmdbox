@@ -485,8 +485,8 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
         data (dict): 出力するデータ
         format (bool): フォーマットするかどうか
         tm (float): 処理時間
-        output_json (str, optional): JSON形式で出力するファイルパス. Defaults to None.
-        output_json_append (bool, optional): JSON形式で出力するファイルパス. Defaults to False.
+        output_json (str, optional): 使用不可：JSON形式で出力するファイルパス. Defaults to None.
+        output_json_append (bool, optional): 使用不可：JSON形式で出力するファイルパス. Defaults to False.
         stdout (bool, optional): 標準出力に出力するかどうか. Defaults to True.
         tablefmt (str, optional): テーブルのフォーマット. Defaults to 'github'.
         pf (List[Dict[str, float]], optional): パフォーマンス情報. Defaults to [].
@@ -533,6 +533,8 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
                 print(txt)
             except BrokenPipeError:
                 pass
+    # 脆弱性にあたるので使用不可とする
+    """
     if output_json is not None:
         try:
             def _w(f):
@@ -541,6 +543,7 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
             save_file(Path(output_json), _w, mode='a' if output_json_append else 'w', nolock=True)
         except Exception as e:
             pass
+    """
     return txt
 
 

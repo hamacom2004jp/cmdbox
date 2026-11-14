@@ -96,15 +96,15 @@ class WebGencert(feature.UnsupportEdgeFeature, validator.Validator):
         output_key = Path(args.output_key)
         if not args.overwrite and output_cert.exists():
             msg = dict(warn=f"File already exists. {output_cert}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if not args.overwrite and output_pkey.exists():
             msg = dict(warn=f"File already exists. {output_pkey}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if not args.overwrite and output_key.exists():
             msg = dict(warn=f"File already exists. {output_key}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         try:
@@ -115,7 +115,7 @@ class WebGencert(feature.UnsupportEdgeFeature, validator.Validator):
             ret = dict(success=dict(data=f"Generate certificate. {output_cert}, {output_pkey}, {output_key}"))
         except Exception as e:
             msg = dict(error=f"Failed to generate certificate. {e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         return self.RESP_SUCCESS, ret, None
 

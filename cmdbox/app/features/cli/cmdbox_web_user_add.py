@@ -114,11 +114,11 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Limi
                         email=args.user_email, groups=args.user_group, home=args.user_home)
             w.user_add(user)
             msg = dict(success=f"User ID {args.user_id} has been added.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w
         except Exception as e:
             msg = dict(warn=f"{e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, w
 
     def output_schema(self) -> type:

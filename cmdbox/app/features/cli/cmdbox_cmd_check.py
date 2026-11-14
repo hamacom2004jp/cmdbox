@@ -98,10 +98,10 @@ class CmdCheck(feature.OneshotResultEdgeFeature, validator.Validator):
                                         opt=args.__dict__, user_name="unknown", user_session=user_session, logger=logger,
                                         appcls=self.appcls, ver=self.ver, language=self.language):
             ret = dict(success=dict(data=False))
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, ret, None
         ret = dict(success=dict(data=True))
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None

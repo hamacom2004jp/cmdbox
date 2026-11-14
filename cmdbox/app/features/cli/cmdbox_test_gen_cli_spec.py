@@ -72,7 +72,7 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         if output_dir.exists():
             if not clear_output_dir:
                 msg = dict(warn=f"Output directory already exists: '{output_dir}'. Use --clear_output_dir True to overwrite.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             shutil.rmtree(output_dir)
 
@@ -84,7 +84,7 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 appcls = getattr(mod, class_name)
             except Exception as e:
                 msg = dict(warn=f"Failed to load app_class '{args.app_class}': {e}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         ver = None
@@ -93,7 +93,7 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 ver = importlib.import_module(args.ver_module)
             except Exception as e:
                 msg = dict(warn=f"Failed to import ver_module '{args.ver_module}': {e}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         try:
@@ -108,7 +108,7 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         except Exception as e:
             logger.warning(f"generate_cli_spec failed: {e}", exc_info=True)
             msg = dict(warn=str(e))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         msg = dict(
@@ -119,7 +119,7 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 count=len(documents),
             )
         )
-        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(msg, args.format, tm, pf=pf)
         return self.RESP_SUCCESS, msg, None
 
     def output_schema(self) -> type:

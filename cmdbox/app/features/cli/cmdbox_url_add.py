@@ -110,12 +110,12 @@ class UrlAdd(feature.OneshotResultEdgeFeature, validator.Validator):
                 file_path=str(json_file),
                 msg=f"Short URL added. url_id={url_id}"
             )))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, None
         except Exception as e:
             msg = dict(warn=f"{e}")
             logger.error(f"Error in url_add: {e}", exc_info=True)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:

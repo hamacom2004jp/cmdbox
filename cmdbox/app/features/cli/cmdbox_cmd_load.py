@@ -84,7 +84,7 @@ class CmdLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         opt = common.loadopt(opt_path, True)
         if not opt or 'cmd' not in opt or 'mode' not in opt:
             ret = dict(warn=f"Command not found: '{args.cmd_title}'")
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             return self.RESP_WARN, ret, None
         scope = signin.get_request_scope()
         user_session = scope["req"].session.get('signin', {}) if scope and scope["req"] is not None else {}
@@ -92,15 +92,12 @@ class CmdLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                                         opt=args.__dict__, user_name="unknown", user_session=user_session, logger=logger,
                                         appcls=self.appcls, ver=self.ver, language=self.language):
             ret = dict(warn=f"You do not have permission to execute this command.")
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             return self.RESP_WARN, ret, None
         ret = dict(success=dict(data=opt))
-
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
-
         return self.RESP_SUCCESS, ret, None
 
     def output_schema(self) -> type:

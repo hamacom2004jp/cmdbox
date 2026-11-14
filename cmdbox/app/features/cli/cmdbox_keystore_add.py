@@ -142,7 +142,7 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
         if key_type == 'signkey':
             if not args.sign_key or not args.sign_cert:
                 msg = dict(warn="Please specify --sign_key and --sign_cert when --key_type signkey.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             # sign_keyファイルの取得
             args.svpath = args.sign_key
@@ -161,12 +161,12 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
         elif key_type == 'enckey':
             if not args.enc_key:
                 msg = dict(warn="Please specify --enc_key when --key_type enckey.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
         elif key_type == 'cacert':
             if not args.ca_cert:
                 msg = dict(warn="Please specify --ca_cert when --key_type cacert.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             # ca_certファイルの取得
             args.svpath = args.ca_cert
@@ -219,7 +219,7 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl

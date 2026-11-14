@@ -70,7 +70,7 @@ class ServerList(feature.OneshotResultEdgeFeature, validator.Validator):
         """
         sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname='server') # list取得なのでデフォルトのsvnameを指定
         ret = sv.list_server()
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
                 return self.RESP_WARN, ret, sv
         return self.RESP_SUCCESS, ret, sv

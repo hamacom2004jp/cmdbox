@@ -120,7 +120,7 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
             signin_file = None if not hasattr(args, 'signin_file') or args.signin_file is None else Path(args.signin_file)
             if signin_file is not None and not signin_file.is_file():
                 msg = dict(warn=f"Signin file '{signin_file}' is not found.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             signin_data = signin.Signin.load_signin_file(signin_file, None, self=self, logger=logger) if signin_file is not None else None
             # ツール側で参照できるようにするためにインスタンス化
@@ -205,12 +205,12 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
                     th.stop()
 
             msg = dict(success="a2a complate.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, a2a_app
         except Exception as e:
             logger.error(f"A2A server start error. {e}", exc_info=True)
             msg = dict(warn=f"A2A server start error. {e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:

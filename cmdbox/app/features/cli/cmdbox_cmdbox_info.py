@@ -70,7 +70,7 @@ class CmdboxInfo(feature.UnsupportEdgeFeature, validator.Validator):
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         if args.enable_value:
             v = getattr(self.ver, '__version__', None)
-            common.print_format(v, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(v, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, v, None
         data = dict()
         success = dict(data=data)
@@ -101,7 +101,7 @@ class CmdboxInfo(feature.UnsupportEdgeFeature, validator.Validator):
             data['srcurl'] = getattr(self.ver, '__srcurl__', None)
             data['docurl'] = getattr(self.ver, '__docurl__', None)
             data['description'] = getattr(self.ver, '__description__', None)
-        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(msg, args.format, tm, pf=pf)
         return self.RESP_SUCCESS, msg, None
 
     def output_schema(self) -> type:

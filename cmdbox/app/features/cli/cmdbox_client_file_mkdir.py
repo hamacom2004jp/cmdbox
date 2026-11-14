@@ -104,7 +104,7 @@ class ClientFileMkdir(feature.UnsupportEdgeFeature, validator.Validator, limiter
         rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         ret = cl.file_mkdir(str(args.svpath).replace('"',''), scope=args.scope, client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths,
                             exist_ok=args.exist_ok, retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

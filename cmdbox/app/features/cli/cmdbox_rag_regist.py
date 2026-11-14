@@ -113,7 +113,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
             extract_names = rag_config.get('extract', [])
             if not isinstance(extract_names, list) or len(extract_names) == 0:
                 msg = dict(warn=f"RAG configuration '{args.rag_name}' does not contain valid extract names.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, cl
 
             # RagStoreの作成
@@ -188,7 +188,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
                             st, extract_res, _ = self.exec_extract_cmd(extract_feat, marge_args, options, args, tm, pf, logger)
                             if st != self.RESP_SUCCESS:
                                 msg = dict(warn=f"Failed to execute extract command for file '{kv['path']}'. Skipping registration for this file.", res=extract_res)
-                                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                common.print_format(msg, args.format, tm, pf=pf)
                                 self.put_resqueue(args, msg)
                                 continue
                             # save_typeの処理
@@ -206,11 +206,11 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
                                 doc_index += len(docs)
                                 if len([doc for doc in docs if 'content' not in doc]) > 0:
                                     msg = dict(warn=f"Extracted document does not contain 'content' field.")
-                                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                    common.print_format(msg, args.format, tm, pf=pf)
                                     continue
                                 if len([doc for doc in docs if 'metadata' not in doc]) > 0:
                                     msg = dict(warn=f"Extracted document does not contain 'metadata' field.")
-                                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                    common.print_format(msg, args.format, tm, pf=pf)
                                     self.put_resqueue(args, msg)
                                     continue
 
@@ -220,7 +220,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
                                 st, embed_res, _ = await self.embedding(rag_config, [doc['content'] for doc in docs], args, cl, tm, pf, logger)
                                 if st != self.RESP_SUCCESS:
                                     msg = dict(warn=f"Failed to execute embedding for extracted document from file '{kv['path']}'.", res=embed_res)
-                                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                    common.print_format(msg, args.format, tm, pf=pf)
                                     self.put_resqueue(args, msg)
                                     return st, embed_res, cl
                                 # RAGストアへの登録
@@ -238,7 +238,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
                                 conn.commit()
 
             ret = dict(success="RAG registration completed successfully.")
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             self.put_resqueue(args, ret)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, cl
@@ -247,7 +247,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             self.put_resqueue(args, msg)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, cl
 
     def output_schema(self) -> type:

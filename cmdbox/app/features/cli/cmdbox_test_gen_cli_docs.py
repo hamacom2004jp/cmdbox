@@ -82,13 +82,13 @@ class TestGenCliDocs(feature.OneshotResultEdgeFeature, validator.Validator):
         except Exception as e:
             logger.warning(f"gen_cli_docs failed: {e}", exc_info=True)
             msg = dict(warn=dict(message=str(e)))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         errors = result.get("errors", [])
         if errors:
             msg = dict(warn=dict(message=f"Completed with errors: {errors}", **result))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         msg = dict(
@@ -99,7 +99,7 @@ class TestGenCliDocs(feature.OneshotResultEdgeFeature, validator.Validator):
                 dry_run=dry_run,
             )
         )
-        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(msg, args.format, tm, pf=pf)
         return self.RESP_SUCCESS, msg, None
 
     def output_schema(self) -> type:

@@ -123,7 +123,7 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 args.msg_audio_format = success.get("mime_type", None) if success else None
             except Exception as e:
                 msg = dict(warn=f"Failed to read audio file: {e}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
         if args.msg_file:
             try:
@@ -137,7 +137,7 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 args.msg_file_name = success.get("name", None) if success else None
             except Exception as e:
                 msg = dict(warn=f"Failed to read file: {e}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         payload = dict(llmname=args.llmname,
@@ -163,7 +163,7 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl

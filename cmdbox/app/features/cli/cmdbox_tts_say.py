@@ -214,7 +214,7 @@ class TtsSay(feature.ResultEdgeFeature, validator.Validator, limiter.LimitedFeat
         if args.tts_engine == 'voicevox':
             if args.voicevox_model is None:
                 msg = dict(warn=f"Please specify the --voicevox_model option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, False, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         tts_engine_b64 = convert.str2b64str(args.tts_engine)
@@ -225,7 +225,11 @@ class TtsSay(feature.ResultEdgeFeature, validator.Validator, limiter.LimitedFeat
         ret =  await cl.redis_cli.asend_cmd(self.get_svcmd(),
                                             [tts_engine_b64, voicevox_model_b64, tts_text_b64],
                                             retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        if args.tts_output:
+        if args.tts_output and args.client_data:
+            v, msg = validator.Validator.validate_safe_path(Path(args.client_data), args.tts_output)
+            if not v:
+                common.print_format(msg, False, tm, None, False, pf=pf)
+                return self.RESP_WARN, dict(warn=msg), cl
             if 'success' in ret and 'data' in ret['success']:
                 wav_b64 = ret['success']['data']
                 wav_data = convert.b64str2bytes(wav_b64)
@@ -233,6 +237,10 @@ class TtsSay(feature.ResultEdgeFeature, validator.Validator, limiter.LimitedFeat
                     f.write(wav_data)
                 common.save_file(args.tts_output, _w, mode='wb', nolock=False)
                 del ret['success']['data'] # 音声データは削除
+            else:
+                msg = dict(warn="Failed to generate TTS output.")
+                common.print_format(msg, False, tm, None, False, pf=pf)
+                return self.RESP_WARN, msg, cl
         common.print_format(ret, False, tm, None, False, pf=pf)
         if 'success' not in ret:
                 return self.RESP_WARN, ret, cl

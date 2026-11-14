@@ -81,7 +81,7 @@ class A2asvReload(feature.OneshotResultEdgeFeature, validator.Validator):
                                    verify=args.send_verify, timeout=args.send_timeout)
         except Exception as e:
             msg = dict(warn=f"Failed request to A2A server. {e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         content_type = (res.headers.get("Content-Type") or "").lower()
@@ -96,11 +96,11 @@ class A2asvReload(feature.OneshotResultEdgeFeature, validator.Validator):
 
         if res.status_code != 200:
             msg = dict(warn=dict(status_code=res.status_code, url=url, body=body))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         msg = dict(success=dict(status_code=res.status_code, url=url, data=body))
-        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(msg, args.format, tm, pf=pf)
         return self.RESP_SUCCESS, msg, None
 
     def output_schema(self) -> type:

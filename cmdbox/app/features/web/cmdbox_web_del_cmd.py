@@ -1,4 +1,4 @@
-from cmdbox.app import feature
+from cmdbox.app import common, feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 
@@ -25,6 +25,20 @@ class DelCmd(feature.WebFeature):
 
             opt_path = web.cmds_path / f"cmd-{title}.json"
             web.logger.info(f"del_cmd: opt_path={opt_path}")
+
+            opt = common.loadopt(opt_path, False)
+            if 'allow_groups' in opt and opt['allow_groups']:
+                signin_groups = []
+                if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
+                    if 'groups' in req.session['signin'] and req.session['signin']['groups'] is not None:
+                        signin_groups = req.session['signin']['groups']
+                allow_groups = opt['allow_groups']
+                if isinstance(allow_groups, str):
+                    allow_groups = [allow_groups]
+                allow_groups = [group for group in allow_groups if group and group.strip()]
+                if allow_groups and not any(group in signin_groups for group in allow_groups):
+                    return dict(warn=f'You do not have permission to delete this command. (your groups: {signin_groups})')
+
             opt_path.unlink()
             if 'signin' in req.session and req.session['signin'] is not None:
                 sess = req.session['signin']

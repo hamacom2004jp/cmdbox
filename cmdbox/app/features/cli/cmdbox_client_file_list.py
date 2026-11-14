@@ -112,7 +112,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
         ret = cl.file_list(svpath=str(args.svpath).replace('"',''), recursive=args.recursive, scope=args.scope,
                            client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths, listregs=listregs, summary=args.summary,
                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

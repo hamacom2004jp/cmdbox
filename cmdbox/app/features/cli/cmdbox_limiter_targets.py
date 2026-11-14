@@ -194,7 +194,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
             cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
             ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, cl
             return self.RESP_SUCCESS, ret, cl
@@ -202,7 +202,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         options = Options.getInstance()
         st, res, _ = await self.limiter_list.apprun(logger, args, tm, pf)
         if st != self.RESP_SUCCESS:
-            common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(res, args.format, tm, pf=pf)
             return st, res, None
         lt = res.get('success', {}).get('data', [])
 
@@ -221,7 +221,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         )
 
         ret = dict(success=dict(data=results))
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         return self.RESP_SUCCESS, ret, None
 
     def output_schema(self) -> type:

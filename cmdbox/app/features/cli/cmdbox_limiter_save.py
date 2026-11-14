@@ -136,12 +136,12 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
         if args.scope not in ['client', 'server']:
             result = dict(warn="Limiters are supported only in the “client” and “server” scopes.")
             logger.warning("Limiters are supported only in the “client” and “server” scopes.")
-            common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(result, args.format, tm, pf=pf)
             return self.RESP_WARN, result, None
         if args.max_history_interval and args.max_history_interval <= 120:
             result = dict(warn="max_history_interval should be greater than 120 seconds.")
             logger.warning("max_history_interval should be greater than 120 seconds.")
-            common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(result, args.format, tm, pf=pf)
             return self.RESP_WARN, result, None
         reset_period_unit = args.reset_period_unit if hasattr(args, 'reset_period_unit') else None
         reset_period_qty = args.reset_period_qty if hasattr(args, 'reset_period_qty') else None
@@ -151,7 +151,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             if period_seconds > 0 and args.max_history_interval < period_seconds:
                 result = dict(warn=f"max_history_interval ({args.max_history_interval}s) must be greater than the reset period ({reset_period_qty} {reset_period_unit} = {period_seconds}s).")
                 logger.warning(result['warn'])
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
 
         # Validate reset_datetime and exec_period_start
@@ -161,7 +161,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             if str(reset_datetime) > str(exec_period_start):
                 result = dict(warn=f"reset_datetime ({reset_datetime}) must be equal to or earlier than exec_period_start ({exec_period_start}).")
                 logger.warning(result['warn'])
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
 
         # Validate history_end and exec_period_end
@@ -171,7 +171,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             if str(history_end) < str(exec_period_end):
                 result = dict(warn=f"history_end ({history_end}) must be equal to or later than exec_period_end ({exec_period_end}).")
                 logger.warning(result['warn'])
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
 
         # Validate limiter_start and limiter_end
@@ -181,7 +181,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             if str(limiter_start) >= str(limiter_end):
                 result = dict(warn=f"limiter_start ({limiter_start}) must be earlier than limiter_end ({limiter_end}).")
                 logger.warning(result['warn'])
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
 
         configure = dict(
@@ -216,7 +216,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             if not client_data:
                 result = dict(warn="client_data is required when scope is 'client'.")
                 logger.warning("client_data is required when scope is 'client'.")
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
             data_dir = Path(client_data)
             configure_path = data_dir / ".limiter" / f"limiter-{args.limiter_name}.json"
@@ -226,7 +226,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 return self.RESP_WARN, msg, None
             common.save_file(configure_path, lambda f: json.dump(configure, f, indent=4), encoding='utf-8', nolock=False)
             out = dict(success=f"Limiter configuration saved to '{str(configure_path)}'.")
-            common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(out, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, out, None
 
         # scope == 'server'
@@ -235,7 +235,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [configure_b64],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl

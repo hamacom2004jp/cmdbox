@@ -211,7 +211,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                 ret = buf.getvalue()
                 ret = ret.replace('\r\n', '\n') if ret is not None else ''
 
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:

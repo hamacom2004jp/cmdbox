@@ -56,7 +56,7 @@ def apprun_check(func:Callable) -> Callable:
                 msg = dict(warn=f"Invalid result format: {e}", output=msg, output_schema=info)
             else:
                 msg = dict(warn=f"Invalid result format: {e}", output=msg)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
     return wrapper
 
@@ -105,7 +105,7 @@ def async_apprun_check(func:Callable) -> Callable:
                 msg = dict(warn=f"Invalid result format: {e}", output=msg, output_schema=info)
             else:
                 msg = dict(warn=f"Invalid result format: {e}", output=msg)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
     return wrapper
 
@@ -141,6 +141,54 @@ class Validator(feature.Feature):
         if isinstance(value, str):
             return unicodedata.normalize('NFC', value)
         return value
+
+    @staticmethod
+    def validate_safe_path(base_dir: Path, relative_path: str, allow_absolute: bool = False) -> Tuple[bool, str]:
+        """
+        相対パスがベースディレクトリの外に出ていないかバリデーション（パストラバーサル対策）
+        
+        Args:
+            base_dir (Path): ベースディレクトリ（絶対パス）
+            relative_path (str): チェックする相対パス（ユーザー入力）
+            allow_absolute (bool): 絶対パスを許可するか（デフォルト: False）
+        
+        Returns:
+            Tuple[bool, str]: (有効性, エラーメッセージ)
+                有効な場合: (True, "")
+                無効な場合: (False, エラーメッセージ)
+        """
+        # Noneチェック
+        if not relative_path:
+            return True, ""
+        
+        # 絶対パスチェック
+        if Path(relative_path).is_absolute():
+            if allow_absolute:
+                return True, ""
+            return False, f"Absolute paths are not allowed: {relative_path}"
+        
+        # 相対パスを組み立て
+        try:
+            import os
+            # パスを正規化（..などを解決）
+            safe_path = (base_dir / relative_path).resolve()
+            base_dir_resolved = base_dir.resolve()
+            
+            # relative_to()を使用してパスがベースディレクトリの下にあるか厳密にチェック
+            # この方法は境界値バグ（/data_hacker が /data を通すなど）を防ぐ
+            try:
+                relative_parts = safe_path.relative_to(base_dir_resolved)
+                # パートに .. が含まれていないか確認（念のため）
+                for part in relative_parts.parts:
+                    if part == "..":
+                        return False, f"Path traversal detected: {relative_path} contains '..' after resolution"
+                return True, ""
+            except ValueError:
+                # relative_toで失敗する場合は、パスがベース外
+                return False, f"Path traversal detected: {relative_path} is outside {base_dir}"
+            
+        except (ValueError, RuntimeError) as e:
+            return False, f"Invalid path: {relative_path} ({str(e)})"
 
     validator_types = {
         options.Options.T_BOOL: [bool],
@@ -205,12 +253,12 @@ class Validator(feature.Feature):
             if required and type not in [options.Options.T_BOOL, options.Options.T_INT, options.Options.T_FLOAT]:
                 if not val:
                     msg = dict(warn=f"Please specify --{opt}")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(msg, args.format, tm, pf=pf)
                     return self.RESP_WARN, msg, None
             elif required and type in [options.Options.T_INT, options.Options.T_FLOAT]:
                 if val is None:
                     msg = dict(warn=f"Please specify --{opt}")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    common.print_format(msg, args.format, tm, pf=pf)
                     return self.RESP_WARN, msg, None
             # TODO: type==T_DATE, T_DATETIME, T_MLISTの検証
             # Choicesの検証 TODO:type==T_DICTのときのchoice検証が必要
@@ -229,7 +277,7 @@ class Validator(feature.Feature):
                         for v in check_vals:
                             if v not in valid_values:
                                 msg = dict(warn=f"Invalid value for --{opt}: {v} (must be one of {valid_values})")
-                                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                common.print_format(msg, args.format, tm, pf=pf)
                                 return self.RESP_WARN, msg, None
 
             # オプション固有のバリデーション
@@ -238,12 +286,12 @@ class Validator(feature.Feature):
                     for v in val:
                         st, msg, obj = validator(logger, opt, type, v, fileio)
                         if st != self.RESP_SUCCESS:
-                            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                            common.print_format(msg, args.format, tm, pf=pf)
                             return st, msg, None
                 else:
                     st, msg, obj = validator(logger, opt, type, val, fileio)
                     if st != self.RESP_SUCCESS:
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        common.print_format(msg, args.format, tm, pf=pf)
                         return st, msg, None
         return self.RESP_SUCCESS, {}, None
 

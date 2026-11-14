@@ -126,15 +126,15 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
         groups = [g for g in args.groups if g] if hasattr(args, 'groups') and isinstance(args.groups, list) else args.groups if hasattr(args, 'groups') else None
         if owner_groups and len([g for g in owner_groups if g in groups]) <= 0:
             msg = dict(warn=f"Owner groups must be in the allowed groups. groups:{groups} , owner_groups:{owner_groups}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if user_groups and len([g for g in user_groups if g in groups]) <= 0:
             msg = dict(warn=f"User groups must be in the allowed groups. groups:{groups} , user_groups:{user_groups}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
         if owner_groups and user_groups and len([g for g in user_groups if g in owner_groups]) <= 0:
             msg = dict(warn=f"User groups must be in the owner groups. owner_groups:{owner_groups} , user_groups:{user_groups}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         configure = dict(
@@ -161,14 +161,14 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             svaccount_path = Path(args.llmsvaccountfile)
             if not svaccount_path.exists():
                 msg = dict(warn=f"The specified llmsvaccountfile '{args.llmsvaccountfile}' does not exist.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             try:
                 with svaccount_path.open('r', encoding='utf-8') as f:
                     configure['llmsvaccountfile_data'] = json.load(f)
             except Exception as e:
                 msg = dict(warn=f"Failed to load the specified llmsvaccountfile '{args.llmsvaccountfile}': {str(e)}")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
         configure_b64 = convert.str2b64str(common.to_str(configure))
@@ -176,7 +176,7 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [configure_b64],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
                 return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl

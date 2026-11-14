@@ -69,8 +69,13 @@ class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
                         errormsg.append(f'The "{ref["opt"]}" option should not be specified in a second or subsequent command. ({cmd_title})')
             if i==0:
                 if 'request_files' in opt and len(opt['request_files']) > 0:
+                    # Only allow overwriting file input keys (fileio == 'in')
+                    file_input_keys = set()
+                    for ref in cmd_ref:
+                        if 'fileio' in ref and ref['fileio'] == 'in':
+                            file_input_keys.add(ref['opt'])
                     for fn in opt['request_files']:
-                        if fn in cmd_opt:
+                        if fn in file_input_keys and fn in cmd_opt:
                             cmd_opt[fn] = opt['request_files'][fn]
                 curl_cmd_file = self.mk_curl_fileup(web, cmd_opt)
 

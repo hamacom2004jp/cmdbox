@@ -109,7 +109,7 @@ class McpsvStart(feature.UnsupportEdgeFeature, validator.Validator):
             signin_file = None if not hasattr(args, 'signin_file') or args.signin_file is None else Path(args.signin_file)
             if signin_file is not None and not signin_file.is_file():
                 msg = dict(warn=f"Signin file '{signin_file}' is not found.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
             signin_data = signin.Signin.load_signin_file(signin_file, None, self=self, logger=logger) if signin_file is not None else None
             # ツール側で参照できるようにするためにインスタンス化
@@ -132,7 +132,7 @@ class McpsvStart(feature.UnsupportEdgeFeature, validator.Validator):
             mcp_app = fastmcp.http_app(stateless_http=True) if fastmcp is not None else None
             if mcp_app is None:
                 msg = dict(warn="MCP app is not created.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
             # mcpsvはセッションを使用しないが、signinミドルウェアでセッションが必要なため追加する
@@ -167,12 +167,12 @@ class McpsvStart(feature.UnsupportEdgeFeature, validator.Validator):
                     th.stop()
 
             msg = dict(success="mcpsv complate.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, fastmcp
         except Exception as e:
             logger.error(f"MCP server start error. {e}", exc_info=True)
             msg = dict(warn=f"MCP server start error. {e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:

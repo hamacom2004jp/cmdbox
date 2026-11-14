@@ -328,7 +328,7 @@ class DatasourceBase(feature.ResultEdgeFeature):
             ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                         retry_count=args.retry_count, retry_interval=args.retry_interval,
                                         timeout=args.timeout, nowait=False)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, cl
             return self.RESP_SUCCESS, ret, cl
@@ -338,7 +338,7 @@ class DatasourceBase(feature.ResultEdgeFeature):
                 logger.warning("client_data is required for client scope.")
                 return self.RESP_WARN, result, None
             ret = self._do_run(Path(payload['client_data']), payload, logger)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, None
             return self.RESP_SUCCESS, ret, None

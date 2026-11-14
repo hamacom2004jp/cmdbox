@@ -129,7 +129,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
                              fwpaths=fwpaths, rjpaths=rjpaths, lmpaths=sorted(lmpaths, reverse=True),
                              meta_chk=self.meta_chk, meta=args.meta, mkdir=args.mkdir, overwrite=args.overwrite,
                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl

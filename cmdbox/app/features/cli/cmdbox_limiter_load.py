@@ -59,7 +59,7 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         if scope not in ['client', 'server']:
             result = dict(warn="Limiters are supported only in the “client” and “server” scopes.")
             logger.warning("Limiters are supported only in the “client” and “server” scopes.")
-            common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(result, args.format, tm, pf=pf)
             return self.RESP_WARN, result, None
 
         if scope == 'client':
@@ -67,18 +67,18 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             if not client_data:
                 result = dict(warn="client_data is required when scope is 'client'.")
                 logger.warning("client_data is required when scope is 'client'.")
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
             configure_path = Path(client_data) / ".limiter" / f"limiter-{args.limiter_name}.json"
             if not configure_path.exists():
                 result = dict(warn=f"Limiter configuration '{args.limiter_name}' not found at '{configure_path}'.")
                 logger.warning(f"Limiter configuration '{args.limiter_name}' not found at '{configure_path}'.")
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(result, args.format, tm, pf=pf)
                 return self.RESP_WARN, result, None
             with configure_path.open('r', encoding='utf-8') as f:
                 configure = json.load(f)
             out = dict(success=dict(data=configure))
-            common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(out, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, out, None
 
         # scope == 'server'
@@ -87,7 +87,7 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = await cl.redis_cli.asend_cmd(self.get_svcmd(), [payload_b64],
                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl

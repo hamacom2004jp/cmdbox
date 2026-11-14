@@ -97,11 +97,11 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature, validator.Validator):
             user = dict(name=args.user_name, apikey_name=args.apikey_name)
             apikey = w.apikey_add(None, user)
             msg = dict(success=dict(apikey=apikey, msg=f"User ApiKey added. user_name={args.user_name} apikey_name={args.apikey_name}"))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w
         except Exception as e:
             msg = dict(warn=f"{e}")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, w
 
     def output_schema(self) -> type:

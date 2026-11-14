@@ -137,7 +137,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase, validator.Validator):
                                   install_extra=args.install_extra,
                                   compose_path=args.compose_path,
                                   language=args.language)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.print_format(ret, args.format, tm, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, None

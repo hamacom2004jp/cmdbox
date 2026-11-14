@@ -71,7 +71,7 @@ class UrlList(feature.OneshotResultEdgeFeature, validator.Validator):
             urls_dir = Path(self.default_data) / '.urls'
             if not urls_dir.exists():
                 msg = dict(success=dict(data=results, msg="No URLs found."))
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_SUCCESS, msg, None
             
             # キーワード検索の設定
@@ -96,12 +96,12 @@ class UrlList(feature.OneshotResultEdgeFeature, validator.Validator):
             
             # 結果を返す
             msg = dict(success=dict(data=results, msg=f"Found {len(results)} URL(s)."))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, None
         except Exception as e:
             msg = dict(warn=f"{e}")
             logger.error(f"Error in url_list: {e}", exc_info=True)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:

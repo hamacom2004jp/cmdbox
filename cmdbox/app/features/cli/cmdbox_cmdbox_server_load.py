@@ -78,7 +78,7 @@ class CmdboxServerLoad(cmdbox_base.CmdboxBase, validator.Validator):
         """
         if platform.system() == 'Windows':
             msg = dict(warn=f"Load command is Unsupported in windows platform.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
         try:
@@ -95,14 +95,14 @@ class CmdboxServerLoad(cmdbox_base.CmdboxBase, validator.Validator):
             with open(docker_compose_path, 'w', encoding='utf-8') as fp:
                 yaml.dump(comp, fp)
             ret = self.load(logger, args.compose_path, container, install_tag, args.image_file)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(ret, args.format, tm, pf=pf)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, None
             return self.RESP_SUCCESS, ret, None
         except Exception as e:
             logger.warning("An error occurred while executing the load command.", exc_info=True)
             msg = dict(WARN=str(e))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_WARN, msg, None
 
     def output_schema(self) -> type:
