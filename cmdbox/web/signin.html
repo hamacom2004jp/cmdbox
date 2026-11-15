@@ -127,7 +127,7 @@
         </ul>
     </div>
     <div class="main_container d-flex justify-content-center align-items-center w-100" style="top:60px;height:calc(100vh - 60px);">
-        <form class="form-signin" method="post" style="width:300px;">
+        <form class="form-signin" method="post" style="width:300px;display:none;">
             <h1 class="h3 mb-3 fw-normal signin_title d-inline align-middle">Please sign in</h1>
             <div class="form-floating mt-3">
                 <input name="name" type="text" class="form-control form-signin-name" id="floatingInput" placeholder="UserName">
@@ -163,6 +163,23 @@
                 <button class="btn btn-outline-primary w-100 py-2 mb-3 btn-saml-azure" type="button" style="display:none;">
                     <svg class="bi my-1 theme-icon-active me-2" fill="currentColor" width="16" height="16"><use href="#azure"></use></svg>
                     <span class="i18n">Sign in with Microsoft SAML</span>
+                </button>
+            </div>
+        </form>
+        <form class="form-totp" method="post" style="width:300px;display:none;">
+            <h1 class="h3 mb-3 fw-normal signin_title d-inline align-middle i18n">Please sign in</h1>
+            <p class="small mb-3 i18n">Please enter Two-Factor Authentication code</p>
+            <div class="form-floating">
+                <input name="totp_code" type="text" class="form-control form-signin-totp-code" id="floatingTotpCode" autocomplete="off" autofocus>
+                <label for="floatingTotpCode" class="i18n">Code</label>
+                <input name="name" type="hidden" class="form-signin-totp-name">
+                <input name="password" type="hidden" class="form-signin-totp-pass">
+            </div>
+            <div id="totp_error" class="alert alert-danger mt-3 d-none" role="alert"></div>
+            <button class="btn btn-primary w-100 py-2 i18n mt-3" type="submit">Verify</button>
+            <div class="mt-3">
+                <button class="btn btn-outline-secondary w-100 py-2 i18n btn-backto-signin" type="button">
+                    <span class="i18n">Back to Sign In</span>
                 </button>
             </div>
         </form>

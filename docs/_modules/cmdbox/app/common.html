@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2026/11/08 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2026/11/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=e88c2e44"></script>
+      <script src="../../../_static/documentation_options.js?v=f7d953b1"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -641,8 +641,8 @@
 <span class="sd">        data (dict): 出力するデータ</span>
 <span class="sd">        format (bool): フォーマットするかどうか</span>
 <span class="sd">        tm (float): 処理時間</span>
-<span class="sd">        output_json (str, optional): JSON形式で出力するファイルパス. Defaults to None.</span>
-<span class="sd">        output_json_append (bool, optional): JSON形式で出力するファイルパス. Defaults to False.</span>
+<span class="sd">        output_json (str, optional): 使用不可：JSON形式で出力するファイルパス. Defaults to None.</span>
+<span class="sd">        output_json_append (bool, optional): 使用不可：JSON形式で出力するファイルパス. Defaults to False.</span>
 <span class="sd">        stdout (bool, optional): 標準出力に出力するかどうか. Defaults to True.</span>
 <span class="sd">        tablefmt (str, optional): テーブルのフォーマット. Defaults to 'github'.</span>
 <span class="sd">        pf (List[Dict[str, float]], optional): パフォーマンス情報. Defaults to [].</span>
@@ -689,14 +689,17 @@
                 <span class="nb">print</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">BrokenPipeError</span><span class="p">:</span>
                 <span class="k">pass</span>
-    <span class="k">if</span> <span class="n">output_json</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-            <span class="n">save_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">output_json</span><span class="p">),</span> <span class="n">_w</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'a'</span> <span class="k">if</span> <span class="n">output_json_append</span> <span class="k">else</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">pass</span>
+    <span class="c1"># 脆弱性にあたるので使用不可とする</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    if output_json is not None:</span>
+<span class="sd">        try:</span>
+<span class="sd">            def _w(f):</span>
+<span class="sd">                json.dump(data, f, default=default_json_enc, ensure_ascii=False)</span>
+<span class="sd">                print('', file=f)</span>
+<span class="sd">            save_file(Path(output_json), _w, mode='a' if output_json_append else 'w', nolock=True)</span>
+<span class="sd">        except Exception as e:</span>
+<span class="sd">            pass</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">txt</span></div>
 
 

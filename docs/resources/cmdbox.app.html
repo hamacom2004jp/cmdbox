@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app package &mdash; cmdbox 2026/11/12 documentation</title>
+  <title>cmdbox.app package &mdash; cmdbox 2026/11/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=3c50c37c"></script>
+      <script src="../_static/documentation_options.js?v=f7d953b1"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -464,6 +464,7 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.validator.Validator.valid_str_ctrlchar"><code class="docutils literal notranslate"><span class="pre">Validator.valid_str_ctrlchar()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.validator.Validator.valid_str_max_length"><code class="docutils literal notranslate"><span class="pre">Validator.valid_str_max_length()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.validator.Validator.valid_type"><code class="docutils literal notranslate"><span class="pre">Validator.valid_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.validator.Validator.validate_safe_path"><code class="docutils literal notranslate"><span class="pre">Validator.validate_safe_path()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.validator.Validator.validator_type_castfunc"><code class="docutils literal notranslate"><span class="pre">Validator.validator_type_castfunc</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.commons.html#cmdbox.app.commons.validator.Validator.validator_types"><code class="docutils literal notranslate"><span class="pre">Validator.validator_types</span></code></a></li>
 </ul>
@@ -1713,8 +1714,8 @@ config (dict): 設定</p>
 <li><p><strong>data</strong> (<em>dict</em>) -- 出力するデータ</p></li>
 <li><p><strong>format</strong> (<em>bool</em>) -- フォーマットするかどうか</p></li>
 <li><p><strong>tm</strong> (<em>float</em>) -- 処理時間</p></li>
-<li><p><strong>output_json</strong> (<em>str</em><em>, </em><em>optional</em>) -- JSON形式で出力するファイルパス. Defaults to None.</p></li>
-<li><p><strong>output_json_append</strong> (<em>bool</em><em>, </em><em>optional</em>) -- JSON形式で出力するファイルパス. Defaults to False.</p></li>
+<li><p><strong>output_json</strong> (<em>str</em><em>, </em><em>optional</em>) -- 使用不可：JSON形式で出力するファイルパス. Defaults to None.</p></li>
+<li><p><strong>output_json_append</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 使用不可：JSON形式で出力するファイルパス. Defaults to False.</p></li>
 <li><p><strong>stdout</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 標準出力に出力するかどうか. Defaults to True.</p></li>
 <li><p><strong>tablefmt</strong> (<em>str</em><em>, </em><em>optional</em>) -- テーブルのフォーマット. Defaults to 'github'.</p></li>
 <li><p><strong>pf</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- パフォーマンス情報. Defaults to [].</p></li>

@@ -389,6 +389,14 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "file_uri": "string"
           }
         ],
+        "render_ui_widgets": [
+          {
+            "id": "string",
+            "provider": "string",
+            "payload": {},
+            "html": "string"
+          }
+        ],
         "wav_b64": "string",
         "ressize": 0,
         "token_usage": {}
@@ -430,6 +438,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.function_responses","list[FunctionResponse] | null","no","null","関数応答一覧"
     "success.artifact_delta","dict[str, int] | null","no","null","更新されたアーティファクト一覧"
     "success.artifacts","list[Artifact] | null","no","null","アーティファクト内容"
+    "success.render_ui_widgets","list[UiWidget] | null","no","null","表示対象のUIウィジェット一覧"
     "success.wav_b64","str | null","no","null","Base64エンコードされたWAVデータ"
     "success.ressize","int | null","no","null","Agentが返したレスポンスのサイズ"
     "success.token_usage","dict[str, int] | null","no","null","トークン使用量"

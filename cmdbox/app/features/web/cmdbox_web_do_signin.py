@@ -2,6 +2,7 @@ import urllib.parse
 from cmdbox.app import common, feature
 from cmdbox.app.auth import signin, signin_saml, azure_signin, azure_signin_saml, github_signin, google_signin
 from cmdbox.app.commons import convert
+from cmdbox.app.features.cli import cmdbox_web_totp_load, cmdbox_web_totp_valid
 from cmdbox.app.features.web import cmdbox_web_signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -26,6 +27,8 @@ class DoSignin(cmdbox_web_signin.Signin):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
+        self.totp_load = cmdbox_web_totp_load.WebTotpLoad(self.appcls, self.ver, self.language)
+        self.totp_valid = cmdbox_web_totp_valid.WebTotpValid(self.appcls, self.ver, self.language)
         @app.post('/dosignin/', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def do_signin(req:Request, res:Response):
             return await do_signin_token(None, '', req, res)
@@ -110,6 +113,19 @@ class DoSignin(cmdbox_web_signin.Signin):
                     web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
                     web.options.audit_exec(req, res, web, body=dict(msg='Wrong password.'), audit_type='auth', user=name)
                     return RedirectResponse(url=f'/signin/{next}?error=1')
+
+                totp_code = form.get('totp_code', None)
+                if not totp_code:
+                    st, msg, _ = self.totp_load.load_info(web.data, arg_user_name=name, uid=uid, user_name=name)
+                    totp_info = msg.get('success', {}).get('data', {}) if msg else {}
+                    if not st and totp_info and totp_info.get('verify', False):
+                        return RedirectResponse(url=f'/signin/{next}?warn=totp_required')
+                else:
+                    st, msg, _ = self.totp_valid.valid_info(web.data, arg_user_name=name, uid=uid, user_name=name, totp_code=totp_code)
+                    if st:
+                        web.options.audit_exec(req, res, web, body=dict(msg=f'Invalid TOTP code. {msg.get("warn", "")}'), audit_type='auth', user=name)
+                        return RedirectResponse(url=f'/signin/{next}?warn=totp_invalid')
+
             group_names = web.signin.__class__.parent_group(signin_data, user['groups'])
             group_homes = web.signin.__class__.group_home(signin_data, group_names)
             group_sps = web.signin.__class__.group_startpage(signin_data, group_names)
@@ -140,7 +156,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
                         _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
-                                     email, passwd, None, group_names, group_homes, group_sps, gids)
+                                     email, passwd, None, group_names, group_homes, group_sps, gids, hash=user.get('hash', None))
                         next = f"../{next}" if token_ok else next
                         web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
                         # プラン有効期限通知をチェック
@@ -153,7 +169,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
             # セッションに保存
             _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
-                         email, passwd, None, group_names, group_homes, group_sps, gids)
+                         email, passwd, None, group_names, group_homes, group_sps, gids, hash=user.get('hash', None))
             next = f"../{next}" if next.find('/') >= 0 else next
             next = f"../{next}" if token_ok else next
             # プラン有効期限通知をチェック
@@ -214,7 +230,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 self.azure_saml_signin = sobj if sobj is not None else self.azure_saml_signin
 
         def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str,
-                         group_names:list, group_homes:list, group_sps:list, gids:list):
+                         group_names:list, group_homes:list, group_sps:list, gids:list, hash:str=None):
             """
             セッションに保存する
 
@@ -228,6 +244,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 group_homes (list): グループホームリスト
                 group_sps (list): グループスタートページリスト
                 gids (list): グループIDリスト
+                hash (str): パスワードのハッシュアルゴリズム
             """
             # 最終サインイン日時更新
             web.user_data(None, user['uid'], user['name'], 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
@@ -241,7 +258,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 web.user_data(None, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
             # セッションに保存
             req.session['signin'] = dict(uid=user['uid'], name=user['name'], home=user['home'], password=hashed_password,
-                                         gids=gids, groups=group_names, group_homes=group_homes, group_sps=group_sps, email=email)
+                                         gids=gids, groups=group_names, group_homes=group_homes, group_sps=group_sps, email=email, hash=hash)
             #req.session['access_token'] = access_token # アクセストークンはセッションに保存しない。大きすぎてCookieに入らないため。
             req.session['apikeys'] = web.get_user_apikeys(req, signin_data, user, include_legacy=True)
             # セッション変更を明示的にマーク（SessionMiddleware が認識するために重要）
@@ -328,7 +345,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 if not signin.is_open_within_period(group_names):
                     return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
                 # セッションに保存
-                _set_session(req, user, email, None, access_token, group_names, group_homes, group_sps, gids)
+                _set_session(req, user, email, None, access_token, group_names, group_homes, group_sps, gids, 'oauth2')
                 #return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
                 # プラン有効期限通知をチェック
                 notice_query = ''
@@ -390,7 +407,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     if not saml_signin.is_open_within_period(group_names):
                         return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
                     # セッションに保存
-                    _set_session(req, user, email, None, None, group_names, group_homes, group_sps, gids)
+                    _set_session(req, user, email, None, None, group_names, group_homes, group_sps, gids, 'saml')
                     # プラン有効期限通知をチェック
                     notice_query = ''
                     if saml_signin.is_notice_expired():

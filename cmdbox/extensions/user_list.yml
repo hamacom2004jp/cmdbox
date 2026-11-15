@@ -185,7 +185,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [admin, user, guest]
     mode: web
-    cmds: [genpass]
+    cmds: [genpass, totp_del, totp_load, totp_save, totp_valid]
     rule: allow
   - groups: [admin, user, guest]
     mode: url

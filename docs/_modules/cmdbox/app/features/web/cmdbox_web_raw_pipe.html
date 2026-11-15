@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.web.cmdbox_web_raw_pipe &mdash; cmdbox 2026/10/17 documentation</title>
+  <title>cmdbox.app.features.web.cmdbox_web_raw_pipe &mdash; cmdbox 2026/11/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=769f61d8"></script>
+      <script src="../../../../../_static/documentation_options.js?v=f7d953b1"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../resources/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
 </ul>
 
@@ -157,8 +158,13 @@
                         <span class="n">errormsg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">'The "</span><span class="si">{</span><span class="n">ref</span><span class="p">[</span><span class="s2">"opt"</span><span class="p">]</span><span class="si">}</span><span class="s1">" option should not be specified in a second or subsequent command. (</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="s1">'request_files'</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">'request_files'</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Only allow overwriting file input keys (fileio == 'in')</span>
+                    <span class="n">file_input_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">cmd_ref</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s1">'fileio'</span> <span class="ow">in</span> <span class="n">ref</span> <span class="ow">and</span> <span class="n">ref</span><span class="p">[</span><span class="s1">'fileio'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'in'</span><span class="p">:</span>
+                            <span class="n">file_input_keys</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ref</span><span class="p">[</span><span class="s1">'opt'</span><span class="p">])</span>
                     <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'request_files'</span><span class="p">]:</span>
-                        <span class="k">if</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">file_input_keys</span> <span class="ow">and</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
                             <span class="n">cmd_opt</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'request_files'</span><span class="p">][</span><span class="n">fn</span><span class="p">]</span>
                 <span class="n">curl_cmd_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_curl_fileup</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">cmd_opt</span><span class="p">)</span>
 

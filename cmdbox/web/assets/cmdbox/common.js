@@ -652,6 +652,186 @@ cmdbox.passchange = async () => {
     chpass_modal.modal('show');
 };
 /**
+ * TOTP（多要素認証）登録画面
+ */
+cmdbox.totpRegister = async () => {
+    const user = await cmdbox.user_info();
+    if (!user) {
+        cmdbox.message('user not found', true);
+        return;
+    }
+
+    // TOTP情報を読み込んで登録済みかどうかを確認
+    cmdbox.show_loading();
+    let totpInfo = null;
+    try {
+        const result = await cmdbox.sv_exec_cmd({
+            'mode': 'web',
+            'cmd': 'totp_load',
+            'user_name': user['name']
+        });
+        if (result && result.success && result.success.data) {
+            totpInfo = result.success.data;
+        }
+    } catch (e) {
+        console.log('TOTP is not configured yet');
+    }
+    cmdbox.hide_loading();
+
+    // モーダル作成
+    const totp_modal = $('#totp_modal').length ? $('#totp_modal') : $(`<div id="totp_modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+    totp_modal.html('');
+    const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle" style="max-width: 600px;"/>`).appendTo(totp_modal);
+    const form = $(`<form id="totp_form" class="modal-content novalidate"/>`).appendTo(daialog);
+
+    const header = $(`<div class="modal-header doc-header"/>`).appendTo(form);
+    header.append('<h5 class="modal-title glow-text-cyan system-font i18n">Two-Factor Authentication (TOTP)</h5>');
+    header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
+                 +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
+                 +'</button>');
+
+    const body = $(`<div class="modal-body"/>`).appendTo(form);
+    const row_content = $(`<div class="row row_content"/>`).appendTo(body);
+
+    // TOTP登録状態を表示
+    const statusDiv = $(`<div class="col-12 mb-3 alert"/>`).appendTo(row_content);
+    if (totpInfo && totpInfo.verify) {
+        statusDiv.addClass('alert-success');
+        statusDiv.html('<i class="bi bi-check-circle"></i> TOTP is configured and verified');
+    } else if (totpInfo) {
+        statusDiv.addClass('alert-warning');
+        statusDiv.html('<i class="bi bi-exclamation-triangle"></i> TOTP is configured but not verified');
+    } else {
+        statusDiv.addClass('alert-info');
+        statusDiv.html('<i class="bi bi-info-circle"></i> TOTP is not configured yet');
+    }
+
+    // QRコード表示エリア
+    const qrcodeDiv = $(`<div class="col-12 mb-3 text-center" id="qrcode_area" style="display: none;"/>`).appendTo(row_content);
+    const qrcodeImg = $(`<img id="qrcode_img" style="max-width: 300px; border: 1px solid #ccc; padding: 10px;"/>`).appendTo(qrcodeDiv);
+    // コード検証状態表示
+    const verifyStatusDiv = $(`<div class="col-12 mb-3" id="verify_status" style="display: none;"/>`).appendTo(row_content);
+    // フッター作成
+    const footer = $(`<div class="modal-footer"/>`).appendTo(form);
+    // 削除ボタン（TOTP登録済みの場合のみ表示）
+    const deleteBtn = $(`<button type="button" class="btn btn-outline-danger me-auto i18n" id="delete_btn" ${totpInfo ? '' : 'style="display: none;"'}>
+        Delete TOTP
+    </button>`).appendTo(footer);
+    // 閉じるボタン
+    footer.append('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>');
+    // 登録/再登録ボタン
+    const registerBtn = $(`<button type="button" class="btn btn-outline-primary i18n" id="register_btn">
+        ${totpInfo && totpInfo.verify ? 'Re-register TOTP' : 'Register TOTP'}
+    </button>`).appendTo(footer);
+    // コード入力ボタン（QRコード表示時のみ表示）
+    const codeInputBtn = $(`<button type="button" class="btn btn-outline-success i18n" id="code_input_btn" style="display: none;">
+        Verify Code
+    </button>`).appendTo(footer);
+
+    // 登録ボタン押下時の処理
+    registerBtn.off('click').on('click', async () => {
+        const input_password = await cmdbox.prompt('Please enter your current password', true, false, ['password']);
+        if (!input_password) return;
+        // totp_saveコマンドを実行
+        cmdbox.show_loading();
+        try {
+            const result = await cmdbox.sv_exec_cmd({
+                'mode': 'web',
+                'cmd': 'totp_save',
+                'user_name': user['name'],
+                'user_pass': input_password
+            });
+            cmdbox.hide_loading();
+            if (result && result.success && result.success.data) {
+                const qrData = result.success.data;
+                qrcodeImg.attr('src', qrData.qr);
+                qrcodeDiv.show();
+                codeInputBtn.show();
+                registerBtn.hide();
+                deleteBtn.hide();
+                statusDiv.removeClass().addClass('alert alert-warning').html('<i class="bi bi-info-circle"></i> Please verify the code from your authenticator app');
+            } else if (result && result.warn) {
+                cmdbox.message(result.warn, true);
+            } else {
+                cmdbox.message(result, true);
+            }
+        } catch (e) {
+            cmdbox.hide_loading();
+            cmdbox.message(e.message, true);
+        }
+    });
+
+    // コード入力ボタン押下時の処理
+    codeInputBtn.off('click').on('click', async () => {
+        const input_code = await cmdbox.prompt('Please enter current code', true, false, ['text']);
+        if (!input_code) return;
+        // totp_validコマンドを実行
+        cmdbox.show_loading();
+        try {
+            const result = await cmdbox.sv_exec_cmd({
+                'mode': 'web',
+                'cmd': 'totp_valid',
+                'user_name': user['name'],
+                'totp_code': input_code
+            });
+            cmdbox.hide_loading();
+            if (result && result.success) {
+                statusDiv.removeClass().addClass('alert alert-success').html('<i class="bi bi-check-circle"></i> TOTP is configured and verified');
+                qrcodeDiv.hide();
+                codeInputBtn.hide();
+                registerBtn.show();
+                registerBtn.text('Re-register TOTP');
+                deleteBtn.show();
+                cmdbox.message('TOTP verification successful!', false);
+            } else if (result && result.warn) {
+                cmdbox.message(result.warn, true);
+            } else {
+                cmdbox.message(result, true);
+            }
+        } catch (e) {
+            cmdbox.hide_loading();
+            cmdbox.message(e.message, true);
+        }
+    });
+
+    // 削除ボタン押下時の処理
+    deleteBtn.off('click').on('click', async () => {
+        const input_password = await cmdbox.prompt('Please enter your current password to delete TOTP', true, false, ['password']);
+        if (!input_password) return;
+        // totp_delコマンドを実行
+        cmdbox.show_loading();
+        try {
+            const result = await cmdbox.sv_exec_cmd({
+                'mode': 'web',
+                'cmd': 'totp_del',
+                'user_name': user['name'],
+                'user_pass': input_password
+            });
+            cmdbox.hide_loading();
+            if (result && result.success) {
+                statusDiv.removeClass().addClass('alert alert-info').html('<i class="bi bi-info-circle"></i> TOTP is not configured yet');
+                qrcodeDiv.hide();
+                codeInputBtn.hide();
+                deleteBtn.hide();
+                registerBtn.show();
+                registerBtn.text('Register TOTP');
+                cmdbox.message('TOTP deleted successfully!', false);
+            } else if (result && result.warn) {
+                cmdbox.message(result.warn, true);
+            } else {
+                cmdbox.message(result, true);
+            }
+        } catch (e) {
+            cmdbox.hide_loading();
+            cmdbox.message(e.message, true);
+        }
+    });
+    totp_modal.appendTo('body');
+    daialog.draggable({cursor:'move', cancel:'.modal-body'});
+    cmdbox.process_i18n(totp_modal);
+    totp_modal.modal('show');
+};
+/**
  * ユーザーアイコン設定
  */
 cmdbox.userIconChange = async () => {
@@ -896,6 +1076,11 @@ cmdbox.init_user_info_menu = async () => {
             const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item i18n" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
             user_info_menu.find('.dropdown-menu').append(changepass_item);
         }
+        const hash = user['hash'];
+        if (!user_info_menu.find('.dropdown-menu .changetotp-menu-item').length && hash!='oauth2' && hash!='saml') {
+            const changetotp_item = $(`<li><a class="dropdown-item changetotp-menu-item i18n" href="#" onclick="cmdbox.totpRegister();">Change Two-Factor Auth</a></li>`);
+            user_info_menu.find('.dropdown-menu').append(changetotp_item);
+        }
         if (!user_info_menu.find('.dropdown-menu .edituserlanguage-menu-item').length) {
             const edituserlanguage_item = $(`<li><a class="dropdown-item edituserlanguage-menu-item i18n" href="#" onclick="cmdbox.editUserLanguage();">Change Language</a></li>`);
             user_info_menu.find('.dropdown-menu').append(edituserlanguage_item);
@@ -939,6 +1124,8 @@ $(()=>{
     cmdbox.appid('.navbar-brand');
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    $('.form-totp').hide();
+    $('.form-signin').show();
     // サインイン関連エラーがある場合表示
     if (window.location.search) {
         const params = new URLSearchParams(window.location.search);
@@ -958,6 +1145,18 @@ $(()=>{
             if (params.get('warn') == 'plannotice') msgelem.text('Your plan is about to expire.');
             $('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>').appendTo(elem);
             $('body').prepend(elem);
+            if (params.get('warn') == 'totp_required') {
+                elem.remove();
+                $('.form-totp').show();
+                $('.form-signin').hide();
+                $('.form-signin-totp-code').focus();
+            }
+            if (params.get('warn') == 'totp_invalid') {
+                msgelem.text('Two-Factor Authentication code is invalid.');
+                $('.form-totp').show();
+                $('.form-signin').hide();
+                $('.form-signin-totp-code').focus();
+            }
         }
     }
 });

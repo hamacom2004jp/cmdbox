@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.web.cmdbox_web_exec_cmd &mdash; cmdbox 2026/11/01 documentation</title>
+  <title>cmdbox.app.features.web.cmdbox_web_exec_cmd &mdash; cmdbox 2026/11/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=6f679952"></script>
+      <script src="../../../../../_static/documentation_options.js?v=f7d953b1"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -407,7 +407,8 @@
                             <span class="n">res_json</span><span class="p">[</span><span class="s2">"output_image"</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
                             <span class="n">res_json</span><span class="p">[</span><span class="s1">'output_image_name'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">res_json</span><span class="p">[</span><span class="s1">'output_image_name'</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">.png"</span>
                         <span class="k">return</span> <span class="n">res_json</span>
-                    <span class="k">def</span><span class="w"> </span><span class="nf">run_main_serialized</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">run_main_serialized</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+                        <span class="n">signin</span><span class="o">.</span><span class="n">set_request_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
                         <span class="c1"># stdio差し替えとmain実行を同一スレッドで完結させる。</span>
                         <span class="n">stdin_bkup</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span>
                         <span class="n">stdout_bkup</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
@@ -430,7 +431,8 @@
                             <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout_bkup</span>
 
                     <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
-                    <span class="n">status</span><span class="p">,</span> <span class="n">ret_main</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">captured_output</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="n">_CMD_EXECUTOR</span><span class="p">,</span> <span class="n">run_main_serialized</span><span class="p">)</span>
+                    <span class="n">status</span><span class="p">,</span> <span class="n">ret_main</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">captured_output</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="n">_CMD_EXECUTOR</span><span class="p">,</span> <span class="n">run_main_serialized</span><span class="p">,</span>
+                                                                                        <span class="n">signin</span><span class="o">.</span><span class="n">get_request_scope</span><span class="p">())</span>
                     <span class="n">web</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># ログ出力を有効にする</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">server</span><span class="o">.</span><span class="n">Server</span><span class="p">):</span>
                         <span class="n">cmdbox_app</span><span class="o">.</span><span class="n">sv</span> <span class="o">=</span> <span class="n">obj</span>

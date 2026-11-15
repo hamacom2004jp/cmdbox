@@ -315,7 +315,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                             res_json["output_image"] = convert.bytes2b64str(img_bytes)
                             res_json['output_image_name'] = f"{res_json['output_image_name'].strip()}.png"
                         return res_json
-                    def run_main_serialized() -> Tuple[int, Any, Any, str]:
+                    def run_main_serialized(scope) -> Tuple[int, Any, Any, str]:
+                        signin.set_request_scope(scope)
                         # stdio差し替えとmain実行を同一スレッドで完結させる。
                         stdin_bkup = sys.stdin
                         stdout_bkup = sys.stdout
@@ -338,7 +339,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                             sys.stdout = stdout_bkup
 
                     loop = asyncio.get_running_loop()
-                    status, ret_main, obj, captured_output = await loop.run_in_executor(_CMD_EXECUTOR, run_main_serialized)
+                    status, ret_main, obj, captured_output = await loop.run_in_executor(_CMD_EXECUTOR, run_main_serialized,
+                                                                                        signin.get_request_scope())
                     web.logger.disabled = False # ログ出力を有効にする
                     if isinstance(obj, server.Server):
                         cmdbox_app.sv = obj

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.commons.validator &mdash; cmdbox 2026/09/27 documentation</title>
+  <title>cmdbox.app.commons.validator &mdash; cmdbox 2026/11/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=a248f298"></script>
+      <script src="../../../../_static/documentation_options.js?v=f7d953b1"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../resources/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/license.html">License</a></li>
 </ul>
 
@@ -139,7 +140,7 @@
                 <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Invalid result format: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">output_schema</span><span class="o">=</span><span class="n">info</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Invalid result format: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
@@ -191,7 +192,7 @@
                 <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Invalid result format: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">output_schema</span><span class="o">=</span><span class="n">info</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Invalid result format: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
@@ -236,6 +237,57 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s1">'NFC'</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Validator.validate_safe_path">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.commons.html#cmdbox.app.commons.validator.Validator.validate_safe_path">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_safe_path</span><span class="p">(</span><span class="n">base_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">allow_absolute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        相対パスがベースディレクトリの外に出ていないかバリデーション（パストラバーサル対策）</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            base_dir (Path): ベースディレクトリ（絶対パス）</span>
+<span class="sd">            relative_path (str): チェックする相対パス（ユーザー入力）</span>
+<span class="sd">            allow_absolute (bool): 絶対パスを許可するか（デフォルト: False）</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[bool, str]: (有効性, エラーメッセージ)</span>
+<span class="sd">                有効な場合: (True, "")</span>
+<span class="sd">                無効な場合: (False, エラーメッセージ)</span>
+<span class="sd">        """</span>
+        <span class="c1"># Noneチェック</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">relative_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">""</span>
+        
+        <span class="c1"># 絶対パスチェック</span>
+        <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">relative_path</span><span class="p">)</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">allow_absolute</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">""</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Absolute paths are not allowed: </span><span class="si">{</span><span class="n">relative_path</span><span class="si">}</span><span class="s2">"</span>
+        
+        <span class="c1"># 相対パスを組み立て</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+            <span class="c1"># パスを正規化（..などを解決）</span>
+            <span class="n">safe_path</span> <span class="o">=</span> <span class="p">(</span><span class="n">base_dir</span> <span class="o">/</span> <span class="n">relative_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+            <span class="n">base_dir_resolved</span> <span class="o">=</span> <span class="n">base_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+            
+            <span class="c1"># relative_to()を使用してパスがベースディレクトリの下にあるか厳密にチェック</span>
+            <span class="c1"># この方法は境界値バグ（/data_hacker が /data を通すなど）を防ぐ</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">relative_parts</span> <span class="o">=</span> <span class="n">safe_path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">base_dir_resolved</span><span class="p">)</span>
+                <span class="c1"># パートに .. が含まれていないか確認（念のため）</span>
+                <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">relative_parts</span><span class="o">.</span><span class="n">parts</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">part</span> <span class="o">==</span> <span class="s2">".."</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Path traversal detected: </span><span class="si">{</span><span class="n">relative_path</span><span class="si">}</span><span class="s2"> contains '..' after resolution"</span>
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">""</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="c1"># relative_toで失敗する場合は、パスがベース外</span>
+                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Path traversal detected: </span><span class="si">{</span><span class="n">relative_path</span><span class="si">}</span><span class="s2"> is outside </span><span class="si">{</span><span class="n">base_dir</span><span class="si">}</span><span class="s2">"</span>
+            
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">RuntimeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Invalid path: </span><span class="si">{</span><span class="n">relative_path</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span></div>
+
 
     <span class="n">validator_types</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">:</span> <span class="p">[</span><span class="nb">bool</span><span class="p">],</span>
@@ -302,12 +354,12 @@
             <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FLOAT</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="p">:</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify --</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
             <span class="k">elif</span> <span class="n">required</span> <span class="ow">and</span> <span class="nb">type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">T_FLOAT</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Please specify --</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
             <span class="c1"># TODO: type==T_DATE, T_DATETIME, T_MLISTの検証</span>
             <span class="c1"># Choicesの検証 TODO:type==T_DICTのときのchoice検証が必要</span>
@@ -326,7 +378,7 @@
                         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">check_vals</span><span class="p">:</span>
                             <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_values</span><span class="p">:</span>
                                 <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Invalid value for --</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> (must be one of </span><span class="si">{</span><span class="n">valid_values</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
-                                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
                                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
 
             <span class="c1"># オプション固有のバリデーション</span>
@@ -335,12 +387,12 @@
                     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
                         <span class="n">st</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">fileio</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">st</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">:</span>
-                            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
                             <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">st</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">fileio</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">st</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">:</span>
-                        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
+                        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="n">pf</span><span class="p">)</span>
                         <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span></div>
 

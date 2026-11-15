@@ -19,9 +19,13 @@ $(() => {
     const storage_name_key = 'cmdbox-signin-name';
     const storage_password_key = 'cmdbox-signin-password';
     const storage_remember_key = 'cmdbox-signin-remember';
+    const storage_totp_name_key = 'cmdbox-signin-totp-name';
+    const storage_totp_pass_key = 'cmdbox-signin-totp-pass';
     const selecter_name = '.form-signin .form-signin-name';
     const selecter_password = '.form-signin .form-signin-password';
     const selecter_remember = '.form-signin .form-signin-remember';
+    const selecter_totp_name = '.form-totp .form-signin-totp-name';
+    const selecter_totp_pass = '.form-totp .form-signin-totp-pass';
     const form_signin = $('.form-signin');
     form_signin.attr('action', location.pathname.replace('/signin', '/dosignin').replace('/dosignin/dosignin', '/dosignin'));
     form_signin.off('submit').on('submit', (event) => {
@@ -35,10 +39,16 @@ $(() => {
             localStorage.removeItem(storage_password_key);
             localStorage.removeItem(storage_remember_key);
         }
+        localStorage.setItem(storage_totp_name_key, $(selecter_name).val());
+        localStorage.setItem(storage_totp_pass_key, $(selecter_password).val());
     });
+    const form_totp = $('.form-totp');
+    form_totp.attr('action', location.pathname.replace('/signin', '/dosignin').replace('/dosignin/dosignin', '/dosignin'));
     const name = localStorage.getItem(storage_name_key);
     const password = localStorage.getItem(storage_password_key);
     const remember = localStorage.getItem(storage_remember_key);
+    const totp_name = localStorage.getItem(storage_totp_name_key);
+    const totp_pass = localStorage.getItem(storage_totp_pass_key);
     if (name) {
         $(selecter_name).val(name);
     }
@@ -47,6 +57,12 @@ $(() => {
     }
     if (remember) {
         $(selecter_remember).prop('checked', true);
+    }
+    if (totp_name) {
+        $(selecter_totp_name).val(totp_name);
+    }
+    if (totp_pass) {
+        $(selecter_totp_pass).val(totp_pass);
     }
     const btn_eye = $('.eye_buton');
     btn_eye.off('click').on('click', (event) => {
@@ -63,6 +79,7 @@ $(() => {
     const btn_github = $('.btn-github');
     const btn_azure = $('.btn-azure');
     const btn_saml_azure = $('.btn-saml-azure');
+    const btn_backto_signin = $('.btn-backto-signin');
     btn_google.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
         window.location.href = `${ctx_path()}oauth2/google${path}?n=${cmdbox.random_string(8)}`;
@@ -78,6 +95,10 @@ $(() => {
     btn_saml_azure.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
         window.location.href = `${ctx_path()}saml/azure${path}?n=${cmdbox.random_string(8)}`;
+    });
+    btn_backto_signin.off('click').on('click', (event) => {
+        $('.form-totp').hide();
+        $('.form-signin').show();
     });
     oauth2_enabled().then((res) => {
         if (res.google) btn_google.show();

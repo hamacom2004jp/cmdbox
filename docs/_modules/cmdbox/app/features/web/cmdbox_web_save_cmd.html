@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.web.cmdbox_web_save_cmd &mdash; cmdbox 2026/09/22 documentation</title>
+  <title>cmdbox.app.features.web.cmdbox_web_save_cmd &mdash; cmdbox 2026/11/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=fa416c26"></script>
+      <script src="../../../../../_static/documentation_options.js?v=f7d953b1"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../resources/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../docs/license.html">License</a></li>
 </ul>
 
@@ -109,19 +110,20 @@
             <span class="n">opt</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'opt'</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">'Title and opt are required.'</span><span class="p">)</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_cmd</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">opt</span><span class="p">))</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_cmd</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">opt</span><span class="p">))</span>
             <span class="n">web</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret</span></div>
 
 
 <div class="viewcode-block" id="SaveCmd.save_cmd">
 <a class="viewcode-back" href="../../../../../resources/cmdbox.app.features.web.html#cmdbox.app.features.web.cmdbox_web_save_cmd.SaveCmd.save_cmd">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">save_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        コマンドファイルを保存する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            web (Web): Webオブジェクト</span>
+<span class="sd">            req (Request): リクエスト</span>
 <span class="sd">            title (str): タイトル</span>
 <span class="sd">            opt (dict): オプション</span>
 <span class="sd">        </span>
@@ -135,6 +137,29 @@
         <span class="n">modal_mode</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'modal_mode'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">modal_mode</span> <span class="o">==</span> <span class="s1">'add'</span> <span class="ow">and</span> <span class="n">opt_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">" already exists'</span><span class="p">)</span>
+
+        <span class="n">signin_groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">'signin'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">'groups'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'groups'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">signin_groups</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'groups'</span><span class="p">]</span>
+
+        <span class="n">allow_groups</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'allow_groups'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">allow_groups</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">allow_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">allow_groups</span><span class="p">]</span>
+        <span class="n">allow_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">allow_groups</span> <span class="k">if</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="n">allow_groups</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">group</span> <span class="ow">in</span> <span class="n">signin_groups</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">allow_groups</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Your own group has not been set up. (your groups: </span><span class="si">{</span><span class="n">signin_groups</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">modal_mode</span> <span class="o">==</span> <span class="s1">'edit'</span> <span class="ow">and</span> <span class="n">opt_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">org_opt</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">opt_path</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'allow_groups'</span> <span class="ow">in</span> <span class="n">org_opt</span> <span class="ow">and</span> <span class="n">org_opt</span><span class="p">[</span><span class="s1">'allow_groups'</span><span class="p">]:</span>
+                <span class="n">org_allow_groups</span> <span class="o">=</span> <span class="n">org_opt</span><span class="p">[</span><span class="s1">'allow_groups'</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">org_allow_groups</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">org_allow_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">org_allow_groups</span><span class="p">]</span>
+                <span class="n">org_allow_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">org_allow_groups</span> <span class="k">if</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+                <span class="k">if</span> <span class="n">org_allow_groups</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">group</span> <span class="ow">in</span> <span class="n">signin_groups</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">org_allow_groups</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'You do not have permission to save this command. (your groups: </span><span class="si">{</span><span class="n">signin_groups</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="s1">'title_disabled'</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="k">del</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'title_disabled'</span><span class="p">]</span>
         <span class="k">if</span> <span class="s1">'mode_disabled'</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="k">del</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'mode_disabled'</span><span class="p">]</span>
         <span class="k">if</span> <span class="s1">'cmd_disabled'</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="k">del</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'cmd_disabled'</span><span class="p">]</span>

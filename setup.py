@@ -54,18 +54,18 @@ class EggInfoCommand(_egg_info):
 class CustomInstallCommand(install):
     def run(self):
         super().run()
-        if platform.system() != 'Linux':
-            return
-        bashrc = Path.home() / '.bashrc'
-        if not bashrc.exists():
-            return
-        CMD = 'eval "$(register-python-argcomplete cmdbox)"'
-        with open(bashrc, 'r') as fp:
-            for line in fp:
-                if line == CMD:
-                    return
-        with open(bashrc, 'a') as fp:
-            fp.write('\n'+CMD)
+        #if platform.system() != 'Linux':
+        #    return
+        #bashrc = Path.home() / '.bashrc'
+        #if not bashrc.exists():
+        #    return
+        #CMD = 'eval "$(register-python-argcomplete cmdbox)"'
+        #with open(bashrc, 'r') as fp:
+        #    for line in fp:
+        #        if line == CMD:
+        #            return
+        #with open(bashrc, 'a') as fp:
+        #    fp.write('\n'+CMD)
 
 # setup()関数の呼び出しは、残りの設定をpyproject.tomlから取得するために最小限に抑えます
 # dynamic = [...] の設定を有効にするために、setuptoolsのversionは渡しません

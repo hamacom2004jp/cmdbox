@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.web.cmdbox_web_exec_pipe &mdash; cmdbox 2026/10/18 documentation</title>
+  <title>cmdbox.app.features.web.cmdbox_web_exec_pipe &mdash; cmdbox 2026/11/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=9e85c21a"></script>
+      <script src="../../../../../_static/documentation_options.js?v=f7d953b1"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -162,6 +162,16 @@
                             <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">msg</span><span class="p">))</span>
                             <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
                 <span class="n">opt</span><span class="p">[</span><span class="s1">'capture_stdout'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nothread</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># Re-check command rules after possible modifications from raw_pipe</span>
+                <span class="k">for</span> <span class="n">cmd_title</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s1">'pipe_cmd'</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">cmd_title</span> <span class="o">==</span> <span class="s1">''</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">cmd_opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">cmd_title</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">'mode'</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="s1">'cmd'</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">web</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_cmd</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">],</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">],</span> <span class="n">opt</span><span class="p">):</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'Command "</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">" failed. Execute command denyed after parameter override. mode=</span><span class="si">{</span><span class="n">cmd_opt</span><span class="p">[</span><span class="s2">"mode"</span><span class="p">]</span><span class="si">}</span><span class="s1">, cmd=</span><span class="si">{</span><span class="n">cmd_opt</span><span class="p">[</span><span class="s2">"cmd"</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">msg</span><span class="p">))</span>
+                            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exec_pipe</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">web</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="p">))</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Pipeline "</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">" failed. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">))</span>
