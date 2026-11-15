@@ -1,4 +1,4 @@
-from cmdbox.app import common, client, options
+from cmdbox.app import common, client, feature
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, limiter, keystore, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_tts_say
@@ -249,6 +249,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             id: Union[str, None] = pydantic.Field(default=None, description="UIウィジェットID")
             provider: Union[str, None] = pydantic.Field(default=None, description="UIウィジェットプロバイダー")
             payload: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="UIウィジェットペイロード")
+            html: Union[str, None] = pydantic.Field(default=None, description="UIウィジェットのHTML")
         class Message(resdata.Base):
             role: Union[str, None] = pydantic.Field(default=None, description="メッセージの役割")
             content: Union[str, None] = pydantic.Field(default=None, description="メッセージの内容")
@@ -1263,15 +1264,9 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     if responses:
                         success['function_responses'] = [self._serialize_function_response(r) for r in responses]
 
+                    # MCP AppsのUIウィジェットのレンダリング処理
                     if ev.actions and getattr(ev.actions, 'render_ui_widgets', None):
-                        success['render_ui_widgets'] = [
-                            dict(
-                                id=getattr(w, 'id', None),
-                                provider=getattr(w, 'provider', None),
-                                payload=self._to_primitive(getattr(w, 'payload', None)),
-                            )
-                            for w in ev.actions.render_ui_widgets
-                        ]
+                        success['render_ui_widgets'] = self.get_ui_widgets(ev)
 
                     artifacts = []
                     if ev.actions and ev.actions.artifact_delta:
@@ -1294,8 +1289,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
                     if msg:
                         success['message'] = msg
-                        options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
-                                                                    audit_type=options.Options.AT_USER, user=user_name)
+                        self._options.audit_exec(body=dict(agent_session=agent_session.id, result=msg),
+                                                audit_type=self._options.AT_USER, user=user_name)
                         if enable_tts and tts_engine_obj and not is_func_call and not is_func_response:
                             try:
                                 try:

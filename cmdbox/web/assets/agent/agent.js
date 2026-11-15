@@ -27,7 +27,7 @@ agentView.initView = () => {
 
     // バージョン情報の取得と表示
     cmdbox.versions().then((versions) => {
-        const version_html = `${versions['title']}-${versions['version']}`;
+        const version_html = `<span id="app_title">${versions['title']}</span>-<span id="app_version">${versions['version']}</span>`;
         $('#appid_version').html(version_html);
     });
     // 現在時刻の取得と表示

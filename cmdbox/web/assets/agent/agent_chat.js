@@ -302,6 +302,21 @@ agentView.chat = (session_id) => {
             let loading_msg = agentView.spinner_loading(success);
             msg_container.find('.spinner-loading').text(loading_msg);
             const msg_str = agentView.parse_message(success.message);
+            if (success.render_ui_widgets && success.render_ui_widgets.length > 0) {
+                const content = success.render_ui_widgets[0].html;
+                const iframe_name = success.render_ui_widgets[0].id;
+                const iframe = $(`<iframe>`, {
+                    name: iframe_name,
+                    src: `data:text/html;base64,${content}`,
+                    width: '100%',
+                    height: '10px',
+                    frameborder: '0'
+                });
+                mcpapps_host.setupMCPApp(iframe[0]);
+                msg_container.append(iframe);
+                window.frames[iframe_name].dispatchEvent(new Event('DOMContentLoaded'));
+                return;
+            }
             if (msg_str != success.message || hasStructured) {
                 await agentView.format_agent_message(msg_content, msg_str, success);
             }

@@ -16,7 +16,7 @@ $(() => {
                 chat_input_html: fetch('assets/agent/agent_chat_input.html').then(res => res.text()),
                 navbar_html: fetch('assets/agent/agent_navbar.html').then(res => res.text())
             };
-            
+
             // すべてのfetchを並行実行し完了を待機
             const htmlContents = await Promise.all(Object.values(htmlPromises));
             const htmlKeys = Object.keys(htmlPromises);

@@ -244,8 +244,21 @@ class Feature(object):
         return ["https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"]
 
     def get_renderer_html(self, uri) -> Tuple[str, str]:
-        html = None
-        return 'text/html;profile=mcp-app', html
+        js = Path(self.ver.__file__).parent / "web" / "assets" / "agent" / "agent_mcpapps_iframe.js"
+        html = f'''<!DOCTYPE html>
+<html lang="ja" data-bs-theme="dark">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>{self.ver.__appid__}</title>
+</head>
+<body class="overflow-hidden p-2" style="background:transparent;">
+<div id="main_mcpapps" data-resource-uri="{uri}" data-mode="{self.get_mode()}" data-cmd="{self.get_cmd()}"></div>
+<script type="text/javascript">{js.read_text(encoding="utf-8")}</script>
+</body>
+</html>'''
+        return 'text/html;profile=mcp-app', None  #html
 
 class OneshotEdgeFeature(Feature):
     """

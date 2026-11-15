@@ -1,4 +1,5 @@
 from cmdbox.app import common, client, feature, options
+from cmdbox.app.commons import convert
 from cmdbox.app.features.cli import cmdbox_llm_chat, cmdbox_datasource_load
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -11,6 +12,7 @@ import re
 class AgentBase(feature.ResultEdgeFeature):
     def __init__(self, appcls, ver, language:str=None):
         super().__init__(appcls, ver, language=language)
+        self._options = options.Options.getInstance()
         self.llm_chat = cmdbox_llm_chat.LLMChat(appcls, ver, language=language)
         self.ds_load = cmdbox_datasource_load.DatasourceLoad(appcls, ver, language=language)
         is_japan = common.is_japan(language=self.language)
@@ -282,3 +284,34 @@ All incoming requests must be processed in the following order:
             msg = f"{msg} {event.error_message if event.error_message else ''}".strip()
             st = self.RESP_WARN
         return msg, is_func_call, is_func_response, is_final_response, st
+
+    def get_ui_widgets(self, event:Any) -> Any:
+        if not event.actions or not getattr(event.actions, 'render_ui_widgets', None):
+            return []
+        render_ui_widgets = []
+        for w in event.actions.render_ui_widgets:
+            id=getattr(w, 'id', None)
+            name=getattr(w, 'name', None)
+            provider=getattr(w, 'provider', None)
+            payload = getattr(w, 'payload', {}) or {}
+            resource_uri = payload.get('resource_uri', None)
+            tags = payload.get('tool', {}).get('meta', {}).get('fastmcp', {}).get('tags', []) or []
+            if not id or not provider or not payload or not tags:
+                continue
+            for tag in tags:
+                if tag.startswith("mode="):
+                    mode = tag.replace("mode=", "")
+                elif tag.startswith("cmd="):
+                    cmd = tag.replace("cmd=", "")
+            try:
+                feat:feature.Feature = self._options.get_cmd_feature(mode, cmd)
+                mime, html = feat.get_renderer_html(resource_uri)
+                if not html:
+                    continue
+                render_ui_widgets.append(
+                    dict(id=id, name=name, provider=provider, uri=resource_uri,
+                            mode=mode, cmd=cmd, mime=mime, html=convert.str2b64str(html))
+                )
+            except Exception as e:
+                continue
+        return render_ui_widgets
