@@ -2844,8 +2844,16 @@ cmdbox.process_i18n = async (target, nosave, llmname) => {
     cmdbox.translation(words, nosave, llmname).then((data) => {
         targetElems.each((i, elem) => {
             const elm = $(elem);
-            const text = elm.attr('data-i18n');
-            if (text && data[text]) elm.text(data[text]);
+            let text = elm.attr('data-i18n');
+            if (!text) return;
+            if (text && data[text]) {
+                elm.text(data[text]);
+                return;
+            }
+            if (text.includes(' ')) {
+                text = `'${text}'`;
+                if (text && data[text]) elm.text(data[text]);
+            }
         });
     });
 }

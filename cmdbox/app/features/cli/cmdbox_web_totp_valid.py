@@ -148,7 +148,7 @@ class WebTotpValid(feature.UnsupportEdgeFeature, validator.Validator):
 
         name = totp_data.get('user_name', user_name)
         interval = totp_data.get('interval', 30)
-        issuer = totp_data.get('issuer_name', self.ver.__appid__)
+        issuer = totp_data.get('issuer_name', self.ver.__title__)
         # TOTPコードを検証
         totp = pyotp.TOTP(secret, name=name, issuer=issuer, interval=interval)
         if not totp.verify(totp_code):

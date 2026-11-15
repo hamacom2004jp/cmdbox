@@ -126,8 +126,8 @@ class WebTotpSave(feature.UnsupportEdgeFeature, validator.Validator):
 
             # TOTP用のシークレットキーを生成
             secret = pyotp.random_base32()
-            totp = pyotp.TOTP(secret, name=args.user_name, issuer=self.ver.__appid__, interval=30)
-            uri = totp.provisioning_uri(name=args.user_name, issuer_name=self.ver.__appid__)
+            totp = pyotp.TOTP(secret, name=args.user_name, issuer=self.ver.__title__, interval=30)
+            uri = totp.provisioning_uri(name=args.user_name, issuer_name=self.ver.__title__)
 
             # QRコードを生成
             img = qrcode.make(uri)
@@ -137,7 +137,7 @@ class WebTotpSave(feature.UnsupportEdgeFeature, validator.Validator):
             totp_path = client_data / ".totp" / f"{common.safe_fname(uid)}_{common.safe_fname(user_name)}.json"
             totp_path.parent.mkdir(parents=True, exist_ok=True)
             totp_data = dict(uid=uid, user_name=user_name, secret=secret, uri=uri,
-                             issuer_name=self.ver.__appid__, interval=30, verify=False)
+                             issuer_name=self.ver.__title__, interval=30, verify=False)
             common.save_file(totp_path, lambda f: json.dump(totp_data, f, indent=4, ensure_ascii=False),
                              encoding='utf-8', nolock=False)
             msg = dict(success=dict(data=dict(msg=f"User TOTP saved. user_name={args.user_name}",
