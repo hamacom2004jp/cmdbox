@@ -674,7 +674,7 @@ cmdbox.totpRegister = async () => {
             totpInfo = result.success.data;
         }
     } catch (e) {
-        console.log('TOTP is not configured yet');
+        console.log('Two-Factor Auth is not configured yet');
     }
     cmdbox.hide_loading();
 
@@ -694,16 +694,16 @@ cmdbox.totpRegister = async () => {
     const row_content = $(`<div class="row row_content"/>`).appendTo(body);
 
     // TOTP登録状態を表示
-    const statusDiv = $(`<div class="col-12 mb-3 alert"/>`).appendTo(row_content);
+    const statusDiv = $(`<div class="col-12 mb-3 alert i18n"/>`).appendTo(row_content);
     if (totpInfo && totpInfo.verify) {
         statusDiv.addClass('alert-success');
-        statusDiv.html('<i class="bi bi-check-circle"></i> TOTP is configured and verified');
+        statusDiv.html('Two-Factor Auth is configured and verified');
     } else if (totpInfo) {
         statusDiv.addClass('alert-warning');
-        statusDiv.html('<i class="bi bi-exclamation-triangle"></i> TOTP is configured but not verified');
+        statusDiv.html('Two-Factor Auth is configured but not verified');
     } else {
         statusDiv.addClass('alert-info');
-        statusDiv.html('<i class="bi bi-info-circle"></i> TOTP is not configured yet');
+        statusDiv.html('Two-Factor Auth is not configured yet');
     }
 
     // QRコード表示エリア
@@ -715,13 +715,13 @@ cmdbox.totpRegister = async () => {
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
     // 削除ボタン（TOTP登録済みの場合のみ表示）
     const deleteBtn = $(`<button type="button" class="btn btn-outline-danger me-auto i18n" id="delete_btn" ${totpInfo ? '' : 'style="display: none;"'}>
-        Delete TOTP
+        Delete Auth
     </button>`).appendTo(footer);
     // 閉じるボタン
     footer.append('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>');
     // 登録/再登録ボタン
     const registerBtn = $(`<button type="button" class="btn btn-outline-primary i18n" id="register_btn">
-        ${totpInfo && totpInfo.verify ? 'Re-register TOTP' : 'Register TOTP'}
+        ${totpInfo && totpInfo.verify ? 'Re-register Auth' : 'Register Auth'}
     </button>`).appendTo(footer);
     // コード入力ボタン（QRコード表示時のみ表示）
     const codeInputBtn = $(`<button type="button" class="btn btn-outline-success i18n" id="code_input_btn" style="display: none;">
@@ -749,7 +749,9 @@ cmdbox.totpRegister = async () => {
                 codeInputBtn.show();
                 registerBtn.hide();
                 deleteBtn.hide();
-                statusDiv.removeClass().addClass('alert alert-warning').html('<i class="bi bi-info-circle"></i> Please verify the code from your authenticator app');
+                statusDiv.removeClass('alert-success alert-warning alert-info');
+                statusDiv.addClass('alert-warning').html('Please verify the code from your authenticator app');
+                await cmdbox.process_i18n(row_content);
             } else if (result && result.warn) {
                 cmdbox.message(result.warn, true);
             } else {
@@ -776,13 +778,16 @@ cmdbox.totpRegister = async () => {
             });
             cmdbox.hide_loading();
             if (result && result.success) {
-                statusDiv.removeClass().addClass('alert alert-success').html('<i class="bi bi-check-circle"></i> TOTP is configured and verified');
+                statusDiv.removeClass('alert-success alert-warning alert-info');
+                statusDiv.addClass('alert-success').html('Two-Factor Auth is configured and verified');
                 qrcodeDiv.hide();
                 codeInputBtn.hide();
                 registerBtn.show();
-                registerBtn.text('Re-register TOTP');
+                registerBtn.text('Re-register Auth');
                 deleteBtn.show();
-                cmdbox.message('TOTP verification successful!', false);
+                cmdbox.message('Verification successful!', true);
+                await cmdbox.process_i18n(row_content);
+                totp_modal.modal('hide');
             } else if (result && result.warn) {
                 cmdbox.message(result.warn, true);
             } else {
@@ -796,7 +801,7 @@ cmdbox.totpRegister = async () => {
 
     // 削除ボタン押下時の処理
     deleteBtn.off('click').on('click', async () => {
-        const input_password = await cmdbox.prompt('Please enter your current password to delete TOTP', true, false, ['password']);
+        const input_password = await cmdbox.prompt('Please enter your current password to delete Two-Factor Auth', true, false, ['password']);
         if (!input_password) return;
         // totp_delコマンドを実行
         cmdbox.show_loading();
@@ -809,13 +814,16 @@ cmdbox.totpRegister = async () => {
             });
             cmdbox.hide_loading();
             if (result && result.success) {
-                statusDiv.removeClass().addClass('alert alert-info').html('<i class="bi bi-info-circle"></i> TOTP is not configured yet');
+                statusDiv.removeClass('alert-success alert-warning alert-info');
+                statusDiv.addClass('alert-info').html('Two-Factor Auth is not configured yet');
                 qrcodeDiv.hide();
                 codeInputBtn.hide();
                 deleteBtn.hide();
                 registerBtn.show();
-                registerBtn.text('Register TOTP');
-                cmdbox.message('TOTP deleted successfully!', false);
+                registerBtn.text('Register Auth');
+                cmdbox.message('Two-Factor Auth deleted successfully!', true);
+                await cmdbox.process_i18n(row_content);
+                totp_modal.modal('hide');
             } else if (result && result.warn) {
                 cmdbox.message(result.warn, true);
             } else {
@@ -828,8 +836,8 @@ cmdbox.totpRegister = async () => {
     });
     totp_modal.appendTo('body');
     daialog.draggable({cursor:'move', cancel:'.modal-body'});
-    cmdbox.process_i18n(totp_modal);
     totp_modal.modal('show');
+    await cmdbox.process_i18n(totp_modal);
 };
 /**
  * ユーザーアイコン設定
@@ -2845,15 +2853,7 @@ cmdbox.process_i18n = async (target, nosave, llmname) => {
         targetElems.each((i, elem) => {
             const elm = $(elem);
             let text = elm.attr('data-i18n');
-            if (!text) return;
-            if (text && data[text]) {
-                elm.text(data[text]);
-                return;
-            }
-            if (text.includes(' ')) {
-                text = `'${text}'`;
-                if (text && data[text]) elm.text(data[text]);
-            }
+            if (text && data[text]) elm.text(data[text]);
         });
     });
 }

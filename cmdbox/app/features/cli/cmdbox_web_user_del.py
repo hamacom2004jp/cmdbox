@@ -1,6 +1,7 @@
 from cmdbox.app import common, feature, web
 from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
+from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
@@ -87,7 +88,8 @@ class WebUserDel(feature.UnsupportEdgeFeature, validator.Validator):
         """
         w = None
         try:
-            w = web.Web.getInstance(logger, self.data, appcls=self.appcls, ver=self.ver,
+            client_data = Path(args.client_data or args.data)
+            w = web.Web.getInstance(logger, client_data, appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)

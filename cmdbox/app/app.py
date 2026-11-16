@@ -52,6 +52,9 @@ class CmdBoxApp:
         else:
             parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
                                             formatter_class=argparse.RawDescriptionHelpFormatter)
+        if args_list is not None and isinstance(args_list, list):
+            args_list = [item[1:-1] if isinstance(item, str) and len(item) >= 2 and item[0] in ('"', "'") and item[-1] == item[0] else item \
+                         for item in args_list]
         if args_list is not None and '--debug' in args_list:
             self.default_logger = common.default_logger(True, ver=self.ver, webcall=webcall)
         elif sys.argv is not None and '--debug' in sys.argv:

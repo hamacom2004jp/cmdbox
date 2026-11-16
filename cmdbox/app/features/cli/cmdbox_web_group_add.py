@@ -1,6 +1,8 @@
 from cmdbox.app import common, feature, web
+from cmdbox.app.auth import signin
 from cmdbox.app.commons import limiter, resdata, validator
 from cmdbox.app.options import Options
+from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
@@ -100,12 +102,20 @@ class WebGroupAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Lim
         """
         w = None
         try:
-            w = web.Web.getInstance(logger, self.data, appcls=self.appcls, ver=self.ver,
+            client_data = Path(args.client_data or args.data)
+            w = web.Web.getInstance(logger, client_data, appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)
             group = dict(gid=args.group_id, name=args.group_name, home=args.group_home, parent=args.group_parent, startpage=args.startpage)
-            w.group_add(group)
+            scope = signin.get_request_scope()
+            if scope and 'req' in scope and scope['req']:
+                req = scope['req']
+                buildin_user = w.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+                buildin_group = w.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+                w.group_add(group, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
+            else:
+                w.group_add(group)
             msg = dict(success=f"group ID {args.group_id} has been added.")
             common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w

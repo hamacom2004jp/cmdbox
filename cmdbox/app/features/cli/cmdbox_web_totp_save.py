@@ -97,7 +97,7 @@ class WebTotpSave(feature.UnsupportEdgeFeature, validator.Validator):
         try:
             if args.client_data is None:
                 return self.RESP_WARN, dict(warn="Client data is not provided."), None
-            client_data = Path(args.client_data)
+            client_data = Path(args.client_data or args.data)
             _web = web.Web.getInstance(logger, client_data, appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,

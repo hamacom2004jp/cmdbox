@@ -363,6 +363,22 @@ class Web:
         for k, v in apikeys.items():
             self.user_data(req, uid, user_name, 'apikey', k, v)
 
+    def is_buildin_user(self, user_name:str) -> bool:
+        """
+        指定されたユーザーがビルトインユーザーかどうかを判定する
+
+        Args:
+            user_name (str): ユーザー名
+
+        Returns:
+            bool: ビルトインユーザーであればTrue、それ以外はFalse
+        """
+        user = self.user_list(user_name);
+        if not user:
+            return False
+        user = user[0]
+        return 'buildin' in user and user['buildin'] is True
+
     def user_list(self, name:str=None) -> List[Dict[str, Any]]:
         """
         サインインファイルのユーザー一覧を取得する
@@ -515,12 +531,14 @@ class Web:
         self.signin.signin_file_data = signin_data
         #common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def user_add(self, user:Dict[str, Any]):
+    def user_add(self, user:Dict[str, Any], my_buildin_user:bool=False, my_buildin_group:bool=False):
         """
         サインインファイルにユーザーを追加する
 
         Args:
             user (Dict[str, Any]): ユーザー情報
+            my_buildin_user (bool): 自身がビルトインユーザーかどうか
+            my_buildin_group (bool): 自身がビルトイングループかどうか
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
@@ -559,7 +577,8 @@ class Web:
         # buildin設定が有効化されているグループは設定できない
         for gn in user['groups']:
             group = next((g for g in signin_data['groups'] if g['name'] == gn), None)
-            if group and 'buildin' in group and group['buildin'] is True:
+            if group and 'buildin' in group and group['buildin'] is True \
+                and not my_buildin_user and not my_buildin_group:
                 raise ValueError(f"You cannot assign a built-in group to a user.")
 
         jadge, msg = self.signin.check_password_policy(user['name'], '', user['password'])
@@ -579,12 +598,14 @@ class Web:
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def user_edit(self, user:Dict[str, Any]):
+    def user_edit(self, user:Dict[str, Any], my_buildin_user:bool=False, my_buildin_group:bool=False):
         """
         サインインファイルのユーザー情報を編集する
 
         Args:
             user (Dict[str, Any]): ユーザー情報
+            my_buildin_user (bool): 自身がビルトインユーザーかどうか
+            my_buildin_group (bool): 自身がビルトイングループかどうか
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
@@ -618,11 +639,13 @@ class Web:
         # buildin設定が有効化されているグループは設定できない
         for gn in user['groups']:
             group = next((g for g in signin_data['groups'] if g['name'] == gn), None)
-            if group and 'buildin' in group and group['buildin'] is True:
+            if group and 'buildin' in group and group['buildin'] is True \
+                and not my_buildin_user and not my_buildin_group:
                 raise ValueError(f"You cannot assign a built-in group to a user.")
         for u in signin_data['users']:
             if u['uid'] == user['uid']:
-                if 'buildin' in u and u['buildin']:
+                if 'buildin' in u and u['buildin'] \
+                    and not my_buildin_user and not my_buildin_group:
                     raise ValueError(f"You cannot edit a built-in user.")
                 u['name'] = user['name']
                 if 'password' in user and user['password'] is not None and user['password'] != '':
@@ -721,6 +744,24 @@ class Web:
         except Exception as e:
             raise ValueError(f"Failed to get session list from Redis: {e}")
 
+    def is_buildin_group(self, groups:List[str]) -> bool:
+        """
+        指定されたグループリストにビルトイングループが含まれているかどうかを判定する
+
+        Args:
+            groups (List[str]): グループ名のリスト
+
+        Returns:
+            bool: ビルトイングループが含まれている場合はTrue、それ以外はFalse
+        """
+        signin_data = self.signin.signin_file_data
+        if signin_data is None:
+            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+        for g in signin_data['groups']:
+            if g['name'] in groups and 'buildin' in g and g['buildin'] is True:
+                return True
+        return False
+
     def group_list(self, name:str=None, ret_hidden:bool=False) -> List[Dict[str, Any]]:
         """
         サインインファイルのグループ一覧を取得する
@@ -745,12 +786,14 @@ class Web:
                 return [g]
         return []
 
-    def group_add(self, group:Dict[str, Any]):
+    def group_add(self, group:Dict[str, Any], my_buildin_user:bool=False, my_buildin_group:bool=False):
         """
         サインインファイルにグループを追加する
 
         Args:
             group (Dict[str, Any]): グループ情報
+            my_buildin_user (bool, optional): 自身がビルトインユーザーかどうか. Defaults to False.
+            my_buildin_group (bool, optional): 自身がビルトイングループかどうか. Defaults to False.
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
@@ -772,17 +815,22 @@ class Web:
         if len([g for g in signin_data['groups'] if g['name'] == group['name']]) > 0:
             raise ValueError(f"Group name is already exists.")
         # buildin設定が有効化されているグループを親に設定できない
+        add_buildin_subgroup = False
         if 'parent' in group and group['parent'] is not None:
             for g in signin_data['groups']:
                 if 'buildin' in g and g['buildin'] is True and g['name'] == group['parent']:
-                    raise ValueError(f"You cannot set a built-in group as a parent group.")
+                    if my_buildin_user is False and my_buildin_group is False:
+                        raise ValueError(f"You cannot set a built-in group as a parent group.")
+                    add_buildin_subgroup = True
         # buildin設定が有効化されているグループは追加できない
-        if 'buildin' in group and group['buildin']:
-            raise ValueError(f"You cannot add a built-in group.")
+        if 'buildin' in group:
+            if group['buildin']:
+                raise ValueError(f"You cannot add a built-in group.")
+            del group['buildin']
         # readonly設定はFalseで保存する
         group['readonly'] = False
-        # hidden設定はFalseで保存する
-        group['hidden'] = False
+        # hidden設定はFalseで保存する（但し自身がbuildinグループを親に持つの場合はTrueにする）
+        group['hidden'] = add_buildin_subgroup
         group['home'] = f".groups/{group['name']}"
         signin_data['groups'].append(group)
         if self.signin_file is None:
@@ -800,12 +848,16 @@ class Web:
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def group_edit(self, group:Dict[str, Any]):
+    def group_edit(self, group:Dict[str, Any], my_buildin_user:bool=False, my_buildin_group:bool=False):
         """
         サインインファイルのグループ情報を編集する
 
         Args:
             group (Dict[str, Any]): グループ情報
+        Args:
+            my_buildin_user (bool, optional): 自身がビルトインユーザーかどうか. Defaults to False.
+            my_buildin_group (bool, optional): 自身がビルトイングループかどうか. Defaults to False.
+
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
@@ -830,7 +882,8 @@ class Web:
         if 'parent' in group and group['parent'] is not None:
             for g in signin_data['groups']:
                 if 'buildin' in g and g['buildin'] is True and g['name'] == group['parent']:
-                    raise ValueError(f"You cannot set a built-in group as a parent group.")
+                    if my_buildin_user is False and my_buildin_group is False:
+                        raise ValueError(f"You cannot set a built-in group as a parent group.")
         for g in signin_data['groups']:
             if str(g['gid']) == str(group['gid']):
                 # buildin設定が有効化されているグループは編集できない
@@ -840,13 +893,15 @@ class Web:
                 if 'readonly' in g and g['readonly']:
                     raise ValueError(f"You cannot edit a read-only group.")
                 # hidden設定が有効化されているグループは編集できない
-                if 'hidden' in g and g['hidden']:
+                if 'hidden' in g and g['hidden'] and my_buildin_user is False and my_buildin_group is False:
                     raise ValueError(f"You cannot edit a hidden group.")
                 g['name'] = group['name']
                 g['startpage'] = group['startpage'] if 'startpage' in group else None
                 g['parent'] = group['parent'] if 'parent' in group else None
                 if not g['parent']:
                     del g['parent']
+                if 'buildin' in group and not group['buildin']:
+                    del group['buildin']
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         # cmdruleへの適用
@@ -862,12 +917,14 @@ class Web:
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def group_del(self, gid:str):
+    def group_del(self, gid:str, my_buildin_user:bool=False, my_buildin_group:bool=False):
         """
         サインインファイルからグループを削除する
 
         Args:
             gid (str): グループID
+            my_buildin_user (bool): ビルドインユーザーかどうか
+            my_buildin_group (bool): ビルドイングループかどうか
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
@@ -912,7 +969,7 @@ class Web:
                 if 'readonly' in g and g['readonly']:
                     raise ValueError(f"This group is a read-only group.")
                 # hidden設定が有効化されているグループは削除できない
-                if 'hidden' in g and g['hidden']:
+                if 'hidden' in g and g['hidden'] and my_buildin_user is False and my_buildin_group is False:
                     raise ValueError(f"This group is a hidden group.")
 
         # グループ削除

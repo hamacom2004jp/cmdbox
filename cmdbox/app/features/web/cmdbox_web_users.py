@@ -62,7 +62,9 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                web.user_add(form)
+                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+                web.user_add(form, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='add user')
@@ -78,7 +80,9 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                web.user_edit(form)
+                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+                web.user_edit(form, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='edit user')
@@ -167,7 +171,9 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 web.options.audit_exec(req, res, web)
-                return web.group_list(None, ret_hidden=False)
+                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+                return web.group_list(None, ret_hidden=(buildin_user or buildin_group))
             except Exception as e:
                 return dict(warn=str(e))
 
@@ -180,7 +186,9 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                web.group_add(form)
+                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+                web.group_add(form, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='add group')
             except Exception as e:
@@ -195,7 +203,9 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                web.group_edit(form)
+                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+                web.group_edit(form, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='edit group')
             except Exception as e:
@@ -212,7 +222,9 @@ class Users(feature.WebFeature):
                 form = await req.json()
                 if form.get('gid', None) in req.session['signin']['gids']:
                     raise ValueError('You cannot delete yourself group.')
-                web.group_del(form.get('gid', None))
+                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+                web.group_del(form.get('gid', None), my_buildin_user=buildin_user, my_buildin_group=buildin_group)
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='delete group')
             except Exception as e:
