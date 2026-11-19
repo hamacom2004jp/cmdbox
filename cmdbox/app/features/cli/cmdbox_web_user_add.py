@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature, web
-from cmdbox.app.auth import signin
+from cmdbox.app.auth import signin, role
 from cmdbox.app.commons import limiter, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -85,11 +85,19 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Limi
                 dict(opt="user_home", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="ユーザーのホームディレクトリを指定します。",
                      description_en="Specify the home directory for the user."),
+                dict(opt="user_role", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                     choice_fn=self.choice_roles,
+                     description_ja="ユーザーが所有するロールを指定します。",
+                     description_en="Specifies the roles owned by the user."),
                 dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
             ]
         )
+
+    def choice_roles(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        _web = web.Web.getInstance()
+        return [r.name for r in _web.list_roles()]
 
     @limiter.apprun_check_limit
     @validator.apprun_check
@@ -113,8 +121,10 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Limi
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)
+            if isinstance(args.user_role, str):
+                args.user_role = [args.user_role]
             user = dict(uid=args.user_id, name=args.user_name, password=args.user_pass, hash=args.user_pass_hash,
-                        email=args.user_email, groups=args.user_group, home=args.user_home)
+                        email=args.user_email, groups=args.user_group, home=args.user_home, roles=args.user_role)
             scope = signin.get_request_scope()
             if scope and 'req' in scope and scope['req']:
                 req = scope['req']

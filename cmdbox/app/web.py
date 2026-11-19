@@ -1,4 +1,5 @@
 from cmdbox.app import common, options
+from cmdbox.app.auth import role
 from cmdbox.app.commons import module, redis_client
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
@@ -191,6 +192,7 @@ class Web:
         self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.redis_cli,
                                                   self.appcls, self.ver, self.language)
         signin.Signin.set_webcls(self.__class__)
+        self.role_class = role.get_RoleClass(signin_file_data)
 
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web init parameter: data={self.data} -> {self.data.absolute() if self.data is not None else None}")
@@ -271,6 +273,35 @@ class Web:
                                  f" -> {endpoint.__module__}.{endpoint.__class__.__name__}.{endpoint.__name__}")
             else:
                 routes[key] = dict(path=path, methods=methods, endpoint=endpoint, route=route)
+
+    def get_role(self, role_name:str) -> role.Role:
+        """
+        指定されたrole_nameに対応するRoleを取得する
+
+        Args:
+            role_name (str): 取得対象のロール名
+
+        Returns:
+            Role: 指定されたrole_nameに対応するRole
+        """
+        if self.role_class is None:
+            raise ValueError(f"Role class is not defined.")
+        if self.role_class.valid_role(role_name) is False:
+            raise ValueError(f"Invalid role name: {role_name}")
+        return self.role_class[role_name]
+
+    def list_roles(self, hidden=False) -> List[role.Role]:
+        """
+        登録されている全てのロールを取得する
+
+        Args:
+            hidden (bool, optional): 非表示のロールも含めるか. Defaults to False.
+        Returns:
+            List[Role]: 登録されている全てのロール
+        """
+        if self.role_class is None:
+            return []
+        return [r for r in self.role_class if hidden or not r.hidden]
 
     def change_password(self, user_name:str, password:str, new_password:str, confirm_password:str):
         """
@@ -462,7 +493,7 @@ class Web:
             if u['name'] == user['name']:
                 apikeys = self.get_user_apikeys(None, signin_data, u, include_legacy=True)
                 if user['apikey_name'] in apikeys:
-                    raise ValueError(f"ApiKey name is already exists.")
+                    raise FileExistsError(f"ApiKey name is already exists.")
                 apikey = common.random_string(64)
                 apikeys[user['apikey_name']] = apikey
                 if signin_data['apikey']['gen_jwt']['enabled']:
@@ -473,6 +504,7 @@ class Web:
                     claims['uid'] = u['uid']
                     claims['name'] = u['name']
                     claims['groups'] = u['groups']
+                    claims['roles'] = u['roles']
                     claims['email'] = u['email']
                     claims['apikey_name'] = user['apikey_name']
                     apikey = jwt.encode(claims, cls.gen_jwt_privatekey, algorithm=cls.gen_jwt_algorithm)
@@ -565,6 +597,10 @@ class Web:
         for gn in user['groups']:
             if len(self.group_list(gn, ret_hidden=True)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
+        if 'roles' not in user or not user['roles']:
+            user['roles'] = [self.get_role('TEAM_MEMBER')]
+        if 'roles' in user and type(user['roles']) is str:
+            user['roles'] = [user['roles']]
         if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) > 0:
             raise ValueError(f"User uid is already exists.")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) > 0:
@@ -630,6 +666,10 @@ class Web:
         for gn in user['groups']:
             if len(self.group_list(gn, ret_hidden=True)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
+        if 'roles' not in user or not user['roles']:
+            user['roles'] = [self.get_role('TEAM_MEMBER')]
+        if 'roles' in user and type(user['roles']) is str:
+            user['roles'] = [user['roles']]
         if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) <= 0:
             raise ValueError(f"User uid is not found.")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
@@ -661,6 +701,7 @@ class Web:
                 u['hash'] = user['hash']
                 u['groups'] = user['groups']
                 u['email'] = user['email']
+                u['roles'] = user['roles']
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_edit: {self.signin_file}")
         # サインインファイルの保存

@@ -112,6 +112,7 @@ class WebUserList(feature.UnsupportEdgeFeature, validator.Validator):
             email: Union[str, None] = pydantic.Field(default=None, description="メールアドレス")
             groups: Union[List[str], None] = pydantic.Field(default=None, description="所属グループリスト")
             home: Union[str, None] = pydantic.Field(default=None, description="ホームディレクトリ")
+            roles: Union[List[str], None] = pydantic.Field(default=None, description="所有ロールリスト")
         class Data(resdata.Data):
             data: Union[List[UserRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
         class Result(resdata.Result):

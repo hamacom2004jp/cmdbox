@@ -27,9 +27,9 @@ def getDefaultInstance(logger:logging.Logger, signin_file:Path, signin_file_data
     signin_module = signin_file_data['signin']['signin_module']
 
     try:
-        mod = importlib.import_module(signin_module)
-        members = inspect.getmembers(mod, inspect.isclass)
-        for name, cls in members:
+        signin_mod = importlib.import_module(signin_module)
+        signin_members = inspect.getmembers(signin_mod, inspect.isclass)
+        for name, cls in signin_members:
             if cls is Signin or issubclass(cls, Signin):
                 sobj = cls.getInstance(logger, signin_file, signin_file_data, redis_cli, appcls, ver, language)
                 return sobj
@@ -661,6 +661,10 @@ class Signin(object):
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "signin". ({signin_file})')
             if not yml['signin']['signin_module']:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" is empty in "signin". ({signin_file})')
+            if 'role_module' not in yml['signin']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "role_module" not found in "signin". ({signin_file})')
+            if not yml['signin']['role_module']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "role_module" is empty in "signin". ({signin_file})')
         else:
             yml['signin'] = dict(signin_module=cls.__module__)
         # oauth2のフォーマットチェック

@@ -1,7 +1,6 @@
 from cmdbox.app import common, feature, web
 from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
-from cmdbox.app import mcp as mcp_mod
 from cmdbox.app.auth import signin
 from cmdbox.app.web import ThreadedASGI
 from uvicorn.config import Config
@@ -118,6 +117,7 @@ class McpsvStart(feature.UnsupportEdgeFeature, validator.Validator):
                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                                        signin_file=args.signin_file)
 
+            from cmdbox.app import mcp as mcp_mod
             from fastmcp import FastMCP
             sign = signin.getDefaultInstance(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver, self.language)
             self.mcp = mcp_mod.Mcp(logger, Path(args.data), sign, self.appcls, self.ver, self.language)

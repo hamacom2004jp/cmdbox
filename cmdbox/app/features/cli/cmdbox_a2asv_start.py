@@ -1,7 +1,6 @@
 from cmdbox.app import common, feature, web
 from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
-from cmdbox.app import a2a as a2a_mod
 from cmdbox.app.auth import signin
 from cmdbox.app.web import ThreadedASGI
 from fastapi import FastAPI
@@ -130,8 +129,9 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
                                        signin_file=args.signin_file)
 
             sign = signin.getDefaultInstance(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver, self.language)
+            from cmdbox.app import a2a as a2a_mod
             self.a2a = a2a_mod.A2a(logger, Path(args.data), sign, self.appcls, self.ver)
-            
+
             # boot_user のAPIキーを取得
             boot_user_apikey = None
             if hasattr(args, 'boot_user') and args.boot_user is not None:

@@ -65,7 +65,12 @@ class Users(feature.WebFeature):
                 buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
                 buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
                 web.user_add(form, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
-                form.update(dict(password='******', new_password='******', confirm_password='******'))
+                form.update(dict(password='******', new_password='******', confirm_password='******',
+                                 apikey_name='first', valid_days=360, note='APIKey for initial registration.'))
+                try:
+                    web.apikey_add(req, form)
+                except FileExistsError as e:
+                    pass # 既にAPIKeyが存在する場合は無視する
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='add user')
             except Exception as e:
@@ -227,6 +232,22 @@ class Users(feature.WebFeature):
                 web.group_del(form.get('gid', None), my_buildin_user=buildin_user, my_buildin_group=buildin_group)
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='delete group')
+            except Exception as e:
+                return dict(warn=str(e))
+
+        @app.get('/roles/list', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        async def roles_list(req:Request, res:Response):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            if web.signin.signin_file_data is None:
+                return dict(error='signin_file_data is None.')
+            try:
+                web.options.audit_exec(req, res, web)
+                # TODO: 自分が持っているRoleの下位のRoleを対象に返すようにする
+                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+                return [r.name for r in web.list_roles(hidden=buildin_user or buildin_group)]
             except Exception as e:
                 return dict(warn=str(e))
 

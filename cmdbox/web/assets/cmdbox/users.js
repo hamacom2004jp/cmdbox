@@ -8,6 +8,13 @@ users.users_list = async () => {
     }
     const groups_data = await groups_res.json();
 
+    const roles_res = await fetch('roles/list', {method: 'GET'});
+    if (roles_res.status != 200) {
+        cmdbox.message({'error':`${roles_res.status}: ${roles_res.statusText}`}, true, true);
+        return;
+    }
+    const roles_data = await roles_res.json();
+
     const users_res = await fetch('users/list', {method: 'GET'});
     if (users_res.status != 200) {
         cmdbox.message({'error':`${users_res.status}: ${users_res.statusText}`}, true, true);
@@ -91,6 +98,30 @@ users.users_list = async () => {
                     select.attr('name', 'groups').val(group);
                 };
                 for (const group of groups) groups_add_func(group);
+                continue;
+            }
+            if (col == 'roles') {
+                const roles = user && user[col] && user[col].length>0 ? user[col] : [''];
+                const roles_add_func = (role, prev) => {
+                    const row = $(modal.find('.row_content_template_choice').html()).appendTo(row_content);
+                    if (prev) row.insertAfter(prev);
+                    const btn_p = $('<button class="btn btn-secondary puls_buton" type="button"></button>');
+                    btn_p.append('<svg width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16"><use href="#btn_plus"></use></svg>');
+                    btn_p.appendTo(row.find('.input-group')).click(() => {roles_add_func('', row);});
+                    if (row_content.find('[name="roles"]').length > 0) {
+                        const btn_t = $('<button class="btn btn-secondary trash_buton" type="button"></button>');
+                        btn_t.append('<svg width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16"><use href="#btn_trash"></use></svg>');
+                        btn_t.appendTo(row.find('.input-group')).click(() => {row.remove();});
+                    }
+                    row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
+                    const select = row_content.find('.row_content_template_select').removeClass('row_content_template_select');
+                    $('<option>').text('').val('').appendTo(select);
+                    for (const r of roles_data) {
+                        $('<option>').text(r).val(r).appendTo(select);
+                    }
+                    select.attr('name', 'roles').val(role);
+                };
+                for (const role of roles) roles_add_func(role);
                 continue;
             }
             if (col == 'apikeys') {
@@ -199,6 +230,11 @@ users.users_list = async () => {
                 const name = $(p).attr('name');
                 const val = $(p).val();
                 if (name == 'groups') {
+                    data[name] = data[name] || [];
+                    if (val) data[name].push(val);
+                    return;
+                }
+                if (name == 'roles') {
                     data[name] = data[name] || [];
                     if (val) data[name].push(val);
                     return;

@@ -9,9 +9,12 @@ import json
 import redis
 import time
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
 
 class RedisClient(object):
+    _thread_pool = ThreadPoolExecutor(max_workers=10, thread_name_prefix="RedisClient-nowait")
+
     def __init__(self, logger:logging.Logger, host:str = "localhost", port:int = 6379,
                  password:str = None, svname:str="server", org_svname:str=None):
         """
@@ -286,6 +289,38 @@ class RedisClient(object):
         Returns:
             dict: Redisサーバーからの応答
         """
+        # nowait=True の場合、スレッドプール内で同期実行
+        # これにより、asyncio.run が event loop を閉じる際にタスクが取り消されることを防ぐ
+        if nowait:
+            def _send_sync():
+                try:
+                    if isinstance(timeout, str):
+                        timeout_val = int(timeout)
+                    else:
+                        timeout_val = timeout
+                    if timeout_val <= 0:
+                        raise ValueError(f"timeout must be greater than 0. timeout={timeout_val}")
+                    
+                    if not self.check_server(find_svname=True, retry_count=retry_count, 
+                                            retry_interval=retry_interval, outstatus=outstatus):
+                        self.logger.warning(f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
+                        return
+                    
+                    reskey = common.random_string()
+                    reskey = f"cl-{reskey}-{int(time.time())}"
+                    self.redis_cli.rpush(
+                        self.svname,
+                        f"{cmd} {reskey} {' '.join([str(p) for p in params])}",
+                    )
+                except Exception as e:
+                    self.logger.warning(f"fail to execute command in nowait mode. cmd={cmd}, msg={e}", exc_info=True)
+            
+            # イベントループとは独立したスレッドで実行
+            RedisClient._thread_pool.submit(_send_sync)
+            yield dict(success=f"Command sent. cmd={cmd}, nowait={nowait}")
+            return
+        
+        # nowait=False の場合は非同期実行（元の処理）
         async def send(nowait:bool=False, timeout:int=60):
             try:
                 if isinstance(timeout, str):
@@ -344,16 +379,8 @@ class RedisClient(object):
                 yield dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
                 return
 
-        if not nowait:
-            async for msg in send(nowait, timeout):
-                yield msg
-            return
-        else:
-            async def run_send(nowait:bool=False, timeout:int=60):
-                async for _ in send(nowait, timeout):
-                    pass
-            asyncio.create_task(run_send(nowait, timeout))
-            yield dict(success=f"Command sent. cmd={cmd}, nowait={nowait}")
+        async for msg in send(nowait, timeout):
+            yield msg
 
     def _res_cmd(self, reskey:str, res_msg:bytes, sse:bool=False) -> dict:
         """

@@ -1,4 +1,4 @@
-from cmdbox.app import common, feature
+from cmdbox.app import common, feature, web
 from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cmdbox.app.auth import signin
@@ -129,7 +129,6 @@ class Mcp:
         Returns:
             Any: ミドルウェア
         """
-        from cmdbox.app.web import Web
         class ReqScopeMiddleware(Middleware):
             async def on_message(self, context: MiddlewareContext, call_next):
                 try:
@@ -141,7 +140,7 @@ class Mcp:
                         except Exception:
                             # request_context がまだ用意されていない場合など
                             req = None
-                    signin.request_scope.set(dict(req=req, res=Response(), websocket=None, web=Web.getInstance()))
+                    signin.request_scope.set(dict(req=req, res=Response(), websocket=None, web=web.Web.getInstance()))
                 except Exception as e:
                     # ログだけ残して処理は続行する（ミドルウェアで例外が発生すると全体に影響するため）
                     try:
