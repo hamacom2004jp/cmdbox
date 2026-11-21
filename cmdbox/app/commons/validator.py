@@ -210,7 +210,7 @@ class Validator(feature.Feature):
         options.Options.T_DICT: lambda v: v,
         options.Options.T_DIR: lambda v: Validator._nomalize_path(v),
         options.Options.T_FILE: lambda v: Validator._nomalize_path(v),
-        options.Options.T_FLOAT: lambda v: float(v) if isinstance(v, str) and re.match(r'^-?\d+(\.\d+)?$', v) else v,
+        options.Options.T_FLOAT: lambda v: float(v) if (isinstance(v, str) and re.match(r'^-?\d+(\.\d+)?$', v)) or (isinstance(v, int) and not isinstance(v, bool)) else v,
         options.Options.T_INT: lambda v: int(v) if isinstance(v, str) and re.match(r'^-?\d+$', v) else v,
         options.Options.T_PASSWD: lambda v: v,
         options.Options.T_STR: lambda v: str(v),

@@ -720,6 +720,7 @@ class Web:
             self.logger.debug(f"apikey_del: {self.signin_file}")
         self.signin.signin_file_data = signin_data
         #common.save_yml(self.signin_file, signin_data, nolock=False)
+        return apikey
 
     def user_add(self, user:Dict[str, Any], req:Request=None):
         """
@@ -1314,7 +1315,7 @@ class Web:
             raise ValueError(f"User does not have the required role to access this data.")
 
         user_path = self.users_path / f"user-{uid}_{user_name}.json"
-        # セッションは利用者ごとの正本ではないため、常にファイルから読み直す。
+        # 常にファイルから読み直す。
         if user_path.is_file():
             user_data = common.loaduser(user_path)
         else:
