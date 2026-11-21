@@ -290,18 +290,18 @@ class Web:
             raise ValueError(f"Invalid role name: {role_name}")
         return self.role_class[role_name]
 
-    def list_roles(self, hidden=False) -> List[role.Role]:
+    def list_role(self, req:Request=None) -> List[role.Role]:
         """
         登録されている全てのロールを取得する
 
         Args:
-            hidden (bool, optional): 非表示のロールも含めるか. Defaults to False.
+            req (Request): リクエストオブジェクト
         Returns:
             List[Role]: 登録されている全てのロール
         """
         if self.role_class is None:
             return []
-        return [r for r in self.role_class if hidden or not r.hidden]
+        return [r for r in self.role_class]
 
     def is_my(self, req, uid:Union[str, int], user_name:str) -> bool:
         """
@@ -667,15 +667,13 @@ class Web:
         self.signin.signin_file_data = signin_data
         #common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def user_add(self, user:Dict[str, Any], req:Request=None, my_buildin_user:bool=False, my_buildin_group:bool=False):
+    def user_add(self, user:Dict[str, Any], req:Request=None):
         """
         サインインファイルにユーザーを追加する
 
         Args:
             user (Dict[str, Any]): ユーザー情報
             req (Request, optional): リクエストオブジェクト
-            my_buildin_user (bool): 自身がビルトインユーザーかどうか
-            my_buildin_group (bool): 自身がビルトイングループかどうか
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
@@ -722,6 +720,12 @@ class Web:
         if 'buildin' in user and user['buildin']:
             raise ValueError(f"You cannot add a built-in user.")
         # buildin設定が有効化されているグループは設定できない
+        if req and 'signin' in req.session:
+            my_buildin_user = self.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+            my_buildin_group = self.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+        else:
+            my_buildin_user = False
+            my_buildin_group = False
         for gn in user['groups']:
             group = next((g for g in signin_data['groups'] if g['name'] == gn), None)
             if group and 'buildin' in group and group['buildin'] is True \
@@ -758,15 +762,13 @@ class Web:
         # パスワード更新日時の保存
         self.user_data(req, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
 
-    def user_edit(self, user:Dict[str, Any], req:Request=None, my_buildin_user:bool=False, my_buildin_group:bool=False):
+    def user_edit(self, user:Dict[str, Any], req:Request=None):
         """
         サインインファイルのユーザー情報を編集する
 
         Args:
             user (Dict[str, Any]): ユーザー情報
             req (Request, optional): リクエストオブジェクト
-            my_buildin_user (bool): 自身がビルトインユーザーかどうか
-            my_buildin_group (bool): 自身がビルトイングループかどうか
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
@@ -809,6 +811,12 @@ class Web:
         if not pfrole and not admrole and not mgrrole:
             raise ValueError(f"User does not have the required role to access this data.")
         # buildin設定が有効化されているグループは設定できない
+        if req and 'signin' in req.session:
+            my_buildin_user = self.is_buildin_user(req.session.get('signin', {}).get('name', ''))
+            my_buildin_group = self.is_buildin_group(req.session.get('signin', {}).get('groups', []))
+        else:
+            my_buildin_user = False
+            my_buildin_group = False
         for gn in user['groups']:
             group = next((g for g in signin_data['groups'] if g['name'] == gn), None)
             if group and 'buildin' in group and group['buildin'] is True \

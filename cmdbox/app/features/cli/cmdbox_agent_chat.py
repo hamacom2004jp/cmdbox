@@ -933,6 +933,19 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         return self.RESP_WARN
 
     def keystore_value(self, data_dir, conf, conf_key, signin_user, signin_groups):
+        """
+        指定された設定キーの値をキーストアで置き換えます
+
+        Args:
+            data_dir (Path): データディレクトリパス
+            conf (dict): 設定辞書
+            conf_key (str): 設定キー
+            signin_user (str): サインインユーザー
+            signin_groups (List[str]): サインイングループ
+
+        Returns:
+            None
+        """
         value = conf.get(conf_key)
         if not value:
             return
@@ -990,7 +1003,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             # LLMのAPIキーをKeystoreから取得して設定する
             self.keystore_value(data_dir, llm_conf, 'llmapikey', signin_user, signin_groups)
             # A2ASVのAPIキーをKeystoreから取得して設定する
-            self.keystore_value(data_dir, agent_conf, 'a2asv_apikey', signin_user, signin_groups)
+            if agent_conf.get('agent_type', False)=='remote':
+                self.keystore_value(data_dir, agent_conf, 'a2asv_apikey', signin_user, signin_groups)
             # MCPSVのAPIキーをKeystoreから取得して設定する
             for mcpsv_conf in mcpsv_confs:
                 self.keystore_value(data_dir, mcpsv_conf, 'mcpserver_apikey', signin_user, signin_groups)

@@ -62,11 +62,7 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                uid = req.session.get('signin', {}).get('uid', '')
-                user_name = req.session.get('signin', {}).get('name', '')
-                buildin_user = web.is_buildin_user(uid)
-                buildin_group = web.is_buildin_group(user_name)
-                web.user_add(form, req=req, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
+                web.user_add(form, req=req)
                 form.update(dict(password='******', new_password='******', confirm_password='******',
                                  apikey_name='first', valid_days=360, note='APIKey for initial registration.'))
                 try:
@@ -87,9 +83,7 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
-                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
-                web.user_edit(form, req=req, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
+                web.user_edit(form, req=req)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='edit user')
@@ -231,10 +225,7 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 web.options.audit_exec(req, res, web)
-                # TODO: 自分が持っているRoleの下位のRoleを対象に返すようにする
-                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
-                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
-                return [r.name for r in web.list_roles(hidden=buildin_user or buildin_group)]
+                return [r.name for r in web.list_role(req)]
             except Exception as e:
                 return dict(warn=str(e))
 

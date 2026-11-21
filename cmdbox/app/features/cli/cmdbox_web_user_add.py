@@ -97,7 +97,7 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Limi
 
     def choice_roles(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
         _web = web.Web.getInstance()
-        return [r.name for r in _web.list_roles()]
+        return [r.name for r in _web.list_role(None)]
 
     @limiter.apprun_check_limit
     @validator.apprun_check
@@ -127,10 +127,7 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Limi
                         email=args.user_email, groups=args.user_group, home=args.user_home, roles=args.user_role)
             scope = signin.get_request_scope()
             if scope and 'req' in scope and scope['req']:
-                req = scope['req']
-                buildin_user = w.is_buildin_user(req.session.get('signin', {}).get('name', ''))
-                buildin_group = w.is_buildin_group(req.session.get('signin', {}).get('groups', []))
-                w.user_add(user, req=req, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
+                w.user_add(user, req=scope['req'])
             else:
                 w.user_add(user)
             msg = dict(success=f"User ID {args.user_id} has been added.")
