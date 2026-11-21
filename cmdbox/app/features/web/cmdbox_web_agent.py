@@ -172,7 +172,7 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                     if valid_apikey is not None:
                         mcpserver_apikey = valid_apikey
                         a2asv_apikey = valid_apikey
-        language = session.get('user_data', {}).get('language', {}).get('default', web.language)
+        language = web.user_data(None, session['signin']['uid'], user_name, 'language', 'default')
         language = language if language else web.language
         return user_name, groups, mcpserver_apikey, a2asv_apikey, language
 

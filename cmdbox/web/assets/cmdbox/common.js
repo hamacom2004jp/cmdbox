@@ -445,6 +445,13 @@ cmdbox.editapikey = async () => {
             cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
             return;
         }
+        cmdbox.hide_loading();
+        const data = await res.json();
+        if (!data || !data.success) {
+            cmdbox.hide_loading();
+            cmdbox.message(`Failed to delete API key. ${data.warn || data.error || ''}`, true);
+            return;
+        }
         await cmdbox.message('The API key was successfully deleted.', true);
         await editapikey_modal.modal('hide');
         window.setTimeout(cmdbox.editapikey, 500);
@@ -466,6 +473,13 @@ cmdbox.editapikey = async () => {
         });
         if (res.status != 200) {
             cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
+            return;
+        }
+        cmdbox.hide_loading();
+        const data = await res.json();
+        if (!data || !data.success) {
+            cmdbox.hide_loading();
+            cmdbox.message(`Failed to add API key. ${data.warn || data.error || ''}`, true);
             return;
         }
         await cmdbox.message('The API key was successfully added.', true);

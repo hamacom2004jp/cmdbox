@@ -100,12 +100,12 @@ class WebApikeyDel(feature.UnsupportEdgeFeature, validator.Validator):
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)
-            user = dict(name=args.user_name, apikey_name=args.apikey_name)
+            user = dict(uid=args.user_id, name=args.user_name, apikey_name=args.apikey_name)
             scope = signin.get_request_scope()
             if scope and 'req' in scope and scope['req']:
-                w.apikey_del(scope['req'], args.user_id, args.user_name, user)
+                w.apikey_del(scope['req'], user)
             else:
-                w.apikey_del(None, args.user_id, args.user_name, user)
+                w.apikey_del(None, user)
             msg = dict(success=dict(msg=f"User ApiKey deleted. user_name={args.user_name} apikey_name={args.apikey_name}"))
             common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w

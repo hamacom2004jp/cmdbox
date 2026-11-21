@@ -99,6 +99,9 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
                              + "}",
                      description_ja="Proxyに登録するLLM設定名を複数指定します。指定順をフェイルオーバー優先順として扱います。",
                      description_en="Specify multiple LLM configuration names to register to the proxy. The specified order is used as failover priority."),
+                dict(opt="litellm_path", type=Options.T_STR, default=f".venv/bin{os.pathsep}.venv/Scripts", required=False, multi=False, hide=False, choice=None,
+                     description_ja="LiteLLM のパスを指定します。",
+                     description_en="Specify the path to LiteLLM."),
                 dict(opt="num_retries", type=Options.T_INT, default=2, required=False, multi=False, hide=False, choice=None,
                      description_ja="LiteLLM Router の再試行回数を指定します。",
                      description_en="Specify retry count for LiteLLM Router."),
@@ -164,7 +167,7 @@ class LlmProxyStart(feature.UnsupportEdgeFeature, validator.Validator):
                 common.print_format(msg, args.format, tm, pf=pf)
                 return self.RESP_WARN, msg, None
 
-        litellm_exe = shutil.which("litellm")
+        litellm_exe = shutil.which("litellm", path=args.litellm_path)
         if litellm_exe is None:
             msg = dict(warn="LiteLLM command was not found. Install litellm and ensure `litellm` is in PATH.")
             common.print_format(msg, args.format, tm, pf=pf)

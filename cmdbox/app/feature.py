@@ -258,7 +258,7 @@ class Feature(object):
 <script type="text/javascript">{js.read_text(encoding="utf-8")}</script>
 </body>
 </html>'''
-        return 'text/html;profile=mcp-app', None  #html
+        return 'text/html;profile=mcp-app', html
 
 class OneshotEdgeFeature(Feature):
     """

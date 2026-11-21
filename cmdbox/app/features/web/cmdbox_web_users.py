@@ -66,7 +66,7 @@ class Users(feature.WebFeature):
                 form.update(dict(password='******', new_password='******', confirm_password='******',
                                  apikey_name='first', valid_days=360, note='APIKey for initial registration.'))
                 try:
-                    web.apikey_add(req, form.get('uid', None), form.get('user_name', None), form)
+                    web.apikey_add(req, form)
                 except FileExistsError as e:
                     pass # 既にAPIKeyが存在する場合は無視する
                 web.options.audit_exec(req, res, web, body=form)
@@ -121,7 +121,7 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                apikey = web.apikey_add(req, form.get('uid', None), form.get('name', None), form)
+                apikey = web.apikey_add(req, form)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success=apikey)
@@ -141,7 +141,7 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                apikey = web.apikey_del(req, form.get('uid', None), form.get('name', None), form)
+                web.apikey_del(req, form)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success=f"ApiKey deleted successfully.")

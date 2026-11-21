@@ -145,12 +145,13 @@ class Options:
         opts = self.get_cmd_attr(mode, cmd, "choice")
         ret = []
         for o in opts:
+            if type(o) is dict:
+                o = o.copy()
             if not skip_choice_fn and 'choice_fn' in o and o['choice_fn'] is not None:
                 o['choice'] = o['choice_fn'](o, webmode, opt)
             if not webmode or type(o) is not dict:
                 ret.append(o)
                 continue
-            o = o.copy()
             if 'web' in o and o['web'] == 'mask':
                 o['default'] = '********'
             ret.append(o)

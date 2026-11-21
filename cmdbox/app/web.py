@@ -48,6 +48,58 @@ if platform.system() == "Windows":
         pass
 
 
+class MergeRedisStore(RedisStore):
+    """同一セッションの並行リクエストを3-wayマージするRedisストア。"""
+
+    _SESSION_BASELINE = '__cmdbox_session_baseline__'
+
+    async def read(self, session_id:str, lifetime:int) -> bytes:
+        value = await super().read(session_id, lifetime)
+        if not value:
+            return value
+        try:
+            data = json.loads(value)
+        except (json.JSONDecodeError, UnicodeDecodeError, TypeError):
+            return value
+        data[self._SESSION_BASELINE] = copy.deepcopy(data)
+        return json.dumps(data, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+
+    async def write(self, session_id:str, data:bytes, lifetime:int, ttl:int) -> str:
+        try:
+            current = json.loads(data)
+            baseline = current.pop(self._SESSION_BASELINE, None)
+        except (json.JSONDecodeError, UnicodeDecodeError, TypeError):
+            return await super().write(session_id, data, lifetime, ttl)
+        if not isinstance(baseline, dict):
+            return await super().write(session_id, data, lifetime, ttl)
+
+        latest = json.loads(await super().read(session_id, lifetime) or b'{}')
+        if not isinstance(latest, dict):
+            latest = dict()
+        baseline.pop(self._SESSION_BASELINE, None)
+        merged = self._merge_session_value(baseline, current, latest)
+        merged['__metadata__'] = current.get('__metadata__', latest.get('__metadata__', dict()))
+        encoded = json.dumps(merged, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+        return await super().write(session_id, encoded, lifetime, ttl)
+
+    def _merge_session_value(self, baseline:Any, current:Any, latest:Any) -> Any:
+        """リクエスト開始時から変更された値だけを最新セッションへ適用する。"""
+        if isinstance(baseline, dict) and isinstance(current, dict):
+            result = copy.deepcopy(latest) if isinstance(latest, dict) else dict()
+            for key in set(baseline) | set(current):
+                if key not in baseline:
+                    if key in current:
+                        result[key] = copy.deepcopy(current[key])
+                elif key not in current:
+                    if key in latest and latest[key] == baseline[key]:
+                        del result[key]
+                else:
+                    if current[key] != baseline[key]:
+                        result[key] = self._merge_session_value(baseline[key], current[key],
+                                                        result.get(key, baseline[key]))
+            return result
+        return copy.deepcopy(current) if current != baseline else copy.deepcopy(latest)
+
 class Web:
     @classmethod
     def getInstance(cls, *args, **kwargs) -> 'Web':
@@ -539,14 +591,12 @@ class Web:
                                 pass_miss_count=pass_miss_count, pass_miss_last=pass_miss_last)})
         return ret
 
-    def apikey_add(self, req:Request, uid, user_name, user:Dict[str, Any]) -> str:
+    def apikey_add(self, req:Request, user:Dict[str, Any]) -> str:
         """
         サインインファイルにユーザーのApiKeyを追加する
 
         Args:
             req (Request): リクエストオブジェクト
-            uid: 追加対象のユーザーID
-            user_name: 追加対象のユーザー名
             user (Dict[str, Any]): ユーザー情報
 
         Returns:
@@ -556,6 +606,7 @@ class Web:
         pfrole = self.has_role(req, ['PFDEVELOPER', 'PFMASTER'])
         admrole = self.has_role(req, ['USERADMIN'])
         mgrrole = self.has_role(req, ['MANAGER'])
+        uid, user_name = user.get('uid'), user.get('name')
         myrole = self.is_my(req, uid, user_name)
         if not pfrole and not admrole and not mgrrole and not myrole:
             raise ValueError(f"User does not have the required role to access this data.")
@@ -601,6 +652,8 @@ class Web:
                 self.save_user_apikeys(req, u['uid'], u['name'], apikeys)
                 # 互換性維持のため、移行期間はsignin_fileにも同期する
                 u['apikeys'] = copy.deepcopy(apikeys)
+                if req is not None:
+                    req.session['apikeys'] = copy.deepcopy(apikeys)
 
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_add: {self.signin_file}")
@@ -608,20 +661,19 @@ class Web:
         #common.save_yml(self.signin_file, signin_data, nolock=False)
         return apikey
 
-    def apikey_del(self, req:Request, uid:str, user_name:str, user:Dict[str, Any]):
+    def apikey_del(self, req:Request, user:Dict[str, Any]):
         """
         サインインファイルのユーザーのApiKeyを削除する
 
         Args:
             req (Request): リクエストオブジェクト
-            uid (str): ユーザーID
-            user_name (str): ユーザー名
             user (Dict[str, Any]): ユーザー情報
         """
         # Roleによる権限確認
         pfrole = self.has_role(req, ['PFDEVELOPER', 'PFMASTER'])
         admrole = self.has_role(req, ['USERADMIN'])
         mgrrole = self.has_role(req, ['MANAGER'])
+        uid, user_name = user.get('uid'), user.get('name')
         myrole = self.is_my(req, uid, user_name)
         if not pfrole and not admrole and not mgrrole and not myrole:
             raise ValueError(f"User does not have the required role to access this data.")
@@ -657,6 +709,8 @@ class Web:
                         del u['apikeys']
                 else:
                     u['apikeys'] = copy.deepcopy(apikeys)
+                if req is not None:
+                    req.session['apikeys'] = copy.deepcopy(apikeys)
         if apikey is None:
             raise ValueError(f"ApiKey name is not exists.")
 
@@ -1260,19 +1314,11 @@ class Web:
             raise ValueError(f"User does not have the required role to access this data.")
 
         user_path = self.users_path / f"user-{uid}_{user_name}.json"
-        # ユーザーデータの取得
-        if req is not None and 'user_data' in req.session:
-            # セッションにユーザーデータがある場合はそれを使用する
-            user_data = req.session['user_data']
+        # セッションは利用者ごとの正本ではないため、常にファイルから読み直す。
+        if user_path.is_file():
+            user_data = common.loaduser(user_path)
         else:
-            # セッションにユーザーデータがない場合はファイルから読み込む
-            if user_path.is_file():
-                user_data = common.loaduser(user_path)
-            else:
-                user_data = dict()
-            if req is not None:
-                # セッションにユーザーデータを保存する
-                req.session['user_data'] = user_data
+            user_data = dict()
         if categoly not in user_data:
             user_data[categoly] = dict()
 
@@ -1409,7 +1455,7 @@ class Web:
                 res.headers["Strict-Transport-Security"] = "max-age=15768000"
             return res
 
-        session_store = RedisStore(connection=session_redis, prefix=f"{self.ver.__appid__}:{self.svname}:session.")
+        session_store = MergeRedisStore(connection=session_redis, prefix=f"{self.ver.__appid__}:{self.svname}:session.")
         mwparam = dict(store=session_store, cookie_path=self.session_path,
                        lifetime=self.session_timeout, rolling=True, cookie_same_site="lax")
         if self.session_domain is not None:
