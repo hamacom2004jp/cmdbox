@@ -744,7 +744,7 @@ def loadopt(opt_path:str, webmode:bool=False) -> dict:
     """
     if opt_path is None or not Path(opt_path).exists():
         return dict()
-    with open(opt_path) as f:
+    with open(opt_path, encoding='utf-8') as f:
         opt = json.load(f)
         if webmode:
             if 'mode' not in opt or 'cmd' not in opt:

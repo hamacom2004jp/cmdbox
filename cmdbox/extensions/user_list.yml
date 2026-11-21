@@ -7,8 +7,7 @@ users:                         # A list of users, each of which is a map that co
   email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
   home: /.users/admin          # The home directory of the user, used for file operations.
   roles:                       # A list of roles assigned to the user.
-  - USER_ADMIN_MANAGER         # Role types are system-specific and are defined in `cmdbox.app.auth.role` module.
-  - USER_ADMIN                 # To change a role definition, modify the `signin.role_module` setting.
+  - USERADMIN                  # Role types are system-specific and are defined in `cmdbox.app.auth.role` module.
 - uid: 2
   name: develop
   password: develop
@@ -17,8 +16,7 @@ users:                         # A list of users, each of which is a map that co
   email: develop@aaa.bbb.jp
   home: /.users/develop
   roles:
-  - PLATFORM_DEVELOP_MANAGER
-  - PLATFORM_DEVELOPER
+  - PFDEVELOPER
   buildin: true                # Whether the user is a built-in user. Built-in users cannot be deleted.
 - uid: 3
   name: master
@@ -28,8 +26,7 @@ users:                         # A list of users, each of which is a map that co
   email: master@aaa.bbb.jp
   home: /.users/master
   roles:
-  - SERVICE_MASTER_MANAGER
-  - SERVICE_MASTER
+  - PFMASTER
   buildin: true
 - uid: 101
   name: user01
@@ -38,7 +35,8 @@ users:                         # A list of users, each of which is a map that co
   groups: [user]
   email: user01@aaa.bbb.jp
   home: /.users/user01
-  roles: []
+  roles:
+  - MEMBER
 - uid: 102
   name: user02
   password: a7659675668c2b34f0a456dbaa508200340dc36c
@@ -47,7 +45,7 @@ users:                         # A list of users, each of which is a map that co
   email: user02@aaa.bbb.jp
   home: /.users/user02
   roles:
-  - TEAM_MEMBER
+  - MEMBER
 - uid: 103
   name: user03
   password: d64243e8519cce2304fffb92d31acaca622585011b40439c97e9274fae146189
@@ -56,9 +54,7 @@ users:                         # A list of users, each of which is a map that co
   email: user03@aaa.bbb.jp
   home: /.users/user03
   roles:
-  - TEAM_MANAGER
-  - TEAM_LEADER
-  - TEAM_MEMBER
+  - MANAGER
 groups:                        # A list of groups, each of which is a map that contains the following fields.
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.

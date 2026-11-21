@@ -62,19 +62,21 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
-                buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
-                web.user_add(form, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
+                uid = req.session.get('signin', {}).get('uid', '')
+                user_name = req.session.get('signin', {}).get('name', '')
+                buildin_user = web.is_buildin_user(uid)
+                buildin_group = web.is_buildin_group(user_name)
+                web.user_add(form, req=req, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
                 form.update(dict(password='******', new_password='******', confirm_password='******',
                                  apikey_name='first', valid_days=360, note='APIKey for initial registration.'))
                 try:
-                    web.apikey_add(req, form)
+                    web.apikey_add(req, form.get('uid', None), form.get('user_name', None), form)
                 except FileExistsError as e:
                     pass # 既にAPIKeyが存在する場合は無視する
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='add user')
             except Exception as e:
-                return dict(warn=str(e))
+                 return dict(warn=str(e))
 
         @app.post('/users/edit', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def users_edit(req:Request, res:Response):
@@ -87,7 +89,7 @@ class Users(feature.WebFeature):
                 form = await req.json()
                 buildin_user = web.is_buildin_user(req.session.get('signin', {}).get('name', ''))
                 buildin_group = web.is_buildin_group(req.session.get('signin', {}).get('groups', []))
-                web.user_edit(form, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
+                web.user_edit(form, req=req, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='edit user')
@@ -105,7 +107,7 @@ class Users(feature.WebFeature):
                 form = await req.json()
                 if req.session['signin']['uid'] == form.get('uid', None):
                     raise ValueError('You cannot delete yourself.')
-                web.user_del(form.get('uid', None))
+                web.user_del(form.get('uid', None), req=req)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success='delete user')
@@ -113,12 +115,6 @@ class Users(feature.WebFeature):
                 return dict(warn=str(e))
 
         @app.post('/gui/apikey/add', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
-        async def gui_apikey_add(req:Request, res:Response):
-            signin = web.signin.check_signin(req, res)
-            if signin is not None:
-                return signin
-            return await apikey_add(req, res, req.session['signin']['uid'])
-
         @app.post('/users/apikey/add', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def users_apikey_add(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
@@ -126,14 +122,12 @@ class Users(feature.WebFeature):
                 return signin
             return await apikey_add(req, res)
 
-        async def apikey_add(req:Request, res:Response, uid:str=None):
+        async def apikey_add(req:Request, res:Response):
             if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                if req.session['signin']['name'] != form.get('name', None):
-                    raise ValueError('You can only use your API key.')
-                apikey = web.apikey_add(req, form)
+                apikey = web.apikey_add(req, form.get('uid', None), form.get('name', None), form)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success=apikey)
@@ -141,11 +135,6 @@ class Users(feature.WebFeature):
                 return dict(warn=str(e))
 
         @app.post('/gui/apikey/del', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
-        async def gui_apikey_del(req:Request, res:Response):
-            signin = web.signin.check_signin(req, res)
-            if signin is not None:
-                return signin
-            return await apikey_del(req, res, req.session['signin']['uid'])
         @app.post('/users/apikey/del', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def users_apikey_del(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
@@ -153,17 +142,15 @@ class Users(feature.WebFeature):
                 return signin
             return await apikey_del(req, res)
 
-        async def apikey_del(req:Request, res:Response, uid:str=None):
+        async def apikey_del(req:Request, res:Response):
             if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                if req.session['signin']['name'] != form.get('name', None):
-                    raise ValueError('You can only use your API key.')
-                apikey = web.apikey_del(req, form)
+                apikey = web.apikey_del(req, form.get('uid', None), form.get('name', None), form)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
-                return dict(success=apikey)
+                return dict(success=f"ApiKey deleted successfully.")
             except Exception as e:
                 return dict(warn=str(e))
 

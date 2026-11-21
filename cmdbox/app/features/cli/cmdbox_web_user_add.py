@@ -130,7 +130,7 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Limi
                 req = scope['req']
                 buildin_user = w.is_buildin_user(req.session.get('signin', {}).get('name', ''))
                 buildin_group = w.is_buildin_group(req.session.get('signin', {}).get('groups', []))
-                w.user_add(user, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
+                w.user_add(user, req=req, my_buildin_user=buildin_user, my_buildin_group=buildin_group)
             else:
                 w.user_add(user)
             msg = dict(success=f"User ID {args.user_id} has been added.")

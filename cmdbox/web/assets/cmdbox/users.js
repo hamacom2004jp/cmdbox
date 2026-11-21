@@ -151,13 +151,19 @@ users.users_list = async () => {
         }
         // apikey追加実行
         modal.find('#cmd_add_apikey').off('click').on('click', async () => {
-            const apikey_name = window.prompt('Please enter the apikey name.');
-            if (!apikey_name) return;
+            const inputs = await cmdbox.prompt('Please enter the apikey name, valid days.', true, false,
+                                                    ['text', 'number'], ['Enter apikey name', 'Enter valid days'], ['', '30']);
+            if (!inputs) return;
             cmdbox.show_loading();
             const res = await fetch('users/apikey/add', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({'name': row_content.find('[name="name"]').val(), 'apikey_name': apikey_name})
+                body: JSON.stringify({
+                    'uid': row_content.find('[name="uid"]').val(),
+                    'name': row_content.find('[name="name"]').val(),
+                    'apikey_name': inputs[0],
+                    'valid_days': inputs[1]
+                })
             });
             if (res.status != 200) {
                 cmdbox.hide_loading();
@@ -165,7 +171,13 @@ users.users_list = async () => {
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(await res.json(), true, true);
+            const data = await res.json();
+            if (!data || !data.success) {
+                cmdbox.hide_loading();
+                cmdbox.message(`Failed to add API key. ${data.warn || data.error || ''}`, true);
+                return;
+            }
+            await cmdbox.message('The API key was successfully added.', true);
             cmdbox.show_loading();
             users.users_list();
             users.groups_list();
@@ -174,13 +186,17 @@ users.users_list = async () => {
         });
         // apikey削除実行
         modal.find('#cmd_del_apikey').off('click').on('click', async () => {
-            const apikey_name = window.prompt('Please enter the apikey name.');
+            const apikey_name = await cmdbox.prompt('Please enter the apikey name.', true);
             if (!apikey_name) return;
             cmdbox.show_loading();
             const res = await fetch('users/apikey/del', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({'name': row_content.find('[name="name"]').val(), 'apikey_name': apikey_name})
+                body: JSON.stringify({
+                    'uid': row_content.find('[name="uid"]').val(),
+                    'name': row_content.find('[name="name"]').val(),
+                    'apikey_name': apikey_name
+                })
             });
             if (res.status != 200) {
                 cmdbox.hide_loading();
@@ -188,7 +204,13 @@ users.users_list = async () => {
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(await res.json(), true, true);
+            const data = await res.json();
+            if (!data || !data.success) {
+                cmdbox.hide_loading();
+                cmdbox.message(`Failed to delete API key. ${data.warn || data.error || ''}`, true);
+                return;
+            }
+            await cmdbox.message('The API key was successfully deleted.', true);
             cmdbox.show_loading();
             users.users_list();
             users.groups_list();

@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature, web
+from cmdbox.app.auth import signin
 from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -66,6 +67,9 @@ class WebApikeyDel(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="user_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="対象のユーザー名を指定します。",
                      description_en="Specify the target user name."),
+                dict(opt="user_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="対象のユーザーIDを指定します。",
+                     description_en="Specify the target user ID."),
                 dict(opt="apikey_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="このユーザーのApiKey名を指定します。",
                      description_en="Specify the ApiKey name for this user."),
@@ -97,7 +101,11 @@ class WebApikeyDel(feature.UnsupportEdgeFeature, validator.Validator):
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)
             user = dict(name=args.user_name, apikey_name=args.apikey_name)
-            w.apikey_del(None, user)
+            scope = signin.get_request_scope()
+            if scope and 'req' in scope and scope['req']:
+                w.apikey_del(scope['req'], args.user_id, args.user_name, user)
+            else:
+                w.apikey_del(None, args.user_id, args.user_name, user)
             msg = dict(success=dict(msg=f"User ApiKey deleted. user_name={args.user_name} apikey_name={args.apikey_name}"))
             common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w

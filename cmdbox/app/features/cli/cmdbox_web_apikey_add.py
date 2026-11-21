@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature, web
+from cmdbox.app.auth import signin
 from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -63,6 +64,9 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定します。",
                      description_en="Specify the maximum waiting time until the server responds."),
+                dict(opt="user_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="対象のユーザーIDを指定します。",
+                     description_en="Specify the target user ID."),
                 dict(opt="user_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="対象のユーザー名を指定します。",
                      description_en="Specify the target user name."),
@@ -97,7 +101,11 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature, validator.Validator):
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)
             user = dict(name=args.user_name, apikey_name=args.apikey_name)
-            apikey = w.apikey_add(None, user)
+            scope = signin.get_request_scope()
+            if scope and 'req' in scope and scope['req']:
+                apikey = w.apikey_add(scope['req'], args.user_id, args.user_name, user)
+            else:
+                apikey = w.apikey_add(None, args.user_id, args.user_name, user)
             msg = dict(success=dict(apikey=apikey, msg=f"User ApiKey added. user_name={args.user_name} apikey_name={args.apikey_name}"))
             common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, w

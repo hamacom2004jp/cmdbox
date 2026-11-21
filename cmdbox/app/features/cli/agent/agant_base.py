@@ -295,7 +295,11 @@ All incoming requests must be processed in the following order:
             provider=getattr(w, 'provider', None)
             payload = getattr(w, 'payload', {}) or {}
             resource_uri = payload.get('resource_uri', None)
-            tags = payload.get('tool', {}).get('meta', {}).get('fastmcp', {}).get('tags', []) or []
+            from mcp.types import Tool
+            tool = payload.get('tool', {})
+            if type(tool) is Tool:
+                tool = tool.model_dump()
+            tags = tool.get('meta', {}).get('fastmcp', {}).get('tags', []) or []
             if not id or not provider or not payload or not tags:
                 continue
             for tag in tags:

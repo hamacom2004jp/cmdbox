@@ -155,7 +155,8 @@ class DoSignin(cmdbox_web_signin.Signin):
                         return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
-                        _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
+                        _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None),
+                                               roles=user.get('roles', []) or []),
                                      email, passwd, None, group_names, group_homes, group_sps, gids, hash=user.get('hash', None))
                         next = f"../{next}" if token_ok else next
                         web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
@@ -168,7 +169,8 @@ class DoSignin(cmdbox_web_signin.Signin):
             if not web.signin.is_open_within_period(group_names):
                 return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
             # セッションに保存
-            _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
+            _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None),
+                                   roles=user.get('roles', []) or []),
                          email, passwd, None, group_names, group_homes, group_sps, gids, hash=user.get('hash', None))
             next = f"../{next}" if next.find('/') >= 0 else next
             next = f"../{next}" if token_ok else next
@@ -258,9 +260,10 @@ class DoSignin(cmdbox_web_signin.Signin):
                 web.user_data(None, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
             # セッションに保存
             req.session['signin'] = dict(uid=user['uid'], name=user['name'], home=user['home'], password=hashed_password,
-                                         gids=gids, groups=group_names, group_homes=group_homes, group_sps=group_sps, email=email, hash=hash)
+                                         gids=gids, groups=group_names, group_homes=group_homes, group_sps=group_sps,
+                                         roles=user.get('roles', {}), email=email, hash=hash)
             #req.session['access_token'] = access_token # アクセストークンはセッションに保存しない。大きすぎてCookieに入らないため。
-            req.session['apikeys'] = web.get_user_apikeys(req, signin_data, user, include_legacy=True)
+            req.session['apikeys'] = web.get_user_apikeys(None, signin_data, user, include_legacy=True)
             # セッション変更を明示的にマーク（SessionMiddleware が認識するために重要）
             if hasattr(req.session, 'mark_modified'):
                 req.session.mark_modified()
@@ -275,7 +278,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     group_dir.mkdir(parents=True, exist_ok=True)
             if web.logger.level == logging.DEBUG:
                 web.logger.debug(f'Set session, uid={user["uid"]}, name={user["name"]}, home={user["home"]}, email={email}, gids={gids}, groups={group_names}, '
-                                 f'group_homes={group_homes}, group_sps={group_sps}')
+                                 f'group_homes={group_homes}, group_sps={group_sps}, roles={user.get("roles", {})}')
             self.set_session(req, req.session['signin'])
 
         @app.get('/oauth2/google/callback', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)

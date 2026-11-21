@@ -7,7 +7,7 @@ from pathlib import Path
 from redis.asyncio import Redis
 from starsessions import SessionAutoloadMiddleware, SessionMiddleware
 from starsessions.stores.redis import RedisStore
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Union
 from uvicorn.config import Config
 import copy
 import ctypes
@@ -303,6 +303,79 @@ class Web:
             return []
         return [r for r in self.role_class if hidden or not r.hidden]
 
+    def is_my(self, req, uid:Union[str, int], user_name:str) -> bool:
+        """
+        自分の情報かどうかを確認する
+
+        Args:
+            req (Request): リクエストオブジェクト
+            uid (Union[str, int]): ユーザーID
+            user_name (str): ユーザー名
+
+        Returns:
+            bool: 自分の情報であればTrue、そうでなければFalse
+        """
+        if req is None or 'signin' not in req.session:
+            return False
+        if str(req.session['signin'].get('uid')) == str(uid) and req.session['signin'].get('name') == user_name:
+            return True
+        return False
+
+    def has_role(self, req, req_role_names:Union[str, List[str]]) -> bool:
+        """
+        指定されたロールを持っているか確認する
+
+        Args:
+            req (Request): リクエストオブジェクト
+            req_role_names (Union[str, List[str]]): 確認対象のロール名またはロール名のリスト
+
+        Returns:
+            bool: 指定されたreq_role_namesのロールを持っている場合はTrue、持っていない場合はFalse
+        """
+        # セッション情報がない場合は確認不要とする
+        if req is None or 'signin' not in req.session:
+            return True
+        # ユーザーが所有しているRoleが無い場合はFalse
+        user_role_names = req.session['signin'].get('roles', {}) or []
+        if user_role_names is None:
+            return False
+        # 確認対象のRoleが無い場合はFalse
+        if isinstance(user_role_names, str):
+            user_role_names = [user_role_names]
+        if req_role_names is None:
+            return True
+        if isinstance(req_role_names, str):
+            req_role_names = [req_role_names]
+        # ユーザーが所有しているRoleと確認対象のRoleを取得
+        user_roles = [self.get_role(r) for r in user_role_names]
+        req_roles = [self.get_role(r) for r in req_role_names]
+        # 確認対象のRoleをユーザーが所有しているかどうかを判定
+        return any(user_role.has_children(req_role) for user_role in user_roles for req_role in req_roles)
+
+    def in_group(self, req, signin_data:Dict[str, Any], req_group_names:Union[str, List[str]]) -> bool:
+        """
+        指定されたグループに所属しているか確認する
+
+        Args:
+            req (Request): リクエストオブジェクト
+            signin_data (Dict[str, Any]): サインインファイルのデータ
+            req_group_names (Union[str, List[str]]): 確認対象のグループ名またはグループ名のリスト
+
+        Returns:
+            bool: 指定されたreq_group_namesのグループに所属している場合はTrue、所属していない場合はFalse
+        """
+        if req is None or 'signin' not in req.session or not signin_data:
+            return True
+        user_group_names = req.session['signin'].get('groups', {}) or []
+        if isinstance(user_group_names, str):
+            user_group_names = [user_group_names]
+        if req_group_names is None:
+            return True
+        if isinstance(req_group_names, str):
+            req_group_names = [req_group_names]
+        req_group_names = self.signin.parent_group(signin_data, req_group_names)
+        return any(g in user_group_names for g in req_group_names)
+
     def change_password(self, user_name:str, password:str, new_password:str, confirm_password:str):
         """
         パスワードを変更する
@@ -466,17 +539,26 @@ class Web:
                                 pass_miss_count=pass_miss_count, pass_miss_last=pass_miss_last)})
         return ret
 
-    def apikey_add(self, req:Request, user:Dict[str, Any]) -> str:
+    def apikey_add(self, req:Request, uid, user_name, user:Dict[str, Any]) -> str:
         """
         サインインファイルにユーザーのApiKeyを追加する
 
         Args:
             req (Request): リクエストオブジェクト
+            uid: 追加対象のユーザーID
+            user_name: 追加対象のユーザー名
             user (Dict[str, Any]): ユーザー情報
 
         Returns:
             str: ApiKey
         """
+        # Roleによる権限確認
+        pfrole = self.has_role(req, ['PFDEVELOPER', 'PFMASTER'])
+        admrole = self.has_role(req, ['USERADMIN'])
+        mgrrole = self.has_role(req, ['MANAGER'])
+        myrole = self.is_my(req, uid, user_name)
+        if not pfrole and not admrole and not mgrrole and not myrole:
+            raise ValueError(f"User does not have the required role to access this data.")
         signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
@@ -491,6 +573,13 @@ class Web:
         apikey:str = None
         for u in signin_data['users']:
             if u['name'] == user['name']:
+                # 所属グループ以外は編集できない
+                if not pfrole and not admrole and not myrole and not self.in_group(req, signin_data, u.get('groups', [])):
+                    raise ValueError(f"You cannot edit users who are not members of the group.")
+                # プラットフォームロールを持つユーザーは編集できない
+                if not pfrole and any(r in ['PFDEVELOPER', 'PFMASTER'] for r in u.get('roles', [])):
+                    raise ValueError(f"This edit cannot be made.")
+                # ユーザーのApiKeyを取得
                 apikeys = self.get_user_apikeys(None, signin_data, u, include_legacy=True)
                 if user['apikey_name'] in apikeys:
                     raise FileExistsError(f"ApiKey name is already exists.")
@@ -519,14 +608,23 @@ class Web:
         #common.save_yml(self.signin_file, signin_data, nolock=False)
         return apikey
 
-    def apikey_del(self, req:Request, user:Dict[str, Any]):
+    def apikey_del(self, req:Request, uid:str, user_name:str, user:Dict[str, Any]):
         """
         サインインファイルのユーザーのApiKeyを削除する
 
         Args:
             req (Request): リクエストオブジェクト
+            uid (str): ユーザーID
+            user_name (str): ユーザー名
             user (Dict[str, Any]): ユーザー情報
         """
+        # Roleによる権限確認
+        pfrole = self.has_role(req, ['PFDEVELOPER', 'PFMASTER'])
+        admrole = self.has_role(req, ['USERADMIN'])
+        mgrrole = self.has_role(req, ['MANAGER'])
+        myrole = self.is_my(req, uid, user_name)
+        if not pfrole and not admrole and not mgrrole and not myrole:
+            raise ValueError(f"User does not have the required role to access this data.")
         signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
@@ -541,6 +639,12 @@ class Web:
         apikey:str = None
         for u in signin_data['users']:
             if u['name'] == user['name']:
+                # 所属グループ以外は編集できない
+                if not pfrole and not admrole and not myrole and not self.in_group(req, signin_data, u.get('groups', [])):
+                    raise ValueError(f"You cannot edit users who are not members of the group.")
+                # プラットフォームロールを持つユーザーは編集できない
+                if not pfrole and any(r in ['PFDEVELOPER', 'PFMASTER'] for r in u.get('roles', [])):
+                    raise ValueError(f"This edit cannot be made.")
                 apikeys = self.get_user_apikeys(req, signin_data, u, include_legacy=True)
                 if user['apikey_name'] not in apikeys:
                     continue
@@ -563,12 +667,13 @@ class Web:
         self.signin.signin_file_data = signin_data
         #common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def user_add(self, user:Dict[str, Any], my_buildin_user:bool=False, my_buildin_group:bool=False):
+    def user_add(self, user:Dict[str, Any], req:Request=None, my_buildin_user:bool=False, my_buildin_group:bool=False):
         """
         サインインファイルにユーザーを追加する
 
         Args:
             user (Dict[str, Any]): ユーザー情報
+            req (Request, optional): リクエストオブジェクト
             my_buildin_user (bool): 自身がビルトインユーザーかどうか
             my_buildin_group (bool): 自身がビルトイングループかどうか
         """
@@ -598,7 +703,7 @@ class Web:
             if len(self.group_list(gn, ret_hidden=True)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
         if 'roles' not in user or not user['roles']:
-            user['roles'] = [self.get_role('TEAM_MEMBER')]
+            user['roles'] = ['MEMBER']
         if 'roles' in user and type(user['roles']) is str:
             user['roles'] = [user['roles']]
         if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) > 0:
@@ -607,6 +712,12 @@ class Web:
             raise ValueError(f"User name is already exists.")
         if hash not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported.")
+        # Roleによる権限確認
+        pfrole = self.has_role(req, ['PFDEVELOPER', 'PFMASTER'])
+        admrole = self.has_role(req, ['USERADMIN'])
+        mgrrole = self.has_role(req, ['MANAGER'])
+        if not pfrole and not admrole and not mgrrole:
+            raise ValueError(f"User does not have the required role to access this data.")
         # buildin設定が有効化されているユーザーは追加できない
         if 'buildin' in user and user['buildin']:
             raise ValueError(f"You cannot add a built-in user.")
@@ -616,6 +727,19 @@ class Web:
             if group and 'buildin' in group and group['buildin'] is True \
                 and not my_buildin_user and not my_buildin_group:
                 raise ValueError(f"You cannot assign a built-in group to a user.")
+        # 所属グループ以外は編集できない
+        if not pfrole and not admrole and not self.in_group(req, signin_data, user['groups']):
+            raise ValueError(f"You cannot add users who are not members of the group.")
+        # 上位ロールを持つユーザーは編集できない
+        if not pfrole:
+            roles = user.get('roles', [])
+            if any(r in ['PFDEVELOPER', 'PFMASTER'] for r in roles):
+                raise ValueError(f"You cannot make additions that exceed your role's permissions.")
+            if not admrole:
+                if any(r in ['USERADMIN'] for r in roles):
+                    raise ValueError(f"You cannot make additions that exceed your role's permissions.")
+                if not mgrrole and any(r in ['MANAGER'] for r in roles):
+                    raise ValueError(f"You cannot make additions that exceed your role's permissions.")
 
         jadge, msg = self.signin.check_password_policy(user['name'], '', user['password'])
         if not jadge:
@@ -628,18 +752,19 @@ class Web:
         signin_data['users'].append(user)
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_add: {self.signin_file}")
-        # パスワード更新日時の保存
-        self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
         # サインインファイルの保存
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
+        # パスワード更新日時の保存
+        self.user_data(req, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
 
-    def user_edit(self, user:Dict[str, Any], my_buildin_user:bool=False, my_buildin_group:bool=False):
+    def user_edit(self, user:Dict[str, Any], req:Request=None, my_buildin_user:bool=False, my_buildin_group:bool=False):
         """
         サインインファイルのユーザー情報を編集する
 
         Args:
             user (Dict[str, Any]): ユーザー情報
+            req (Request, optional): リクエストオブジェクト
             my_buildin_user (bool): 自身がビルトインユーザーかどうか
             my_buildin_group (bool): 自身がビルトイングループかどうか
         """
@@ -667,7 +792,7 @@ class Web:
             if len(self.group_list(gn, ret_hidden=True)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
         if 'roles' not in user or not user['roles']:
-            user['roles'] = [self.get_role('TEAM_MEMBER')]
+            user['roles'] = ['MEMBER']
         if 'roles' in user and type(user['roles']) is str:
             user['roles'] = [user['roles']]
         if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) <= 0:
@@ -676,17 +801,48 @@ class Web:
             raise ValueError(f"User name is not found.")
         if hash not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported.")
+        # Roleによる権限確認
+        pfrole = self.has_role(req, ['PFDEVELOPER', 'PFMASTER'])
+        admrole = self.has_role(req, ['USERADMIN'])
+        mgrrole = self.has_role(req, ['MANAGER'])
+        myrole = self.is_my(req, user['uid'], user['name'])
+        if not pfrole and not admrole and not mgrrole:
+            raise ValueError(f"User does not have the required role to access this data.")
         # buildin設定が有効化されているグループは設定できない
         for gn in user['groups']:
             group = next((g for g in signin_data['groups'] if g['name'] == gn), None)
             if group and 'buildin' in group and group['buildin'] is True \
                 and not my_buildin_user and not my_buildin_group:
                 raise ValueError(f"You cannot assign a built-in group to a user.")
+        # 上位ロールを持つユーザーに編集できない
+        if not pfrole:
+            roles = user.get('roles', [])
+            if any(r in ['PFDEVELOPER', 'PFMASTER'] for r in roles):
+                raise ValueError(f"You cannot make edits that exceed your role's permissions.")
+            if not admrole:
+                if any(r in ['USERADMIN'] for r in roles):
+                    raise ValueError(f"You cannot make edits that exceed your role's permissions.")
+                if not mgrrole and any(r in ['MANAGER'] for r in roles):
+                    raise ValueError(f"You cannot make edits that exceed your role's permissions.")
+
         for u in signin_data['users']:
             if u['uid'] == user['uid']:
                 if 'buildin' in u and u['buildin'] \
                     and not my_buildin_user and not my_buildin_group:
                     raise ValueError(f"You cannot edit a built-in user.")
+                # 所属グループ以外は編集できない
+                if not pfrole and not admrole and not myrole and not self.in_group(req, signin_data, u.get('groups', [])):
+                    raise ValueError(f"You cannot edit users who are not members of the group.")
+                # 上位ロールを持つユーザーは編集できない
+                if not pfrole:
+                    roles = u.get('roles', [])
+                    if any(r in ['PFDEVELOPER', 'PFMASTER'] for r in roles):
+                        raise ValueError(f"You cannot make edits that exceed your role's permissions.")
+                    if not admrole:
+                        if any(r in ['USERADMIN'] for r in roles):
+                            raise ValueError(f"You cannot make edits that exceed your role's permissions.")
+                        if not mgrrole and any(r in ['MANAGER'] for r in roles):
+                            raise ValueError(f"You cannot make edits that exceed your role's permissions.")
                 u['name'] = user['name']
                 if 'password' in user and user['password'] is not None and user['password'] != '':
                     jadge, msg = self.signin.check_password_policy(user['name'], u['password'], user['password'])
@@ -697,7 +853,7 @@ class Web:
                     else:
                         u['password'] = user['password']
                     # パスワード更新日時の保存
-                    self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
+                    self.user_data(req, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
                 u['hash'] = user['hash']
                 u['groups'] = user['groups']
                 u['email'] = user['email']
@@ -708,12 +864,15 @@ class Web:
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def user_del(self, uid:int):
+    def user_del(self, uid:int, req:Request=None, my_buildin_user:bool=False, my_buildin_group:bool=False):
         """
         サインインファイルからユーザーを削除する
 
         Args:
             uid (int): ユーザーID
+            req (Request, optional): リクエストオブジェクト
+            my_buildin_user (bool, optional): 自身がビルトインユーザーかどうか
+            my_buildin_group (bool, optional): 自身がビルトイングループかどうか
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
@@ -724,12 +883,35 @@ class Web:
             uid = int(uid)
         except:
             raise ValueError(f"User uid is not number. ({uid})")
+        # Roleによる権限確認
+        pfrole = self.has_role(req, ['PFDEVELOPER', 'PFMASTER'])
+        admrole = self.has_role(req, ['USERADMIN'])
+        mgrrole = self.has_role(req, ['MANAGER'])
+        if not pfrole and not admrole and not mgrrole:
+            raise ValueError(f"User does not have the required role to access this data.")
+
         # ユーザーがbuildin設定されていないことをチェック
+        users = []
         for u in signin_data['users']:
-            if u['uid'] == uid and 'buildin' in u and u['buildin']:
-                raise ValueError(f"This user is a built-in user. ({uid})")
+            if u['uid'] == uid:
+                if 'buildin' in u and u['buildin']:
+                    raise ValueError(f"This user is a built-in user.")
+                # 所属グループ以外は編集できない
+                if not pfrole and not admrole and not self.in_group(req, signin_data, u.get('groups', [])):
+                    raise ValueError(f"You cannot edit users who are not members of the group.")
+                # 上位ロールを持つユーザーは削除できない
+                if not pfrole:
+                    roles = u.get('roles', [])
+                    if any(r in ['PFDEVELOPER', 'PFMASTER'] for r in roles):
+                        raise ValueError(f"You cannot make deletions that exceed your role's permissions.")
+                    if not admrole:
+                        if any(r in ['USERADMIN'] for r in roles):
+                            raise ValueError(f"You cannot make deletions that exceed your role's permissions.")
+                        if not mgrrole and any(r in ['MANAGER'] for r in roles):
+                            raise ValueError(f"You cannot make deletions that exceed your role's permissions.")
+            else:
+                users.append(u)
         # ユーザーの削除
-        users = [u for u in signin_data['users'] if u['uid'] != uid]
         if len(users) == len(signin_data['users']):
             raise ValueError(f"User uid is not found. ({uid})")
         signin_data['users'] = users
@@ -1061,6 +1243,14 @@ class Web:
         Returns:
             Any: 値 or カテゴリのデータ
         """
+        # Roleによる権限確認
+        pfrole = self.has_role(req, ['PFDEVELOPER', 'PFMASTER'])
+        admrole = self.has_role(req, ['USERADMIN'])
+        mgrrole = self.has_role(req, ['MANAGER'])
+        myrole = self.is_my(req, uid, user_name)
+        if not pfrole and not admrole and not mgrrole and not myrole:
+            raise ValueError(f"User does not have the required role to access this data.")
+
         user_path = self.users_path / f"user-{uid}_{user_name}.json"
         # ユーザーデータの取得
         if req is not None and 'user_data' in req.session:
@@ -1077,6 +1267,27 @@ class Web:
                 req.session['user_data'] = user_data
         if categoly not in user_data:
             user_data[categoly] = dict()
+
+        # 所属グループ以外は編集できない
+        signin_data = self.signin.signin_file_data
+        user = [u for u in signin_data['users'] if u['name'] == user_name]
+        if user:
+            user = copy.deepcopy(user[0])
+        if not user:
+            raise ValueError(f"User not found.")
+        if not pfrole and not admrole and not myrole and not self.in_group(req, signin_data, user.get('groups', [])):
+            raise ValueError(f"You cannot edit users who are not members of the group.")
+        # 上位ロールを持つユーザーに編集できない
+        if not pfrole:
+            roles = user.get('roles', [])
+            if any(r in ['PFDEVELOPER', 'PFMASTER'] for r in roles):
+                raise ValueError(f"You cannot make edits that exceed your role's permissions.")
+            if not admrole:
+                if any(r in ['USERADMIN'] for r in roles):
+                    raise ValueError(f"You cannot make edits that exceed your role's permissions.")
+                if not mgrrole and any(r in ['MANAGER'] for r in roles):
+                    raise ValueError(f"You cannot make edits that exceed your role's permissions.")
+
         # キー削除の場合
         if delkey:
             if key is not None and key in user_data[categoly]:
@@ -1089,6 +1300,9 @@ class Web:
         # キーが指定されている場合は値を設定または取得する
         if val is None:
             return user_data[categoly][key] if key in user_data[categoly] else None
+        if isinstance(val, datetime.datetime):
+            val = datetime.datetime.isoformat(val, timespec='seconds')
+
         user_data[categoly][key] = val
         common.saveuser(user_data, user_path)
         return val

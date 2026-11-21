@@ -435,7 +435,11 @@ cmdbox.editapikey = async () => {
         const res = await fetch('gui/apikey/del', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({'name': user['name'], 'apikey_name': apikey_name})
+            body: JSON.stringify({
+                'uid': user['uid'],
+                'name': user['name'],
+                'apikey_name': apikey_name
+            })
         });
         if (res.status != 200) {
             cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
@@ -454,10 +458,11 @@ cmdbox.editapikey = async () => {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
+                'uid': user['uid'],
                 'name': user['name'],
                 'apikey_name': inputs[0],
-                'valid_days': inputs[1],
-                'note': inputs[2]})
+                'valid_days': inputs[1]
+            })
         });
         if (res.status != 200) {
             cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
