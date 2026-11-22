@@ -317,5 +317,5 @@ All incoming requests must be processed in the following order:
                             mode=mode, cmd=cmd, mime=mime, html=convert.str2b64str(html))
                 )
             except Exception as e:
-                continue
+                raise ValueError(f"Failed to render UI widget: {e}") from e
         return render_ui_widgets

@@ -1322,7 +1322,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                         resval.append(outputs)
                         redis_cli.rpush(reskey, outputs)
             except Exception as e:
-                raise e
+                raise Exception("Agent chat processing failed.") from e
 
         msg = dict(success=dict(message=f"Chat '{runner_name}' completed.",
                                 ressize=len(convert.str2b64str(common.to_str(resval))),

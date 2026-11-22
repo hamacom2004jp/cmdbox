@@ -238,13 +238,48 @@ class Feature(object):
         return len(set(normalized_request).intersection(set(normalized_allowed))) > 0
 
     def get_renderer_uri(self, suffix:str="") -> str:
+        """
+        MCP Appsのui.resource_uriを返します
+
+        Args:
+            suffix (str): リソースURIの末尾に追加する文字列
+        Returns:
+            str: MCP Appsのui.resource_uri
+        """
         return f"ui://mcpapps/{self.ver.__appid__}/{self.get_mode()}/{self.get_cmd()}{'' if not suffix else '/' + suffix}"
 
     def get_renderer_domains(self) -> List[str]:
+        """
+        MCP Appsのレンダラーが利用するドメインのリストを返します
+
+        Returns:
+            List[str]: レンダラーが利用するドメインのリスト
+        """
         return ["https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"]
 
     def get_renderer_html(self, uri) -> Tuple[str, str]:
+        """
+        MCP Appsのレンダラー用のHTMLを生成します。
+        この内容がiframe内で表示されるHTMLです。
+        生成されるHTMLには、指定されたリソースURIを持つdiv要素が含まれます。
+        通常このメソッドはオーバーライドせず、
+        コマンド固有のHTMLは `get_renderer_content` で、
+        コマンド固有のレンダリング処理は `get_renderer_function` で返すようにしてください。
+
+        Args:
+            uri (str): リソースURI
+        Returns:
+            Tuple[str, str]: コンテンツタイプとHTML文字列
+        """
         js = Path(self.ver.__file__).parent / "web" / "assets" / "agent" / "agent_mcpapps_iframe.js"
+        if not js.exists():
+            js = Path(version.__file__).parent / "web" / "assets" / "agent" / "agent_mcpapps_iframe.js"
+        renderer_fg, mime, mcpapps_content = self.get_renderer_content(uri)
+        if not renderer_fg:
+            return mime, None
+        assets_js = ""
+        for path, type_ in self.get_renderer_assets(uri).items():
+            assets_js += f'mcpapps.asset_{type_}(baseurl, "{path}");\n'
         html = f'''<!DOCTYPE html>
 <html lang="ja" data-bs-theme="dark">
 <head>
@@ -254,11 +289,76 @@ class Feature(object):
 <title>{self.ver.__appid__}</title>
 </head>
 <body class="overflow-hidden p-2" style="background:transparent;">
-<div id="main_mcpapps" data-resource-uri="{uri}" data-mode="{self.get_mode()}" data-cmd="{self.get_cmd()}"></div>
+<div id="mcpapps_main" data-resource-uri="{uri}" data-mode="{self.get_mode()}" data-cmd="{self.get_cmd()}">
+<div id="mcpapps_content">
+{mcpapps_content}</div></div>
 <script type="text/javascript">{js.read_text(encoding="utf-8")}</script>
-</body>
-</html>'''
-        return 'text/html;profile=mcp-app', html
+<script type="text/javascript">
+''' + '''mcpapps.assets = (baseurl) => {if (baseurl) {
+''' + assets_js + '''}};
+</script></body></html>'''
+        return mime, html
+
+    def get_renderer_content(self, uri) -> Tuple[bool, str, str]:
+        """
+        コマンド固有のHTMLコンテンツを生成します。
+        get_renderer_htmlで生成されるHTMLの一部として使用されます。
+
+        Args:
+            uri (str): リソースURI
+        Returns:
+            bool: レンダリングフラグ。Trueの場合はレンダリングを行い、Falseの場合は行わない。
+            str: コンテンツタイプ
+            str: HTML文字列
+        """
+        mcpapps_content = ''
+        return False, 'text/html;profile=mcp-app', mcpapps_content
+
+    def get_renderer_assets(self, uri) -> Dict[str, str]:
+        """
+        MCP Appsのレンダラー用のアセット情報を取得します。
+        戻り値のキーがアセット(JSやCSS)のファイルパス(URL上のパス)で、値が種類(例: "js" や "css")です。
+        get_renderer_htmlで生成されるHTMLの一部として使用されます。
+
+        Args:
+            uri (str): リソースURI
+
+        Returns:
+            Dict[str, str]: アセットの種類とURLの辞書
+        """
+        return {
+            "/assets/cmdbox/color_mode.css": "css",
+            "/assets/cmdbox/color_mode_ext.css": "css",
+            "/assets/agent/agent.css": "css",
+            "/assets/agent/agent_ext.css": "css",
+        }
+    def get_renderer_function(self, uri) -> str:
+        """
+        MCP Appsのレンダラー用のJavaScript関数を取得します。
+        agent_mcpapps_iframe.js の `mcpapps.render` メソッドを差し替えるようにしてください。
+        パラメータの `container` はレンダリング先のDOM要素、
+        パラメータの `result` はレンダリング対象の結果オブジェクトです。
+        パラメータの `result` はMCPのツールコールの結果（通常コマンドレットの実行結果オブジェクト）です。
+        get_renderer_htmlで生成されるHTMLの一部として使用されます。
+
+        Args:
+            uri (str): リソースURI
+
+        Returns:
+            str: JavaScript関数の文字列
+        """
+        mcpapps_render_function = '''
+mcpapps.render = (container, result) => {
+    container.replaceChildren();
+    const content = mcpapps.answerOf(result);
+    if (content === null || (Array.isArray(content) && content.length === 0)) {
+        mcpapps.warn('The processing results could not be loaded.');
+        return;
+    }
+    container.appendChild(mcpapps.renderNode(content));
+};
+'''
+        return mcpapps_render_function
 
 class OneshotEdgeFeature(Feature):
     """

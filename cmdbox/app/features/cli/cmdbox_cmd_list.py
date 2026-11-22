@@ -131,6 +131,10 @@ class CmdList(feature.OneshotResultEdgeFeature, validator.Validator, testable.Un
             success: Union[Data, List[CmdRecord], None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
 
+    def get_renderer_content(self, uri):
+        _, mime, mcpapps_content = super().get_renderer_content(uri)
+        return True, mime, mcpapps_content
+
     def create_tests(self, logger:logging.Logger, base_args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]) -> List[testable.TestCase]:
         """
         テストケースを作成するためのメソッド

@@ -40,8 +40,8 @@ mcpapps.warn = (text) => {
     const el = document.createElement("div");
     el.className = "text-danger";
     el.textContent = text;
-    mcpapps.main_container.appendChild(el);
-}
+    mcpapps.mcpapps_content.appendChild(el);
+};
 /**
  * MCP サーバが返したツール結果を解析する
  * @param {object} result - MCP サーバからのツール結果
@@ -293,7 +293,7 @@ mcpapps.render = (container, result) => {
  * @param {object} result - 表示するツール結果
  */
 mcpapps.show = (result) => {
-    mcpapps.render(mcpapps.main_container, result);
+    mcpapps.render(mcpapps.mcpapps_content, result);
 };
 /**
  * ホスト側にメッセージを送信する
@@ -328,32 +328,51 @@ mcpapps.theme = (context) => {
     if (context?.theme) document.documentElement.dataset.bsTheme = context.theme;
 }
 /**
- * ホストが提供するアセットのベースURLを設定し、必要なCSSを読み込む
- * @param {string} baseurl - ホストが提供するアセットのベースURL
+ * feature.pyのget_renderer_assetsで指定されたCSSアセットを読み込むための関数
+ * @param {string} baseurl - アセットのベースURL
+ * @param {string} path - アセットのパス
  */
-mcpapps.assets = (baseurl) => {
-    if (baseurl) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = `${baseurl}/assets/cmdbox/color_mode.css`;
-        document.head.appendChild(link);
-
-        const linkExt = document.createElement('link');
-        linkExt.rel = 'stylesheet';
-        linkExt.href = `${baseurl}/assets/cmdbox/color_mode_ext.css`;
-        document.head.appendChild(linkExt);
-
-        const agentLink = document.createElement('link');
-        agentLink.rel = 'stylesheet';
-        agentLink.href = `${baseurl}/assets/agent/agent.css`;
-        document.head.appendChild(agentLink);
-
-        const agentLinkExt = document.createElement('link');
-        agentLinkExt.rel = 'stylesheet';
-        agentLinkExt.href = `${baseurl}/assets/agent/agent_ext.css`;
-        document.head.appendChild(agentLinkExt);
+mcpapps.asset_css = (baseurl, path) => {
+    if (baseurl && path) {
+        fetch(`${baseurl}${path}`)
+            .then(response => response.text())
+            .then(css => {
+                const style = document.createElement('style');
+                style.textContent = css;
+                document.head.appendChild(style);
+            })
+            .catch(error => console.error('Failed to load stylesheet:', error));
     }
 };
+/**
+ * feature.pyのget_renderer_assetsで指定されたJSアセットを読み込むための関数
+ * @param {string} baseurl - アセットのベースURL
+ * @param {string} path - アセットのパス
+ */
+mcpapps.asset_js = (baseurl, path) => {
+    if (baseurl && path) {
+        fetch(`${baseurl}${path}`)
+            .then(response => response.text())
+            .then(code => {
+                const script = document.createElement('script');
+                script.textContent = code;
+                document.body.appendChild(script);
+            })
+            .catch(error => console.error('Failed to load script:', error));
+    }
+};
+/**
+ * ホストが提供するアセットのベースURLを設定し、必要なCSSを読み込む
+ * @param {string} baseurl - ホストが提供するアセットのベースURL
+mcpapps.assets = (baseurl) => {
+    if (baseurl) {
+        mcpapps.asset_css(baseurl, "/assets/cmdbox/color_mode.css");
+        mcpapps.asset_css(baseurl, "/assets/cmdbox/color_mode_ext.css");
+        mcpapps.asset_css(baseurl, "/assets/agent/agent.css");
+        mcpapps.asset_css(baseurl, "/assets/agent/agent_ext.css");
+    }
+};
+ */
 /**
  * ホスト側からのメッセージを処理する
  * @param {object} message - JSON-RPC 2.0形式のメッセージ
@@ -385,10 +404,10 @@ mcpapps.handleRequest = async (message) => {
     try {
         let result;
         if (method === 'ui/get-size') {
-            const main_mcpapps = document.querySelector('#main_mcpapps');
+            const mcpapps_main = document.querySelector('#mcpapps_main');
             result = {
-                width: main_mcpapps.clientWidth+20 || Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
-                height: main_mcpapps.clientHeight+20 || Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+                width: mcpapps_main.clientWidth+20 || Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
+                height: mcpapps_main.clientHeight+20 || Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
             };
         } else if (method === 'tools/call') {
             // 実装予定：ここで実際にツールを実行
@@ -437,7 +456,6 @@ mcpapps.handleResponse = (message) => {
  */
 mcpapps.handleNotification = (message) => {
     const { method, params } = message;
-    
     if (method === "ui/notifications/tool-result") {
         mcpapps.show(params);
     } else if (method === "ui/notifications/host-context-changed") {
@@ -445,7 +463,7 @@ mcpapps.handleNotification = (message) => {
     }
 };
 
-mcpapps.main_container = null;
+mcpapps.mcpapps_content = null;
 
 /**
  * MCP Apps iframe を初期化します
@@ -457,10 +475,10 @@ mcpapps.main_container = null;
  */
 mcpapps.init = () => {
     console.log("Initializing mcpapps...");
-    const main_selector = '#main_mcpapps'
-    mcpapps.main_container = document.querySelector(main_selector);
-    if (!mcpapps.main_container) {
-        const msg = `Container not found for selector: ${main_selector}`;
+    const mcpapps_selector = '#mcpapps_content'
+    mcpapps.mcpapps_content = document.querySelector(mcpapps_selector);
+    if (!mcpapps.mcpapps_content) {
+        const msg = `Container not found for selector: ${mcpapps_selector}`;
         console.error(msg);
         window.alert(msg);
         return;
@@ -469,7 +487,7 @@ mcpapps.init = () => {
         if (ev.source !== window.parent) return;
         mcpapps.handleHostMessage(ev.data);
     });
-    mcpapps.main_container.addEventListener('click', async (event) => {
+    mcpapps.mcpapps_content.addEventListener('click', async (event) => {
         const target = event.target.closest('[data-mcp-tool]');
         if (!target) return;
         event.preventDefault();
@@ -480,7 +498,7 @@ mcpapps.init = () => {
             mcpapps.warn(`Tool execution failed. ${error.message}`);
         }
     });
-    mcpapps.main_container.addEventListener('submit', async (event) => {
+    mcpapps.mcpapps_content.addEventListener('submit', async (event) => {
         const form = event.target.closest('form[data-mcp-tool]');
         if (!form) return;
         event.preventDefault();
