@@ -50,45 +50,8 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
         agentView.chatMessages.html('');
         let agent_message_id = null;
         for (const event of session['events']) {
-            const author = event['author'];
-            const msg = event['text'];
-            if (!msg || msg.length <= 0) continue;
-            if (author == 'user') {
-                // ユーザーメッセージ
-                agentView.create_user_message(msg, {
-                    session_id: session_id,
-                    runner_name: runner_name,
-                    event: event,
-                });
-            } else {
-                // エージェントメッセージ
-                if (!event['final_response']) {
-                    if (agent_message_id==null) {
-                        agent_message_id = cmdbox.random_string(16);
-                        msg_container = $(`#${agent_message_id}`);
-                    }
-                    let msg_content = agentView.create_agent_message(agent_message_id);
-                    msg_container = $(`#${agent_message_id}`);
-                    msg_content.addClass('message-thinking');
-                    if (msg_content.children().length > 0) {
-                        msg_container.append('<div class="msg-content message-thinking"></div>');
-                        msg_content = agentView.create_agent_message(agent_message_id);
-                        msg_container = $(`#${agent_message_id}`);
-                    }
-                    if (!msg_content.hasClass('collapsed')) {
-                        msg_content.addClass('collapsed');
-                        msg_container.find('.btn-toggle-message').text('▶');
-                    }
-                    const msg_str = agentView.parse_message(msg);
-                    await agentView.format_agent_message(msg_content, msg_str);
-                } else {
-                    let txt = agentView.create_agent_message(cmdbox.random_string(16));
-                    const msg_str = agentView.parse_message(msg);
-                    await agentView.format_agent_message(txt, msg_str);
-                    txt.parent().find('.btn-toggle-message').remove();
-                    agent_message_id = null;
-                }
-            }
+            event['message'] = event['text'] || '';
+            agentView.onmessage && agentView.onmessage({success: event});
         }
     });
     return li;

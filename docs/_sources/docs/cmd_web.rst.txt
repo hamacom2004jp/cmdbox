@@ -24,6 +24,7 @@ web ( apikey_add ) : ``cmdbox -m web -c apikey_add <Option>``
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
+    "--user_id <user_id>","str","","required","","","Specify the target user ID."
     "--user_name <user_name>","str","","required","","","Specify the target user name."
     "--apikey_name <apikey_name>","str","","required","","","Specify the ApiKey name for this user."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
@@ -91,6 +92,7 @@ web ( apikey_del ) : ``cmdbox -m web -c apikey_del <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--user_name <user_name>","str","","required","","","Specify the target user name."
+    "--user_id <user_id>","str","","required","","","Specify the target user ID."
     "--apikey_name <apikey_name>","str","","required","","","Specify the ApiKey name for this user."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
 
@@ -1063,6 +1065,7 @@ web ( user_add ) : ``cmdbox -m web -c user_add <Option>``
     "--user_email <user_email>","str","","","","","Specify the user email. Required when `user_pass_hash` is `oauth2` or `saml`."
     "--user_group <user_group>","str","multi","required","","","Specifies the groups to which the user belongs."
     "--user_home <user_home>","str","","required","","","Specify the home directory for the user."
+    "--user_role <user_role>","str","multi","","","","Specifies the roles owned by the user."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
 
 **Output Schema**
@@ -1285,7 +1288,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "groups": [
               "string"
             ],
-            "home": "string"
+            "home": "string",
+            "roles": [
+              "string"
+            ]
           }
         ]
       },

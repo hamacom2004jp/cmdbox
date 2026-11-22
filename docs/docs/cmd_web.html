@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2026/11/15 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2026/11/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f7d953b1"></script>
+      <script src="../_static/documentation_options.js?v=9100b3b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -222,7 +222,15 @@
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<tr class="row-even"><td><p>--user_id &lt;user_id&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the target user ID.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_name &lt;user_name&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -230,7 +238,7 @@
 <td></td>
 <td><p>Specify the target user name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--apikey_name &lt;apikey_name&gt;</p></td>
+<tr class="row-even"><td><p>--apikey_name &lt;apikey_name&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -238,7 +246,7 @@
 <td></td>
 <td><p>Specify the ApiKey name for this user.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -465,7 +473,15 @@
 <td></td>
 <td><p>Specify the target user name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--apikey_name &lt;apikey_name&gt;</p></td>
+<tr class="row-odd"><td><p>--user_id &lt;user_id&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the target user ID.</p></td>
+</tr>
+<tr class="row-even"><td><p>--apikey_name &lt;apikey_name&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -473,7 +489,7 @@
 <td></td>
 <td><p>Specify the ApiKey name for this user.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -3902,7 +3918,15 @@
 <td></td>
 <td><p>Specify the home directory for the user.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<tr class="row-odd"><td><p>--user_role &lt;user_role&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specifies the roles owned by the user.</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -4641,7 +4665,10 @@
 <span class="w">        </span><span class="nt">"groups"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="s2">"string"</span>
 <span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">"home"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
+<span class="w">        </span><span class="nt">"home"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"string"</span>
+<span class="w">        </span><span class="p">]</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app package &mdash; cmdbox 2026/11/15 documentation</title>
+  <title>cmdbox.app package &mdash; cmdbox 2026/11/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f7d953b1"></script>
+      <script src="../_static/documentation_options.js?v=9100b3b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -482,7 +482,7 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_a2asv_reload">cmdbox.app.features.cli.cmdbox_a2asv_reload module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#cmdbox-app-features-cli-cmdbox-a2asv-start-module">cmdbox.app.features.cli.cmdbox_a2asv_start module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_a2asv_start">cmdbox.app.features.cli.cmdbox_a2asv_start module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_a2asv_stop">cmdbox.app.features.cli.cmdbox_a2asv_stop module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_agent_agent_del">cmdbox.app.features.cli.cmdbox_agent_agent_del module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_agent_agent_list">cmdbox.app.features.cli.cmdbox_agent_agent_list module</a></li>
@@ -586,7 +586,7 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_llm_proxy_stop">cmdbox.app.features.cli.cmdbox_llm_proxy_stop module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_llm_save">cmdbox.app.features.cli.cmdbox_llm_save module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_llm_translation">cmdbox.app.features.cli.cmdbox_llm_translation module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#cmdbox-app-features-cli-cmdbox-mcpsv-start-module">cmdbox.app.features.cli.cmdbox_mcpsv_start module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_mcpsv_start">cmdbox.app.features.cli.cmdbox_mcpsv_start module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_mcpsv_stop">cmdbox.app.features.cli.cmdbox_mcpsv_stop module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_omni_pred">cmdbox.app.features.cli.cmdbox_omni_pred module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.features.cli.html#module-cmdbox.app.features.cli.cmdbox_rag_build">cmdbox.app.features.cli.cmdbox_rag_build module</a></li>
@@ -3458,6 +3458,52 @@ meta (Dict[str, Any], optional): メタデータ. Defaults to None.</p>
 <section id="module-cmdbox.app.web">
 <span id="cmdbox-app-web-module"></span><h2>cmdbox.app.web module<a class="headerlink" href="#module-cmdbox.app.web" title="Link to this heading"></a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.web.MergeRedisStore">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.web.</span></span><span class="sig-name descname"><span class="pre">MergeRedisStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Redis</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'starsessions.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gc_ttl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2592000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#MergeRedisStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.MergeRedisStore" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RedisStore</span></code></p>
+<p>同一セッションの並行リクエストを3-wayマージするRedisストア。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.MergeRedisStore.read">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lifetime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#MergeRedisStore.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.MergeRedisStore.read" title="Link to this definition"></a></dt>
+<dd><p>Read session data from the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_id</strong> -- ID associated with session</p></li>
+<li><p><strong>lifetime</strong> -- session lifetime duration</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns bytes<span class="colon">:</span></dt>
+<dd class="field-even"><p>session data as bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.MergeRedisStore.write">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lifetime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#MergeRedisStore.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.MergeRedisStore.write" title="Link to this definition"></a></dt>
+<dd><p>Write session data to the storage.</p>
+<p>Must return session ID. Either new or from arguments.
+The difference between <cite>lifetime</cite> and <cite>ttl</cite> is that former defines the total session duration
+and the latter ony tells the amount to seconds left before the data can be safely removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_id</strong> -- ID associated with session</p></li>
+<li><p><strong>data</strong> -- session data serialized to bytes</p></li>
+<li><p><strong>lifetime</strong> -- session lifetime, in seconds</p></li>
+<li><p><strong>ttl</strong> -- keep session data this amount of time, in seconds</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns str<span class="colon">:</span></dt>
+<dd class="field-even"><p>session ID</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="cmdbox.app.web.RaiseThread">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cmdbox.app.web.</span></span><span class="sig-name descname"><span class="pre">RaiseThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#RaiseThread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.RaiseThread" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></p>
@@ -3575,6 +3621,23 @@ meta (Dict[str, Any], optional): メタデータ. Defaults to None.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.get_role">
+<span class="sig-name descname"><span class="pre">get_role</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Role</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.get_role"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.get_role" title="Link to this definition"></a></dt>
+<dd><p>指定されたrole_nameに対応するRoleを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>role_name</strong> (<em>str</em>) -- 取得対象のロール名</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>指定されたrole_nameに対応するRole</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Role</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.get_user_apikeys">
 <span class="sig-name descname"><span class="pre">get_user_apikeys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signin_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_legacy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.get_user_apikeys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.get_user_apikeys" title="Link to this definition"></a></dt>
 <dd><p>ユーザーのApiKey一覧を取得する（user_data優先、必要に応じてsignin_fileをフォールバック）</p>
@@ -3598,33 +3661,45 @@ meta (Dict[str, Any], optional): メタデータ. Defaults to None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.group_add">
-<span class="sig-name descname"><span class="pre">group_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.group_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.group_add" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">group_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_buildin_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_buildin_group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.group_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.group_add" title="Link to this definition"></a></dt>
 <dd><p>サインインファイルにグループを追加する</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>group</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- グループ情報</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- グループ情報</p></li>
+<li><p><strong>my_buildin_user</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 自身がビルトインユーザーかどうか. Defaults to False.</p></li>
+<li><p><strong>my_buildin_group</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 自身がビルトイングループかどうか. Defaults to False.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.group_del">
-<span class="sig-name descname"><span class="pre">group_del</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.group_del"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.group_del" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">group_del</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_buildin_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_buildin_group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.group_del"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.group_del" title="Link to this definition"></a></dt>
 <dd><p>サインインファイルからグループを削除する</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>gid</strong> (<em>str</em>) -- グループID</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gid</strong> (<em>str</em>) -- グループID</p></li>
+<li><p><strong>my_buildin_user</strong> (<em>bool</em>) -- ビルドインユーザーかどうか</p></li>
+<li><p><strong>my_buildin_group</strong> (<em>bool</em>) -- ビルドイングループかどうか</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.group_edit">
-<span class="sig-name descname"><span class="pre">group_edit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.group_edit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.group_edit" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">group_edit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_buildin_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_buildin_group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.group_edit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.group_edit" title="Link to this definition"></a></dt>
 <dd><p>サインインファイルのグループ情報を編集する</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>group</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- グループ情報</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- グループ情報</p></li>
+<li><p><strong>my_buildin_user</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 自身がビルトインユーザーかどうか. Defaults to False.</p></li>
+<li><p><strong>my_buildin_group</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 自身がビルトイングループかどうか. Defaults to False.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -3650,9 +3725,122 @@ meta (Dict[str, Any], optional): メタデータ. Defaults to None.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.has_role">
+<span class="sig-name descname"><span class="pre">has_role</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req_role_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.has_role"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.has_role" title="Link to this definition"></a></dt>
+<dd><p>指定されたロールを持っているか確認する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<em>Request</em>) -- リクエストオブジェクト</p></li>
+<li><p><strong>req_role_names</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- 確認対象のロール名またはロール名のリスト</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>指定されたreq_role_namesのロールを持っている場合はTrue、持っていない場合はFalse</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.in_group">
+<span class="sig-name descname"><span class="pre">in_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signin_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req_group_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.in_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.in_group" title="Link to this definition"></a></dt>
+<dd><p>指定されたグループに所属しているか確認する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<em>Request</em>) -- リクエストオブジェクト</p></li>
+<li><p><strong>signin_data</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- サインインファイルのデータ</p></li>
+<li><p><strong>req_group_names</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- 確認対象のグループ名またはグループ名のリスト</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>指定されたreq_group_namesのグループに所属している場合はTrue、所属していない場合はFalse</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.init_webfeatures">
 <span class="sig-name descname"><span class="pre">init_webfeatures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FastAPI</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.init_webfeatures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.init_webfeatures" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.is_buildin_group">
+<span class="sig-name descname"><span class="pre">is_buildin_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.is_buildin_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.is_buildin_group" title="Link to this definition"></a></dt>
+<dd><p>指定されたグループリストにビルトイングループが含まれているかどうかを判定する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>groups</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) -- グループ名のリスト</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ビルトイングループが含まれている場合はTrue、それ以外はFalse</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.is_buildin_user">
+<span class="sig-name descname"><span class="pre">is_buildin_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.is_buildin_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.is_buildin_user" title="Link to this definition"></a></dt>
+<dd><p>指定されたユーザーがビルトインユーザーかどうかを判定する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_name</strong> (<em>str</em>) -- ユーザー名</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ビルトインユーザーであればTrue、それ以外はFalse</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.is_my">
+<span class="sig-name descname"><span class="pre">is_my</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.is_my"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.is_my" title="Link to this definition"></a></dt>
+<dd><p>自分の情報かどうかを確認する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<em>Request</em>) -- リクエストオブジェクト</p></li>
+<li><p><strong>uid</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>int</em><em>]</em>) -- ユーザーID</p></li>
+<li><p><strong>user_name</strong> (<em>str</em>) -- ユーザー名</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>自分の情報であればTrue、そうでなければFalse</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.list_role">
+<span class="sig-name descname"><span class="pre">list_role</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Role</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.list_role"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.list_role" title="Link to this definition"></a></dt>
+<dd><p>登録されている全てのロールを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>req</strong> (<em>Request</em>) -- リクエストオブジェクト</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>登録されている全てのロール</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Role]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.save_user_apikeys">
@@ -3721,11 +3909,14 @@ meta (Dict[str, Any], optional): メタデータ. Defaults to None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.user_add">
-<span class="sig-name descname"><span class="pre">user_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.user_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.user_add" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">user_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.user_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.user_add" title="Link to this definition"></a></dt>
 <dd><p>サインインファイルにユーザーを追加する</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>user</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- ユーザー情報</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- ユーザー情報</p></li>
+<li><p><strong>req</strong> (<em>Request</em><em>, </em><em>optional</em>) -- リクエストオブジェクト</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -3777,22 +3968,30 @@ meta (Dict[str, Any], optional): メタデータ. Defaults to None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.user_del">
-<span class="sig-name descname"><span class="pre">user_del</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.user_del"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.user_del" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">user_del</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_buildin_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_buildin_group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.user_del"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.user_del" title="Link to this definition"></a></dt>
 <dd><p>サインインファイルからユーザーを削除する</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>uid</strong> (<em>int</em>) -- ユーザーID</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uid</strong> (<em>int</em>) -- ユーザーID</p></li>
+<li><p><strong>req</strong> (<em>Request</em><em>, </em><em>optional</em>) -- リクエストオブジェクト</p></li>
+<li><p><strong>my_buildin_user</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 自身がビルトインユーザーかどうか</p></li>
+<li><p><strong>my_buildin_group</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 自身がビルトイングループかどうか</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.user_edit">
-<span class="sig-name descname"><span class="pre">user_edit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.user_edit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.user_edit" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">user_edit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.user_edit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.user_edit" title="Link to this definition"></a></dt>
 <dd><p>サインインファイルのユーザー情報を編集する</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>user</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- ユーザー情報</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- ユーザー情報</p></li>
+<li><p><strong>req</strong> (<em>Request</em><em>, </em><em>optional</em>) -- リクエストオブジェクト</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

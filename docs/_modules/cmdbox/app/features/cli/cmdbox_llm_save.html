@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.features.cli.cmdbox_llm_save &mdash; cmdbox 2026/11/15 documentation</title>
+  <title>cmdbox.app.features.cli.cmdbox_llm_save &mdash; cmdbox 2026/11/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=f7d953b1"></script>
+      <script src="../../../../../_static/documentation_options.js?v=9100b3b0"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -140,14 +140,13 @@
                      <span class="n">description_ja</span><span class="o">=</span><span class="s2">"保存するLLM設定の名前を指定します。"</span><span class="p">,</span>
                      <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the name of the LLM configuration to save."</span><span class="p">),</span>
                 <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"llmprov"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s2">""</span><span class="p">,</span> <span class="s2">"azureopenai"</span><span class="p">,</span> <span class="s2">"openai"</span><span class="p">,</span> <span class="s2">"vertexai"</span><span class="p">,</span> <span class="s2">"ollama"</span><span class="p">,</span> <span class="s2">"proxy"</span><span class="p">,</span> <span class="s2">"custom"</span><span class="p">],</span>
+                     <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="s2">""</span><span class="p">,</span> <span class="s2">"azureopenai"</span><span class="p">,</span> <span class="s2">"openai"</span><span class="p">,</span> <span class="s2">"vertexai"</span><span class="p">,</span> <span class="s2">"ollama"</span><span class="p">,</span> <span class="s2">"custom"</span><span class="p">],</span>
                      <span class="n">description_ja</span><span class="o">=</span><span class="s2">"llmのプロバイダを指定します。"</span><span class="p">,</span>
                      <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify llm provider."</span><span class="p">,</span>
                      <span class="n">choice_show</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">azureopenai</span><span class="o">=</span><span class="p">[</span><span class="s2">"llmapikey"</span><span class="p">,</span> <span class="s2">"llmendpoint"</span><span class="p">,</span> <span class="s2">"llmmodel"</span><span class="p">,</span> <span class="s2">"llmapiversion"</span><span class="p">],</span>
                                       <span class="n">openai</span><span class="o">=</span><span class="p">[</span><span class="s2">"llmapikey"</span><span class="p">,</span> <span class="s2">"llmendpoint"</span><span class="p">,</span> <span class="s2">"llmmodel"</span><span class="p">],</span>
                                       <span class="n">vertexai</span><span class="o">=</span><span class="p">[</span><span class="s2">"llmprojectid"</span><span class="p">,</span> <span class="s2">"llmsvaccountfile"</span><span class="p">,</span> <span class="s2">"llmlocation"</span><span class="p">,</span> <span class="s2">"llmmodel"</span><span class="p">,</span> <span class="s2">"llmseed"</span><span class="p">,</span> <span class="s2">"llmtemperature"</span><span class="p">],</span>
                                       <span class="n">ollama</span><span class="o">=</span><span class="p">[</span><span class="s2">"llmendpoint"</span><span class="p">,</span> <span class="s2">"llmmodel"</span><span class="p">,</span> <span class="s2">"llmtemperature"</span><span class="p">],</span>
-                                      <span class="n">proxy</span><span class="o">=</span><span class="p">[</span><span class="s2">"llmendpoint"</span><span class="p">,</span> <span class="s2">"llmmodel"</span><span class="p">,</span> <span class="s2">"llmapikey"</span><span class="p">],</span>
                                       <span class="n">custom</span><span class="o">=</span><span class="p">[</span><span class="s2">"llmprojectid"</span><span class="p">,</span> <span class="s2">"llmsvaccountfile"</span><span class="p">,</span> <span class="s2">"llmlocation"</span><span class="p">,</span>
                                               <span class="s2">"llmapikey"</span><span class="p">,</span> <span class="s2">"llmapiversion"</span><span class="p">,</span> <span class="s2">"llmendpoint"</span><span class="p">,</span> <span class="s2">"llmmodel"</span><span class="p">,</span> <span class="s2">"llmseed"</span><span class="p">,</span> <span class="s2">"llmtemperature"</span><span class="p">]),</span>
                      <span class="p">),</span>

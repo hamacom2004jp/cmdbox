@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox package &mdash; cmdbox 2026/11/15 documentation</title>
+  <title>cmdbox package &mdash; cmdbox 2026/11/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f7d953b1"></script>
+      <script src="../_static/documentation_options.js?v=9100b3b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -386,6 +386,11 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmdbox.app.html#module-cmdbox.app.web">cmdbox.app.web module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.MergeRedisStore"><code class="docutils literal notranslate"><span class="pre">MergeRedisStore</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.MergeRedisStore.read"><code class="docutils literal notranslate"><span class="pre">MergeRedisStore.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.MergeRedisStore.write"><code class="docutils literal notranslate"><span class="pre">MergeRedisStore.write()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.RaiseThread"><code class="docutils literal notranslate"><span class="pre">RaiseThread</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.RaiseThread.get_id"><code class="docutils literal notranslate"><span class="pre">RaiseThread.get_id()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.RaiseThread.raise_exception"><code class="docutils literal notranslate"><span class="pre">RaiseThread.raise_exception()</span></code></a></li>
@@ -403,12 +408,19 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.apikey_del"><code class="docutils literal notranslate"><span class="pre">Web.apikey_del()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.change_password"><code class="docutils literal notranslate"><span class="pre">Web.change_password()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.getInstance"><code class="docutils literal notranslate"><span class="pre">Web.getInstance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.get_role"><code class="docutils literal notranslate"><span class="pre">Web.get_role()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.get_user_apikeys"><code class="docutils literal notranslate"><span class="pre">Web.get_user_apikeys()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.group_add"><code class="docutils literal notranslate"><span class="pre">Web.group_add()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.group_del"><code class="docutils literal notranslate"><span class="pre">Web.group_del()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.group_edit"><code class="docutils literal notranslate"><span class="pre">Web.group_edit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.group_list"><code class="docutils literal notranslate"><span class="pre">Web.group_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.has_role"><code class="docutils literal notranslate"><span class="pre">Web.has_role()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.in_group"><code class="docutils literal notranslate"><span class="pre">Web.in_group()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.init_webfeatures"><code class="docutils literal notranslate"><span class="pre">Web.init_webfeatures()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.is_buildin_group"><code class="docutils literal notranslate"><span class="pre">Web.is_buildin_group()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.is_buildin_user"><code class="docutils literal notranslate"><span class="pre">Web.is_buildin_user()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.is_my"><code class="docutils literal notranslate"><span class="pre">Web.is_my()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.list_role"><code class="docutils literal notranslate"><span class="pre">Web.list_role()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.save_user_apikeys"><code class="docutils literal notranslate"><span class="pre">Web.save_user_apikeys()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.session_list"><code class="docutils literal notranslate"><span class="pre">Web.session_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.start"><code class="docutils literal notranslate"><span class="pre">Web.start()</span></code></a></li>

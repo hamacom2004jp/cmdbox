@@ -1213,9 +1213,45 @@ This command implements ``output_schema()`` returning ``Result`` model.
               {
                 "author": "string",
                 "text": "string",
-                "final_response": false,
-                "function_call": false,
-                "function_response": false
+                "flags": {
+                  "final_response": false,
+                  "function_call": false,
+                  "function_response": false,
+                  "turn_complete": false,
+                  "interrupted": false
+                },
+                "function_calls": [
+                  {
+                    "id": "string",
+                    "name": "string",
+                    "args": {}
+                  }
+                ],
+                "function_responses": [
+                  {
+                    "id": "string",
+                    "name": "string",
+                    "response": {}
+                  }
+                ],
+                "render_ui_widgets": [
+                  {
+                    "id": "string",
+                    "provider": "string",
+                    "payload": {},
+                    "html": "string"
+                  }
+                ],
+                "artifacts": [
+                  {
+                    "filename": "string",
+                    "version": 0,
+                    "text": "string",
+                    "mime_type": "string",
+                    "inline_data_size": 0,
+                    "file_uri": "string"
+                  }
+                ]
               }
             ]
           }

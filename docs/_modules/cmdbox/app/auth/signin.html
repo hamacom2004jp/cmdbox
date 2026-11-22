@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/10/17 documentation</title>
+  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/11/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=769f61d8"></script>
+      <script src="../../../../_static/documentation_options.js?v=9100b3b0"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../resources/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/license.html">License</a></li>
 </ul>
 
@@ -110,9 +111,9 @@
     <span class="n">signin_module</span> <span class="o">=</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'signin_module'</span><span class="p">]</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">signin_module</span><span class="p">)</span>
-        <span class="n">members</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
+        <span class="n">signin_mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">signin_module</span><span class="p">)</span>
+        <span class="n">signin_members</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">signin_mod</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">signin_members</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="n">Signin</span> <span class="ow">or</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">Signin</span><span class="p">):</span>
                 <span class="n">sobj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">sobj</span>
@@ -776,6 +777,10 @@
                 <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'signin_file format error. "signin_module" not found in "signin". (</span><span class="si">{</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">yml</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'signin_module'</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'signin_file format error. "signin_module" is empty in "signin". (</span><span class="si">{</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">'role_module'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'signin_file format error. "role_module" not found in "signin". (</span><span class="si">{</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">yml</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">][</span><span class="s1">'role_module'</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'signin_file format error. "role_module" is empty in "signin". (</span><span class="si">{</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">yml</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">signin_module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span><span class="p">)</span>
         <span class="c1"># oauth2のフォーマットチェック</span>

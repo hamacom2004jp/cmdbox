@@ -81,6 +81,44 @@ agentView.spinner_loading = (success) => {
     return loading_msg;
 };
 
+/**
+ * MCP Apps UI ウィジェットを、受け取ったツール結果とともに描画します
+ * @param {Object} success - エージェントサーバーからの成功レスポンス
+ * @param {Array} success.render_ui_widgets - 描画対象の MCP App ウィジェット一覧
+ * @param {Array} success.function_responses - 直前のツール実行結果
+ * @param {jQuery} container - UI を描画する DOM コンテナ
+ * @returns {number} - 描画したウィジェット数
+ */
+agentView.render_mcpapps_widgets = (success, container) => {
+    const widgets = success.render_ui_widgets || [];
+    for (const widget of widgets) {
+        const responses = success.function_responses || [];
+        const functionResponse = [...responses].reverse().find((item) => item.name === widget.name)
+            || responses[responses.length - 1];
+        const toolResult = functionResponse?.response || functionResponse
+            || agentView.mcpapps_last_tool_result || null;
+        const iframe = $(`<iframe>`, {
+            name: widget.id,
+            title: widget.name || 'MCP App',
+            src: `data:text/html;base64,${widget.html}`,
+            width: '100%',
+            height: '10px',
+            frameborder: '0',
+            sandbox: 'allow-scripts allow-forms allow-popups allow-downloads'
+        });
+        container.append(iframe);
+        mcpapps_host.setupMCPApp(iframe[0], {
+            serverInfo: {
+                mcpserver_name: widget.provider,
+                provider: widget.provider,
+                resource_uri: widget.uri
+            },
+            toolResult: toolResult
+        });
+    }
+    return widgets.length;
+};
+
 agentView.chat = (session_id) => {
     const ping_interval = 5000; // pingの間隔
     const max_reconnect_count = 60000/ping_interval*1; // 最大再接続回数
@@ -96,6 +134,7 @@ agentView.chat = (session_id) => {
     }
     agentView.chatMessages.attr('data-session_id', session_id);
     agentView.message_id = null;
+    agentView.mcpapps_last_tool_result = null;
     agentView.chat_reconnect_count = 0;
     //agentView.btn_user_msg.prop('disabled', true); // 初期状態で送信ボタンを無効化
     // 送信ボタンのクリックイベント
@@ -237,6 +276,9 @@ agentView.chat = (session_id) => {
             // エージェント側の表示枠が無かったら追加
             agentView.message_id = cmdbox.random_string(16);
         }
+        agentView.onmessage && agentView.onmessage(packet);
+    };
+    agentView.onmessage = async (packet) => {
         // チャットリスナーにメッセージを渡す
         agentView.chat_listeners && agentView.chat_listeners.forEach(listener => listener(packet));
         if (packet && packet['warn']) {
@@ -269,6 +311,7 @@ agentView.chat = (session_id) => {
         const hasStructured = !!(
             (success.function_calls && success.function_calls.length > 0) ||
             (success.function_responses && success.function_responses.length > 0) ||
+            (success.render_ui_widgets && success.render_ui_widgets.length > 0) ||
             (success.artifact_delta && Object.keys(success.artifact_delta).length > 0) ||
             (success.artifacts && success.artifacts.length > 0)
         );
@@ -281,6 +324,21 @@ agentView.chat = (session_id) => {
             return;
         }
         console.log(packet);
+        if (success.function_responses && success.function_responses.length > 0) {
+            const latestResponse = success.function_responses[success.function_responses.length - 1];
+            agentView.mcpapps_last_tool_result = latestResponse?.response || latestResponse;
+        }
+        if (success.render_ui_widgets && success.render_ui_widgets.length > 0) {
+            if (msg_container.length <= 0) {
+                agentView.create_agent_message(agentView.message_id);
+                msg_container = $(`#${agentView.message_id}`);
+            }
+            agentView.render_mcpapps_widgets(success, msg_container);
+            if (!success.message && !success.function_responses && !success.artifact_delta && !success.artifacts) {
+                agentView.scrollToBottom();
+                return;
+            }
+        }
         if (success.flags && !success.flags['final_response']) {
             // 「考え中」を表示
             if (agentView.message_id==null) {
@@ -302,21 +360,6 @@ agentView.chat = (session_id) => {
             let loading_msg = agentView.spinner_loading(success);
             msg_container.find('.spinner-loading').text(loading_msg);
             const msg_str = agentView.parse_message(success.message);
-            if (success.render_ui_widgets && success.render_ui_widgets.length > 0) {
-                const content = success.render_ui_widgets[0].html;
-                const iframe_name = success.render_ui_widgets[0].id;
-                const iframe = $(`<iframe>`, {
-                    name: iframe_name,
-                    src: `data:text/html;base64,${content}`,
-                    width: '100%',
-                    height: '10px',
-                    frameborder: '0'
-                });
-                mcpapps_host.setupMCPApp(iframe[0]);
-                msg_container.append(iframe);
-                window.frames[iframe_name].dispatchEvent(new Event('DOMContentLoaded'));
-                return;
-            }
             if (msg_str != success.message || hasStructured) {
                 await agentView.format_agent_message(msg_content, msg_str, success);
             }

@@ -73,12 +73,40 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:
+        class FunctionCall(resdata.Base):
+            id: Union[str, None] = pydantic.Field(default=None, description="関数呼び出しID")
+            name: Union[str, None] = pydantic.Field(default=None, description="関数名")
+            args: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="関数引数")
+        class FunctionResponse(resdata.Base):
+            id: Union[str, None] = pydantic.Field(default=None, description="関数応答ID")
+            name: Union[str, None] = pydantic.Field(default=None, description="関数名")
+            response: Union[Dict[str, Any], str, None] = pydantic.Field(default=None, description="関数応答内容")
+        class Artifact(resdata.Base):
+            filename: Union[str, None] = pydantic.Field(default=None, description="アーティファクト名")
+            version: Union[int, None] = pydantic.Field(default=None, description="バージョン")
+            text: Union[str, None] = pydantic.Field(default=None, description="テキスト本文")
+            mime_type: Union[str, None] = pydantic.Field(default=None, description="MIMEタイプ")
+            inline_data_size: Union[int, None] = pydantic.Field(default=None, description="inline_dataサイズ")
+            file_uri: Union[str, None] = pydantic.Field(default=None, description="ファイルURI")
+        class UiWidget(resdata.Base):
+            id: Union[str, None] = pydantic.Field(default=None, description="UIウィジェットID")
+            provider: Union[str, None] = pydantic.Field(default=None, description="UIウィジェットプロバイダー")
+            payload: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="UIウィジェットペイロード")
+            html: Union[str, None] = pydantic.Field(default=None, description="UIウィジェットのHTML")
+        class Flags(resdata.Base):
+            final_response: bool = pydantic.Field(default=False, description="最終レスポンスフラグ")
+            function_call: bool = pydantic.Field(default=False, description="関数呼び出しフラグ")
+            function_response: bool = pydantic.Field(default=False, description="関数レスポンスフラグ")
+            turn_complete: bool = pydantic.Field(default=False, description="ターン完了フラグ")
+            interrupted: bool = pydantic.Field(default=False, description="割り込みフラグ")
         class SessionEvent(resdata.Base):
             author: Union[str, None] = pydantic.Field(default=None, description="作成者")
             text: Union[str, None] = pydantic.Field(default=None, description="テキスト")
-            final_response: Union[bool, None] = pydantic.Field(default=None, description="最終レスポンスフラグ")
-            function_call: Union[bool, None] = pydantic.Field(default=None, description="関数呼び出しフラグ")
-            function_response: Union[bool, None] = pydantic.Field(default=None, description="関数レスポンスフラグ")
+            flags: Union[Flags, None] = pydantic.Field(default=None, description="フラグ情報")
+            function_calls: Union[List[FunctionCall], None] = pydantic.Field(default=None, description="関数呼び出し一覧")
+            function_responses: Union[List[FunctionResponse], None] = pydantic.Field(default=None, description="関数応答一覧")
+            render_ui_widgets: Union[List[UiWidget], None] = pydantic.Field(default=None, description="表示対象のUIウィジェット一覧")
+            artifacts: Union[List[Artifact], None] = pydantic.Field(default=None, description="アーティファクト内容")
         class SessionRecord(resdata.Base):
             runner_name: Union[str, None] = pydantic.Field(default=None, description="ランナー名")
             session_id: Union[str, None] = pydantic.Field(default=None, description="セッションID")
@@ -101,10 +129,31 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
     def format_event(self, ev:Any) -> Dict[str, Any]:
         """1 イベントを session_list 応答用 dict に整形するフック。"""
         msg, is_func_call, is_func_response, is_final_response, st = self.gen_msg(ev)
-        return dict(author=ev.author, text=msg,
-                    final_response=is_final_response,
-                    function_call=is_func_call,
-                    function_response=is_func_response)
+        result = dict(author=ev.author, text=msg)
+        
+        flags = dict(
+            final_response=is_final_response,
+            function_call=is_func_call,
+            function_response=is_func_response,
+            turn_complete=getattr(ev, 'turn_complete', False) or False,
+            interrupted=getattr(ev, 'interrupted', False) or False
+        )
+        result['flags'] = flags
+        calls = ev.get_function_calls() or []
+        if calls:
+            result['function_calls'] = [self._serialize_function_call(c) for c in calls]
+        responses = ev.get_function_responses() or []
+        if responses:
+            result['function_responses'] = [self._serialize_function_response(r) for r in responses]
+        if ev.actions and getattr(ev.actions, 'render_ui_widgets', None):
+            result['render_ui_widgets'] = self.get_ui_widgets(ev)
+        if ev.actions and ev.actions.artifact_delta:
+            artifacts = []
+            for filename, version in ev.actions.artifact_delta.items():
+                artifacts.append(dict(filename=filename, version=version))
+            if artifacts:
+                result['artifacts'] = artifacts
+        return result
 
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):

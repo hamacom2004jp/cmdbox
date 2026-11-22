@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2026/11/15 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2026/11/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=f7d953b1"></script>
+      <script src="../../../_static/documentation_options.js?v=9100b3b0"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -81,6 +81,7 @@
              
   <h1>Source code for cmdbox.app.web</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">role</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">module</span><span class="p">,</span> <span class="n">redis_client</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asynccontextmanager</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
@@ -88,7 +89,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">redis.asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">Redis</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">starsessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionAutoloadMiddleware</span><span class="p">,</span> <span class="n">SessionMiddleware</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">starsessions.stores.redis</span><span class="w"> </span><span class="kn">import</span> <span class="n">RedisStore</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">uvicorn.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span>
@@ -127,6 +128,67 @@
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="c1"># monkeypatchingに問題が発生した場合は、デフォルトの動作に戻す</span>
         <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="MergeRedisStore">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.MergeRedisStore">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MergeRedisStore</span><span class="p">(</span><span class="n">RedisStore</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""同一セッションの並行リクエストを3-wayマージするRedisストア。"""</span>
+
+    <span class="n">_SESSION_BASELINE</span> <span class="o">=</span> <span class="s1">'__cmdbox_session_baseline__'</span>
+
+<div class="viewcode-block" id="MergeRedisStore.read">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.MergeRedisStore.read">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">lifetime</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">lifetime</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_SESSION_BASELINE</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="s1">':'</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'utf-8'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MergeRedisStore.write">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.MergeRedisStore.write">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">lifetime</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">ttl</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">baseline</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_SESSION_BASELINE</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">lifetime</span><span class="p">,</span> <span class="n">ttl</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">lifetime</span><span class="p">,</span> <span class="n">ttl</span><span class="p">)</span>
+
+        <span class="n">latest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">lifetime</span><span class="p">)</span> <span class="ow">or</span> <span class="sa">b</span><span class="s1">'</span><span class="si">{}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">latest</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">latest</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">baseline</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_SESSION_BASELINE</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_session_value</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="n">latest</span><span class="p">)</span>
+        <span class="n">merged</span><span class="p">[</span><span class="s1">'__metadata__'</span><span class="p">]</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'__metadata__'</span><span class="p">,</span> <span class="n">latest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'__metadata__'</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()))</span>
+        <span class="n">encoded</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="s1">':'</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'utf-8'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">encoded</span><span class="p">,</span> <span class="n">lifetime</span><span class="p">,</span> <span class="n">ttl</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_merge_session_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baseline</span><span class="p">:</span><span class="n">Any</span><span class="p">,</span> <span class="n">current</span><span class="p">:</span><span class="n">Any</span><span class="p">,</span> <span class="n">latest</span><span class="p">:</span><span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""リクエスト開始時から変更された値だけを最新セッションへ適用する。"""</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">latest</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">latest</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">baseline</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">current</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">baseline</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">current</span><span class="p">:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">latest</span> <span class="ow">and</span> <span class="n">latest</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">baseline</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                        <span class="k">del</span> <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">current</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">baseline</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_session_value</span><span class="p">(</span><span class="n">baseline</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">current</span><span class="p">[</span><span class="n">key</span><span class="p">],</span>
+                                                        <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">baseline</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current</span><span class="p">)</span> <span class="k">if</span> <span class="n">current</span> <span class="o">!=</span> <span class="n">baseline</span> <span class="k">else</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">latest</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web">
@@ -278,6 +340,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">signin_saml</span> <span class="o">=</span> <span class="n">signin_saml</span><span class="o">.</span><span class="n">SigninSAML</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="n">signin</span><span class="o">.</span><span class="n">Signin</span><span class="o">.</span><span class="n">set_webcls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">role_class</span> <span class="o">=</span> <span class="n">role</span><span class="o">.</span><span class="n">get_RoleClass</span><span class="p">(</span><span class="n">signin_file_data</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"web init parameter: data=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="kc">None</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -360,6 +423,123 @@
                                  <span class="sa">f</span><span class="s2">" -&gt; </span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">routes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="n">methods</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.get_role">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.get_role">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_role</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role_name</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">role</span><span class="o">.</span><span class="n">Role</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        指定されたrole_nameに対応するRoleを取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            role_name (str): 取得対象のロール名</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Role: 指定されたrole_nameに対応するRole</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">role_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Role class is not defined."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">role_class</span><span class="o">.</span><span class="n">valid_role</span><span class="p">(</span><span class="n">role_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid role name: </span><span class="si">{</span><span class="n">role_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">role_class</span><span class="p">[</span><span class="n">role_name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Web.list_role">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.list_role">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_role</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">role</span><span class="o">.</span><span class="n">Role</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        登録されている全てのロールを取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエストオブジェクト</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Role]: 登録されている全てのロール</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">role_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">role_class</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Web.is_my">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.is_my">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_my</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">user_name</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        自分の情報かどうかを確認する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエストオブジェクト</span>
+<span class="sd">            uid (Union[str, int]): ユーザーID</span>
+<span class="sd">            user_name (str): ユーザー名</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 自分の情報であればTrue、そうでなければFalse</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">req</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s1">'signin'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'uid'</span><span class="p">))</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span> <span class="o">==</span> <span class="n">user_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Web.has_role">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.has_role">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_role</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">req_role_names</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        指定されたロールを持っているか確認する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエストオブジェクト</span>
+<span class="sd">            req_role_names (Union[str, List[str]]): 確認対象のロール名またはロール名のリスト</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 指定されたreq_role_namesのロールを持っている場合はTrue、持っていない場合はFalse</span>
+<span class="sd">        """</span>
+        <span class="c1"># セッション情報がない場合は確認不要とする</span>
+        <span class="k">if</span> <span class="n">req</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s1">'signin'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># ユーザーが所有しているRoleが無い場合はFalse</span>
+        <span class="n">user_role_names</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'roles'</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">user_role_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># 確認対象のRoleが無い場合はFalse</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user_role_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">user_role_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">user_role_names</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">req_role_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req_role_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">req_role_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">req_role_names</span><span class="p">]</span>
+        <span class="c1"># ユーザーが所有しているRoleと確認対象のRoleを取得</span>
+        <span class="n">user_roles</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_role</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">user_role_names</span><span class="p">]</span>
+        <span class="n">req_roles</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_role</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">req_role_names</span><span class="p">]</span>
+        <span class="c1"># 確認対象のRoleをユーザーが所有しているかどうかを判定</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">user_role</span><span class="o">.</span><span class="n">has_children</span><span class="p">(</span><span class="n">req_role</span><span class="p">)</span> <span class="k">for</span> <span class="n">user_role</span> <span class="ow">in</span> <span class="n">user_roles</span> <span class="k">for</span> <span class="n">req_role</span> <span class="ow">in</span> <span class="n">req_roles</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.in_group">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.in_group">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">in_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">req_group_names</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        指定されたグループに所属しているか確認する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエストオブジェクト</span>
+<span class="sd">            signin_data (Dict[str, Any]): サインインファイルのデータ</span>
+<span class="sd">            req_group_names (Union[str, List[str]]): 確認対象のグループ名またはグループ名のリスト</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 指定されたreq_group_namesのグループに所属している場合はTrue、所属していない場合はFalse</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">req</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s1">'signin'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">signin_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">user_group_names</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'signin'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user_group_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">user_group_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">user_group_names</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">req_group_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req_group_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">req_group_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">req_group_names</span><span class="p">]</span>
+        <span class="n">req_group_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">parent_group</span><span class="p">(</span><span class="n">signin_data</span><span class="p">,</span> <span class="n">req_group_names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">g</span> <span class="ow">in</span> <span class="n">user_group_names</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">req_group_names</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.change_password">
@@ -462,6 +642,25 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span><span class="p">,</span> <span class="s1">'apikey'</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Web.is_buildin_user">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.is_buildin_user">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_buildin_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_name</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        指定されたユーザーがビルトインユーザーかどうかを判定する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_name (str): ユーザー名</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: ビルトインユーザーであればTrue、それ以外はFalse</span>
+<span class="sd">        """</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_list</span><span class="p">(</span><span class="n">user_name</span><span class="p">);</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span></div>
+
+
 <div class="viewcode-block" id="Web.user_list">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.user_list">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">user_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
@@ -534,6 +733,14 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            str: ApiKey</span>
 <span class="sd">        """</span>
+        <span class="c1"># Roleによる権限確認</span>
+        <span class="n">pfrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">])</span>
+        <span class="n">admrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">])</span>
+        <span class="n">mgrrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">])</span>
+        <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'uid'</span><span class="p">),</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
+        <span class="n">myrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_my</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mgrrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">myrole</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User does not have the required role to access this data."</span><span class="p">)</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'signin_file_data is None. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
@@ -548,9 +755,16 @@
         <span class="n">apikey</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]:</span>
+                <span class="c1"># 所属グループ以外は編集できない</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">myrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_group</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">[])):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot edit users who are not members of the group."</span><span class="p">)</span>
+                <span class="c1"># プラットフォームロールを持つユーザーは編集できない</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'roles'</span><span class="p">,</span> <span class="p">[])):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This edit cannot be made."</span><span class="p">)</span>
+                <span class="c1"># ユーザーのApiKeyを取得</span>
                 <span class="n">apikeys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_apikeys</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">include_legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s1">'apikey_name'</span><span class="p">]</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ApiKey name is already exists."</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ApiKey name is already exists."</span><span class="p">)</span>
                 <span class="n">apikey</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span>
                 <span class="n">apikeys</span><span class="p">[</span><span class="n">user</span><span class="p">[</span><span class="s1">'apikey_name'</span><span class="p">]]</span> <span class="o">=</span> <span class="n">apikey</span>
                 <span class="k">if</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'apikey'</span><span class="p">][</span><span class="s1">'gen_jwt'</span><span class="p">][</span><span class="s1">'enabled'</span><span class="p">]:</span>
@@ -561,6 +775,7 @@
                     <span class="n">claims</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]</span>
                     <span class="n">claims</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span>
                     <span class="n">claims</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span>
+                    <span class="n">claims</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]</span>
                     <span class="n">claims</span><span class="p">[</span><span class="s1">'email'</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">'email'</span><span class="p">]</span>
                     <span class="n">claims</span><span class="p">[</span><span class="s1">'apikey_name'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">'apikey_name'</span><span class="p">]</span>
                     <span class="n">apikey</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">claims</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">gen_jwt_privatekey</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">gen_jwt_algorithm</span><span class="p">)</span>
@@ -568,6 +783,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">save_user_apikeys</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="n">apikeys</span><span class="p">)</span>
                 <span class="c1"># 互換性維持のため、移行期間はsignin_fileにも同期する</span>
                 <span class="n">u</span><span class="p">[</span><span class="s1">'apikeys'</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">req</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'apikeys'</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"apikey_add: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -586,6 +803,14 @@
 <span class="sd">            req (Request): リクエストオブジェクト</span>
 <span class="sd">            user (Dict[str, Any]): ユーザー情報</span>
 <span class="sd">        """</span>
+        <span class="c1"># Roleによる権限確認</span>
+        <span class="n">pfrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">])</span>
+        <span class="n">admrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">])</span>
+        <span class="n">mgrrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">])</span>
+        <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'uid'</span><span class="p">),</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
+        <span class="n">myrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_my</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mgrrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">myrole</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User does not have the required role to access this data."</span><span class="p">)</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'signin_file_data is None. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
@@ -600,6 +825,12 @@
         <span class="n">apikey</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]:</span>
+                <span class="c1"># 所属グループ以外は編集できない</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">myrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_group</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">[])):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot edit users who are not members of the group."</span><span class="p">)</span>
+                <span class="c1"># プラットフォームロールを持つユーザーは編集できない</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'roles'</span><span class="p">,</span> <span class="p">[])):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This edit cannot be made."</span><span class="p">)</span>
                 <span class="n">apikeys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_apikeys</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">include_legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s1">'apikey_name'</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -612,6 +843,8 @@
                         <span class="k">del</span> <span class="n">u</span><span class="p">[</span><span class="s1">'apikeys'</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">u</span><span class="p">[</span><span class="s1">'apikeys'</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">req</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'apikeys'</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">apikey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ApiKey name is not exists."</span><span class="p">)</span>
 
@@ -619,18 +852,20 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"signin_file is None."</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"apikey_del: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span></div>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
         <span class="c1">#common.save_yml(self.signin_file, signin_data, nolock=False)</span>
+        <span class="k">return</span> <span class="n">apikey</span></div>
+
 
 <div class="viewcode-block" id="Web.user_add">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.user_add">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">user_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        サインインファイルにユーザーを追加する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            user (Dict[str, Any]): ユーザー情報</span>
+<span class="sd">            req (Request, optional): リクエストオブジェクト</span>
 <span class="sd">        """</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -657,20 +892,50 @@
         <span class="k">for</span> <span class="n">gn</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group_list</span><span class="p">(</span><span class="n">gn</span><span class="p">,</span> <span class="n">ret_hidden</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Group is not found. (</span><span class="si">{</span><span class="n">gn</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'roles'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]:</span>
+            <span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'MEMBER'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">'roles'</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User uid is already exists."</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User name is already exists."</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hash</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'oauth2'</span><span class="p">,</span> <span class="s1">'saml'</span><span class="p">,</span> <span class="s1">'plain'</span><span class="p">,</span> <span class="s1">'md5'</span><span class="p">,</span> <span class="s1">'sha1'</span><span class="p">,</span> <span class="s1">'sha256'</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User hash is not supported."</span><span class="p">)</span>
+        <span class="c1"># Roleによる権限確認</span>
+        <span class="n">pfrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">])</span>
+        <span class="n">admrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">])</span>
+        <span class="n">mgrrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mgrrole</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User does not have the required role to access this data."</span><span class="p">)</span>
         <span class="c1"># buildin設定が有効化されているユーザーは追加できない</span>
         <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot add a built-in user."</span><span class="p">)</span>
         <span class="c1"># buildin設定が有効化されているグループは設定できない</span>
+        <span class="k">if</span> <span class="n">req</span> <span class="ow">and</span> <span class="s1">'signin'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+            <span class="n">my_buildin_user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_buildin_user</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'signin'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">''</span><span class="p">))</span>
+            <span class="n">my_buildin_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_buildin_group</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'signin'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">my_buildin_user</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">my_buildin_group</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">gn</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]:</span>
             <span class="n">group</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">gn</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">group</span> <span class="ow">and</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group</span> <span class="ow">and</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span> \
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">my_buildin_user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">my_buildin_group</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot assign a built-in group to a user."</span><span class="p">)</span>
+        <span class="c1"># 所属グループ以外は編集できない</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_group</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot add users who are not members of the group."</span><span class="p">)</span>
+        <span class="c1"># 上位ロールを持つユーザーは編集できない</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span><span class="p">:</span>
+            <span class="n">roles</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'roles'</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make additions that exceed your role's permissions."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">admrole</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make additions that exceed your role's permissions."</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mgrrole</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make additions that exceed your role's permissions."</span><span class="p">)</span>
 
         <span class="n">jadge</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_password_policy</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="s1">''</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">'password'</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">jadge</span><span class="p">:</span>
@@ -683,21 +948,22 @@
         <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"user_add: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="c1"># パスワード更新日時の保存</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">],</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="s1">'password'</span><span class="p">,</span> <span class="s1">'last_update'</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
         <span class="c1"># サインインファイルの保存</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># パスワード更新日時の保存</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">],</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="s1">'password'</span><span class="p">,</span> <span class="s1">'last_update'</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="Web.user_edit">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.user_edit">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">user_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        サインインファイルのユーザー情報を編集する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            user (Dict[str, Any]): ユーザー情報</span>
+<span class="sd">            req (Request, optional): リクエストオブジェクト</span>
 <span class="sd">        """</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -722,21 +988,64 @@
         <span class="k">for</span> <span class="n">gn</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group_list</span><span class="p">(</span><span class="n">gn</span><span class="p">,</span> <span class="n">ret_hidden</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Group is not found. (</span><span class="si">{</span><span class="n">gn</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'roles'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]:</span>
+            <span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'MEMBER'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">'roles'</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User uid is not found."</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User name is not found."</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hash</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'oauth2'</span><span class="p">,</span> <span class="s1">'saml'</span><span class="p">,</span> <span class="s1">'plain'</span><span class="p">,</span> <span class="s1">'md5'</span><span class="p">,</span> <span class="s1">'sha1'</span><span class="p">,</span> <span class="s1">'sha256'</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User hash is not supported."</span><span class="p">)</span>
+        <span class="c1"># Roleによる権限確認</span>
+        <span class="n">pfrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">])</span>
+        <span class="n">admrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">])</span>
+        <span class="n">mgrrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">])</span>
+        <span class="n">myrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_my</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">],</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mgrrole</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User does not have the required role to access this data."</span><span class="p">)</span>
         <span class="c1"># buildin設定が有効化されているグループは設定できない</span>
+        <span class="k">if</span> <span class="n">req</span> <span class="ow">and</span> <span class="s1">'signin'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+            <span class="n">my_buildin_user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_buildin_user</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'signin'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">''</span><span class="p">))</span>
+            <span class="n">my_buildin_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_buildin_group</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'signin'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">my_buildin_user</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">my_buildin_group</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">gn</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]:</span>
             <span class="n">group</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">gn</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">group</span> <span class="ow">and</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group</span> <span class="ow">and</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span> \
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">my_buildin_user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">my_buildin_group</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot assign a built-in group to a user."</span><span class="p">)</span>
+        <span class="c1"># 上位ロールを持つユーザーに編集できない</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span><span class="p">:</span>
+            <span class="n">roles</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'roles'</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">admrole</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mgrrole</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">u</span> <span class="ow">and</span> <span class="n">u</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">u</span> <span class="ow">and</span> <span class="n">u</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> \
+                    <span class="ow">and</span> <span class="ow">not</span> <span class="n">my_buildin_user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">my_buildin_group</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot edit a built-in user."</span><span class="p">)</span>
+                <span class="c1"># 所属グループ以外は編集できない</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">myrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_group</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">[])):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot edit users who are not members of the group."</span><span class="p">)</span>
+                <span class="c1"># 上位ロールを持つユーザーは編集できない</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span><span class="p">:</span>
+                    <span class="n">roles</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'roles'</span><span class="p">,</span> <span class="p">[])</span>
+                    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">admrole</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">mgrrole</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
                 <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span>
                 <span class="k">if</span> <span class="s1">'password'</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">user</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">''</span><span class="p">:</span>
                     <span class="n">jadge</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">check_password_policy</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s1">'password'</span><span class="p">],</span> <span class="n">user</span><span class="p">[</span><span class="s1">'password'</span><span class="p">])</span>
@@ -747,10 +1056,11 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">u</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span>
                     <span class="c1"># パスワード更新日時の保存</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">],</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="s1">'password'</span><span class="p">,</span> <span class="s1">'last_update'</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">],</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="s1">'password'</span><span class="p">,</span> <span class="s1">'last_update'</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
                 <span class="n">u</span><span class="p">[</span><span class="s1">'hash'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">'hash'</span><span class="p">]</span>
                 <span class="n">u</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span>
                 <span class="n">u</span><span class="p">[</span><span class="s1">'email'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">'email'</span><span class="p">]</span>
+                <span class="n">u</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">'roles'</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"user_edit: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="c1"># サインインファイルの保存</span>
@@ -760,12 +1070,15 @@
 
 <div class="viewcode-block" id="Web.user_del">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.user_del">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">user_del</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user_del</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">my_buildin_user</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">my_buildin_group</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        サインインファイルからユーザーを削除する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            uid (int): ユーザーID</span>
+<span class="sd">            req (Request, optional): リクエストオブジェクト</span>
+<span class="sd">            my_buildin_user (bool, optional): 自身がビルトインユーザーかどうか</span>
+<span class="sd">            my_buildin_group (bool, optional): 自身がビルトイングループかどうか</span>
 <span class="sd">        """</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -776,12 +1089,35 @@
             <span class="n">uid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User uid is not number. (</span><span class="si">{</span><span class="n">uid</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+        <span class="c1"># Roleによる権限確認</span>
+        <span class="n">pfrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">])</span>
+        <span class="n">admrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">])</span>
+        <span class="n">mgrrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mgrrole</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User does not have the required role to access this data."</span><span class="p">)</span>
+
         <span class="c1"># ユーザーがbuildin設定されていないことをチェック</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]</span> <span class="o">==</span> <span class="n">uid</span> <span class="ow">and</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">u</span> <span class="ow">and</span> <span class="n">u</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This user is a built-in user. (</span><span class="si">{</span><span class="n">uid</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]</span> <span class="o">==</span> <span class="n">uid</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">u</span> <span class="ow">and</span> <span class="n">u</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This user is a built-in user."</span><span class="p">)</span>
+                <span class="c1"># 所属グループ以外は編集できない</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_group</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">[])):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot edit users who are not members of the group."</span><span class="p">)</span>
+                <span class="c1"># 上位ロールを持つユーザーは削除できない</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span><span class="p">:</span>
+                    <span class="n">roles</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'roles'</span><span class="p">,</span> <span class="p">[])</span>
+                    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make deletions that exceed your role's permissions."</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">admrole</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make deletions that exceed your role's permissions."</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">mgrrole</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make deletions that exceed your role's permissions."</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
         <span class="c1"># ユーザーの削除</span>
-        <span class="n">users</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'uid'</span><span class="p">]</span> <span class="o">!=</span> <span class="n">uid</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User uid is not found. (</span><span class="si">{</span><span class="n">uid</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
         <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]</span> <span class="o">=</span> <span class="n">users</span>
@@ -841,6 +1177,27 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to get session list from Redis: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Web.is_buildin_group">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.is_buildin_group">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_buildin_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        指定されたグループリストにビルトイングループが含まれているかどうかを判定する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            groups (List[str]): グループ名のリスト</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: ビルトイングループが含まれている場合はTrue、それ以外はFalse</span>
+<span class="sd">        """</span>
+        <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
+        <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'signin_file_data is None. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="ow">in</span> <span class="n">groups</span> <span class="ow">and</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
 <div class="viewcode-block" id="Web.group_list">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.group_list">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">group_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ret_hidden</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
@@ -870,12 +1227,14 @@
 
 <div class="viewcode-block" id="Web.group_add">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.group_add">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">group_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">my_buildin_user</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">my_buildin_group</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        サインインファイルにグループを追加する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            group (Dict[str, Any]): グループ情報</span>
+<span class="sd">            my_buildin_user (bool, optional): 自身がビルトインユーザーかどうか. Defaults to False.</span>
+<span class="sd">            my_buildin_group (bool, optional): 自身がビルトイングループかどうか. Defaults to False.</span>
 <span class="sd">        """</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -897,17 +1256,22 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">group</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Group name is already exists."</span><span class="p">)</span>
         <span class="c1"># buildin設定が有効化されているグループを親に設定できない</span>
+        <span class="n">add_buildin_subgroup</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="s1">'parent'</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s1">'parent'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">group</span><span class="p">[</span><span class="s1">'parent'</span><span class="p">]:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot set a built-in group as a parent group."</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">my_buildin_user</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">my_buildin_group</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot set a built-in group as a parent group."</span><span class="p">)</span>
+                    <span class="n">add_buildin_subgroup</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1"># buildin設定が有効化されているグループは追加できない</span>
-        <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot add a built-in group."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot add a built-in group."</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span>
         <span class="c1"># readonly設定はFalseで保存する</span>
         <span class="n">group</span><span class="p">[</span><span class="s1">'readonly'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="c1"># hidden設定はFalseで保存する</span>
-        <span class="n">group</span><span class="p">[</span><span class="s1">'hidden'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># hidden設定はFalseで保存する（但し自身がbuildinグループを親に持つの場合はTrueにする）</span>
+        <span class="n">group</span><span class="p">[</span><span class="s1">'hidden'</span><span class="p">]</span> <span class="o">=</span> <span class="n">add_buildin_subgroup</span>
         <span class="n">group</span><span class="p">[</span><span class="s1">'home'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">".groups/</span><span class="si">{</span><span class="n">group</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">signin_data</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -928,12 +1292,16 @@
 
 <div class="viewcode-block" id="Web.group_edit">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.group_edit">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">group_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">my_buildin_user</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">my_buildin_group</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        サインインファイルのグループ情報を編集する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            group (Dict[str, Any]): グループ情報</span>
+<span class="sd">        Args:</span>
+<span class="sd">            my_buildin_user (bool, optional): 自身がビルトインユーザーかどうか. Defaults to False.</span>
+<span class="sd">            my_buildin_group (bool, optional): 自身がビルトイングループかどうか. Defaults to False.</span>
+
 <span class="sd">        """</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -958,7 +1326,8 @@
         <span class="k">if</span> <span class="s1">'parent'</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s1">'parent'</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">group</span><span class="p">[</span><span class="s1">'parent'</span><span class="p">]:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot set a built-in group as a parent group."</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">my_buildin_user</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">my_buildin_group</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot set a built-in group as a parent group."</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'groups'</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">'gid'</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">'gid'</span><span class="p">]):</span>
                 <span class="c1"># buildin設定が有効化されているグループは編集できない</span>
@@ -968,13 +1337,15 @@
                 <span class="k">if</span> <span class="s1">'readonly'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'readonly'</span><span class="p">]:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot edit a read-only group."</span><span class="p">)</span>
                 <span class="c1"># hidden設定が有効化されているグループは編集できない</span>
-                <span class="k">if</span> <span class="s1">'hidden'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'hidden'</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">'hidden'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'hidden'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">my_buildin_user</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">my_buildin_group</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot edit a hidden group."</span><span class="p">)</span>
                 <span class="n">g</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span>
                 <span class="n">g</span><span class="p">[</span><span class="s1">'startpage'</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">'startpage'</span><span class="p">]</span> <span class="k">if</span> <span class="s1">'startpage'</span> <span class="ow">in</span> <span class="n">group</span> <span class="k">else</span> <span class="kc">None</span>
                 <span class="n">g</span><span class="p">[</span><span class="s1">'parent'</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">'parent'</span><span class="p">]</span> <span class="k">if</span> <span class="s1">'parent'</span> <span class="ow">in</span> <span class="n">group</span> <span class="k">else</span> <span class="kc">None</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="p">[</span><span class="s1">'parent'</span><span class="p">]:</span>
                     <span class="k">del</span> <span class="n">g</span><span class="p">[</span><span class="s1">'parent'</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">'buildin'</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]:</span>
+                    <span class="k">del</span> <span class="n">group</span><span class="p">[</span><span class="s1">'buildin'</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"signin_file is None."</span><span class="p">)</span>
         <span class="c1"># cmdruleへの適用</span>
@@ -993,12 +1364,14 @@
 
 <div class="viewcode-block" id="Web.group_del">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.group_del">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">group_del</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group_del</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">my_buildin_user</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">my_buildin_group</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        サインインファイルからグループを削除する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            gid (str): グループID</span>
+<span class="sd">            my_buildin_user (bool): ビルドインユーザーかどうか</span>
+<span class="sd">            my_buildin_group (bool): ビルドイングループかどうか</span>
 <span class="sd">        """</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1043,7 +1416,7 @@
                 <span class="k">if</span> <span class="s1">'readonly'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'readonly'</span><span class="p">]:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This group is a read-only group."</span><span class="p">)</span>
                 <span class="c1"># hidden設定が有効化されているグループは削除できない</span>
-                <span class="k">if</span> <span class="s1">'hidden'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'hidden'</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">'hidden'</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">'hidden'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">my_buildin_user</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">my_buildin_group</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This group is a hidden group."</span><span class="p">)</span>
 
         <span class="c1"># グループ削除</span>
@@ -1100,22 +1473,43 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Any: 値 or カテゴリのデータ</span>
 <span class="sd">        """</span>
+        <span class="c1"># Roleによる権限確認</span>
+        <span class="n">pfrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">])</span>
+        <span class="n">admrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">])</span>
+        <span class="n">mgrrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_role</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">])</span>
+        <span class="n">myrole</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_my</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mgrrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">myrole</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User does not have the required role to access this data."</span><span class="p">)</span>
+
         <span class="n">user_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">users_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"user-</span><span class="si">{</span><span class="n">uid</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">user_name</span><span class="si">}</span><span class="s2">.json"</span>
-        <span class="c1"># ユーザーデータの取得</span>
-        <span class="k">if</span> <span class="n">req</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">'user_data'</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
-            <span class="c1"># セッションにユーザーデータがある場合はそれを使用する</span>
-            <span class="n">user_data</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'user_data'</span><span class="p">]</span>
+        <span class="c1"># 常にファイルから読み直す。</span>
+        <span class="k">if</span> <span class="n">user_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">user_data</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">loaduser</span><span class="p">(</span><span class="n">user_path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># セッションにユーザーデータがない場合はファイルから読み込む</span>
-            <span class="k">if</span> <span class="n">user_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-                <span class="n">user_data</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">loaduser</span><span class="p">(</span><span class="n">user_path</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">user_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">req</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># セッションにユーザーデータを保存する</span>
-                <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'user_data'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_data</span>
+            <span class="n">user_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">categoly</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user_data</span><span class="p">:</span>
             <span class="n">user_data</span><span class="p">[</span><span class="n">categoly</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="c1"># 所属グループ以外は編集できない</span>
+        <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User not found."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">admrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">myrole</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_group</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">[])):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot edit users who are not members of the group."</span><span class="p">)</span>
+        <span class="c1"># 上位ロールを持つユーザーに編集できない</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pfrole</span><span class="p">:</span>
+            <span class="n">roles</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'roles'</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'PFDEVELOPER'</span><span class="p">,</span> <span class="s1">'PFMASTER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">admrole</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'USERADMIN'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mgrrole</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'MANAGER'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You cannot make edits that exceed your role's permissions."</span><span class="p">)</span>
+
         <span class="c1"># キー削除の場合</span>
         <span class="k">if</span> <span class="n">delkey</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">user_data</span><span class="p">[</span><span class="n">categoly</span><span class="p">]:</span>
@@ -1128,6 +1522,9 @@
         <span class="c1"># キーが指定されている場合は値を設定または取得する</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">user_data</span><span class="p">[</span><span class="n">categoly</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">user_data</span><span class="p">[</span><span class="n">categoly</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">timespec</span><span class="o">=</span><span class="s1">'seconds'</span><span class="p">)</span>
+
         <span class="n">user_data</span><span class="p">[</span><span class="n">categoly</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="n">common</span><span class="o">.</span><span class="n">saveuser</span><span class="p">(</span><span class="n">user_data</span><span class="p">,</span> <span class="n">user_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">val</span></div>
@@ -1229,7 +1626,7 @@
                 <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">"Strict-Transport-Security"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"max-age=15768000"</span>
             <span class="k">return</span> <span class="n">res</span>
 
-        <span class="n">session_store</span> <span class="o">=</span> <span class="n">RedisStore</span><span class="p">(</span><span class="n">connection</span><span class="o">=</span><span class="n">session_redis</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">:session."</span><span class="p">)</span>
+        <span class="n">session_store</span> <span class="o">=</span> <span class="n">MergeRedisStore</span><span class="p">(</span><span class="n">connection</span><span class="o">=</span><span class="n">session_redis</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">:session."</span><span class="p">)</span>
         <span class="n">mwparam</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">store</span><span class="o">=</span><span class="n">session_store</span><span class="p">,</span> <span class="n">cookie_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_path</span><span class="p">,</span>
                        <span class="n">lifetime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span><span class="p">,</span> <span class="n">rolling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cookie_same_site</span><span class="o">=</span><span class="s2">"lax"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
