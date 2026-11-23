@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app package &mdash; cmdbox 2026/11/22 documentation</title>
+  <title>cmdbox.app package &mdash; cmdbox 2026/11/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=9100b3b0"></script>
+      <script src="../_static/documentation_options.js?v=357837a9"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -2250,19 +2250,118 @@ bool: 監査ログを記録する場合はTrue</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.feature.Feature.get_renderer_assets">
+<span class="sig-name descname"><span class="pre">get_renderer_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.get_renderer_assets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.get_renderer_assets" title="Link to this definition"></a></dt>
+<dd><p>MCP Appsのレンダラー用のアセット情報を取得します。
+戻り値のキーがアセット(JSやCSS)のファイルパス(URL上のパス)で、値が種類(例: &quot;js&quot; や &quot;css&quot;)です。
+get_renderer_htmlで生成されるHTMLの一部として使用されます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uri</strong> (<em>str</em>) -- リソースURI</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>アセットの種類とURLの辞書</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.feature.Feature.get_renderer_content">
+<span class="sig-name descname"><span class="pre">get_renderer_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.get_renderer_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.get_renderer_content" title="Link to this definition"></a></dt>
+<dd><p>コマンド固有のHTMLコンテンツを生成します。
+get_renderer_htmlで生成されるHTMLの一部として使用されます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uri</strong> (<em>str</em>) -- リソースURI</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>レンダリングフラグ。Trueの場合はレンダリングを行い、Falseの場合は行わない。
+str: コンテンツタイプ
+str: HTML文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.feature.Feature.get_renderer_domains">
 <span class="sig-name descname"><span class="pre">get_renderer_domains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.get_renderer_domains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.get_renderer_domains" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>MCP Appsのレンダラーが利用するドメインのリストを返します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>レンダラーが利用するドメインのリスト</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.feature.Feature.get_renderer_function">
+<span class="sig-name descname"><span class="pre">get_renderer_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.get_renderer_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.get_renderer_function" title="Link to this definition"></a></dt>
+<dd><p>MCP Appsのレンダラー用のJavaScript関数を取得します。
+agent_mcpapps_iframe.js の <cite>mcpapps.render</cite> メソッドを差し替えるようにしてください。
+パラメータの <cite>container</cite> はレンダリング先のDOM要素、
+パラメータの <cite>result</cite> はレンダリング対象の結果オブジェクトです。
+パラメータの <cite>result</cite> はMCPのツールコールの結果（通常コマンドレットの実行結果オブジェクト）です。
+get_renderer_htmlで生成されるHTMLの一部として使用されます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uri</strong> (<em>str</em>) -- リソースURI</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JavaScript関数の文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.feature.Feature.get_renderer_html">
 <span class="sig-name descname"><span class="pre">get_renderer_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.get_renderer_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.get_renderer_html" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>MCP Appsのレンダラー用のHTMLを生成します。
+この内容がiframe内で表示されるHTMLです。
+生成されるHTMLには、指定されたリソースURIを持つdiv要素が含まれます。
+通常このメソッドはオーバーライドせず、
+コマンド固有のHTMLは <cite>get_renderer_content</cite> で、
+コマンド固有のレンダリング処理は <cite>get_renderer_function</cite> で返すようにしてください。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uri</strong> (<em>str</em>) -- リソースURI</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>コンテンツタイプとHTML文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.feature.Feature.get_renderer_uri">
 <span class="sig-name descname"><span class="pre">get_renderer_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#Feature.get_renderer_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.Feature.get_renderer_uri" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>MCP Appsのui.resource_uriを返します</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>suffix</strong> (<em>str</em>) -- リソースURIの末尾に追加する文字列</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>MCP Appsのui.resource_uri</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.feature.Feature.get_svcmd">

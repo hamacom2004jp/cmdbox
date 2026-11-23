@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.feature &mdash; cmdbox 2026/11/22 documentation</title>
+  <title>cmdbox.app.feature &mdash; cmdbox 2026/11/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=9100b3b0"></script>
+      <script src="../../../_static/documentation_options.js?v=357837a9"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -363,19 +363,54 @@
 <div class="viewcode-block" id="Feature.get_renderer_uri">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_uri">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        MCP Appsのui.resource_uriを返します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            suffix (str): リソースURIの末尾に追加する文字列</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: MCP Appsのui.resource_uri</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">"ui://mcpapps/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mode</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cmd</span><span class="p">()</span><span class="si">}{</span><span class="s1">''</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">suffix</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">suffix</span><span class="si">}</span><span class="s2">"</span></div>
 
 
 <div class="viewcode-block" id="Feature.get_renderer_domains">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_domains">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        MCP Appsのレンダラーが利用するドメインのリストを返します</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[str]: レンダラーが利用するドメインのリスト</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">[</span><span class="s2">"https://cdn.jsdelivr.net"</span><span class="p">,</span> <span class="s2">"https://cdnjs.cloudflare.com"</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="Feature.get_renderer_html">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_html">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        MCP Appsのレンダラー用のHTMLを生成します。</span>
+<span class="sd">        この内容がiframe内で表示されるHTMLです。</span>
+<span class="sd">        生成されるHTMLには、指定されたリソースURIを持つdiv要素が含まれます。</span>
+<span class="sd">        通常このメソッドはオーバーライドせず、</span>
+<span class="sd">        コマンド固有のHTMLは `get_renderer_content` で、</span>
+<span class="sd">        コマンド固有のレンダリング処理は `get_renderer_function` で返すようにしてください。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uri (str): リソースURI</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[str, str]: コンテンツタイプとHTML文字列</span>
+<span class="sd">        """</span>
         <span class="n">js</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"web"</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"agent"</span> <span class="o">/</span> <span class="s2">"agent_mcpapps_iframe.js"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">js</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">js</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"web"</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"agent"</span> <span class="o">/</span> <span class="s2">"agent_mcpapps_iframe.js"</span>
+        <span class="n">renderer_fg</span><span class="p">,</span> <span class="n">mime</span><span class="p">,</span> <span class="n">mcpapps_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_renderer_content</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">renderer_fg</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">mime</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">assets_js</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">type_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_renderer_assets</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">assets_js</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">'mcpapps.asset_</span><span class="si">{</span><span class="n">type_</span><span class="si">}</span><span class="s1">(baseurl, "</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">");</span><span class="se">\n</span><span class="s1">'</span>
         <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'''&lt;!DOCTYPE html&gt;</span>
 <span class="s1">&lt;html lang="ja" data-bs-theme="dark"&gt;</span>
 <span class="s1">&lt;head&gt;</span>
@@ -385,11 +420,85 @@
 <span class="s1">&lt;title&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">&lt;/title&gt;</span>
 <span class="s1">&lt;/head&gt;</span>
 <span class="s1">&lt;body class="overflow-hidden p-2" style="background:transparent;"&gt;</span>
-<span class="s1">&lt;div id="main_mcpapps" data-resource-uri="</span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1">" data-mode="</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mode</span><span class="p">()</span><span class="si">}</span><span class="s1">" data-cmd="</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cmd</span><span class="p">()</span><span class="si">}</span><span class="s1">"&gt;&lt;/div&gt;</span>
+<span class="s1">&lt;div id="mcpapps_main" data-resource-uri="</span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1">" data-mode="</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mode</span><span class="p">()</span><span class="si">}</span><span class="s1">" data-cmd="</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cmd</span><span class="p">()</span><span class="si">}</span><span class="s1">"&gt;</span>
+<span class="s1">&lt;div id="mcpapps_content"&gt;</span>
+<span class="si">{</span><span class="n">mcpapps_content</span><span class="si">}</span><span class="s1">&lt;/div&gt;&lt;/div&gt;</span>
 <span class="s1">&lt;script type="text/javascript"&gt;</span><span class="si">{</span><span class="n">js</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="si">}</span><span class="s1">&lt;/script&gt;</span>
-<span class="s1">&lt;/body&gt;</span>
-<span class="s1">&lt;/html&gt;'''</span>
-        <span class="k">return</span> <span class="s1">'text/html;profile=mcp-app'</span><span class="p">,</span> <span class="n">html</span></div>
+<span class="s1">&lt;script type="text/javascript"&gt;</span>
+<span class="s1">'''</span> <span class="o">+</span> <span class="s1">'''mcpapps.assets = (baseurl) =&gt; {if (baseurl) {</span>
+<span class="s1">'''</span> <span class="o">+</span> <span class="n">assets_js</span> <span class="o">+</span> <span class="s1">'''}};</span>
+<span class="s1">&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;'''</span>
+        <span class="k">return</span> <span class="n">mime</span><span class="p">,</span> <span class="n">html</span></div>
+
+
+<div class="viewcode-block" id="Feature.get_renderer_content">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        コマンド固有のHTMLコンテンツを生成します。</span>
+<span class="sd">        get_renderer_htmlで生成されるHTMLの一部として使用されます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uri (str): リソースURI</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: レンダリングフラグ。Trueの場合はレンダリングを行い、Falseの場合は行わない。</span>
+<span class="sd">            str: コンテンツタイプ</span>
+<span class="sd">            str: HTML文字列</span>
+<span class="sd">        """</span>
+        <span class="n">mcpapps_content</span> <span class="o">=</span> <span class="s1">''</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">'text/html;profile=mcp-app'</span><span class="p">,</span> <span class="n">mcpapps_content</span></div>
+
+
+<div class="viewcode-block" id="Feature.get_renderer_assets">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_assets">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_assets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        MCP Appsのレンダラー用のアセット情報を取得します。</span>
+<span class="sd">        戻り値のキーがアセット(JSやCSS)のファイルパス(URL上のパス)で、値が種類(例: "js" や "css")です。</span>
+<span class="sd">        get_renderer_htmlで生成されるHTMLの一部として使用されます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uri (str): リソースURI</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, str]: アセットの種類とURLの辞書</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"/assets/cmdbox/color_mode.css"</span><span class="p">:</span> <span class="s2">"css"</span><span class="p">,</span>
+            <span class="s2">"/assets/cmdbox/color_mode_ext.css"</span><span class="p">:</span> <span class="s2">"css"</span><span class="p">,</span>
+            <span class="s2">"/assets/agent/agent.css"</span><span class="p">:</span> <span class="s2">"css"</span><span class="p">,</span>
+            <span class="s2">"/assets/agent/agent_ext.css"</span><span class="p">:</span> <span class="s2">"css"</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Feature.get_renderer_function">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_renderer_function">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        MCP Appsのレンダラー用のJavaScript関数を取得します。</span>
+<span class="sd">        agent_mcpapps_iframe.js の `mcpapps.render` メソッドを差し替えるようにしてください。</span>
+<span class="sd">        パラメータの `container` はレンダリング先のDOM要素、</span>
+<span class="sd">        パラメータの `result` はレンダリング対象の結果オブジェクトです。</span>
+<span class="sd">        パラメータの `result` はMCPのツールコールの結果（通常コマンドレットの実行結果オブジェクト）です。</span>
+<span class="sd">        get_renderer_htmlで生成されるHTMLの一部として使用されます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uri (str): リソースURI</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: JavaScript関数の文字列</span>
+<span class="sd">        """</span>
+        <span class="n">mcpapps_render_function</span> <span class="o">=</span> <span class="s1">'''</span>
+<span class="s1">mcpapps.render = (container, result) =&gt; {</span>
+<span class="s1">    container.replaceChildren();</span>
+<span class="s1">    const content = mcpapps.answerOf(result);</span>
+<span class="s1">    if (content === null || (Array.isArray(content) &amp;&amp; content.length === 0)) {</span>
+<span class="s1">        mcpapps.warn('The processing results could not be loaded.');</span>
+<span class="s1">        return;</span>
+<span class="s1">    }</span>
+<span class="s1">    container.appendChild(mcpapps.renderNode(content));</span>
+<span class="s1">};</span>
+<span class="s1">'''</span>
+        <span class="k">return</span> <span class="n">mcpapps_render_function</span></div>
 </div>
 
 

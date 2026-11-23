@@ -28,21 +28,22 @@ To install the project, follow these steps:
     .. code-block:: cmd
 
         winget install astral-sh.uv
-        uv python install 3.11
-        uv venv -p 3.11 --seed --link-mode=copy
+        uv python install 3.12
+        uv venv -p 3.12 --seed --link-mode=copy
         .venv\\Scripts\\activate
 
     .. code-block:: bash
 
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        uv python install 3.11
-        uv venv -p 3.11 --seed --link-mode=copy
+        uv python install 3.12
+        uv venv -p 3.12 --seed --link-mode=copy
         . .venv/bin/activate
 
 4. Install project dependencies:
 
     .. code-block:: bash
 
+        uv cache clean
         uv sync --extra app --extra dev --link-mode=copy
         uv pip uninstall cmdbox
         uv pip install --upgrade pip

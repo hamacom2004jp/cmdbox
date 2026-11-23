@@ -225,27 +225,32 @@ pathrule:                      # List of RESTAPI rules, rules that determine whe
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.
   - groups:                    # Specify the groups to which the rule applies.
-    - admin
     - develop
     - master
     paths: [/]                 # Specify the "path" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
+  - groups: [admin]
+    paths: [/audit, /users, /groups, /roles, /cmdrules, /pathrules, /passsetting]
+    rule: allow
   - groups: [guest]
-    paths: [/signin, /assets, /copyright, /dosignin, /dosignout, /password/change,
-            /gui, /get_server_opt, /usesignout,
+    paths: [/signin, /signin_translation, /ru,
+            /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
+            /gui, /get_server_opt, /usesignout, /oauth2, /saml,
             /versions, /versions_cmdbox, /versions_used]
     rule: allow
-  - groups: [user]
-    paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
+  - groups: [admin, user]
+    paths: [/signin, /signin_translation, /ru,
+            /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
+            /gui, /get_server_opt, /usesignout, /oauth2, /saml,
             /gui/user_data/load, /gui/user_data/save, /gui/user_data/delete,
             /agent, /a2a, /a2a_reload, /mcp,
-            /exec_cmd, /exec_pipe, /filer, /result, /gui, /get_server_opt, /usesignout,
+            /exec_cmd, /exec_sse_cmd, /exec_pipe, /filer, /result,
             /versions, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [readonly]
     paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
     rule: deny
-  - groups: [editor]
+  - groups: [admin, editor]
     paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
     rule: allow
 password:                       # Password settings.

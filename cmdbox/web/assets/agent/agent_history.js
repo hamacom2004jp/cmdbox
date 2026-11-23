@@ -48,9 +48,13 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
             return;
         }
         agentView.chatMessages.html('');
-        let agent_message_id = null;
         for (const event of session['events']) {
-            event['message'] = event['text'] || '';
+            event['message'] = event['text'] || event['message'] || '';
+            if (event['author']=='user') {
+                const ctx = {session_id:session_id, runner_name:runner_name};
+                agentView.create_user_message(event['message'], ctx);
+                continue;
+            }
             agentView.onmessage && agentView.onmessage({success: event});
         }
     });
