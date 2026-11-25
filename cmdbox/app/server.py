@@ -85,6 +85,7 @@ return new_value
         if self.redis_cli is None:
             self.redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
         svlist = self.redis_cli.list_server()
+        svlist = [sv for sv in svlist if sv.get('svname', '').startswith(f"{self.org_svname}-")]
         if len(svlist) <= 0:
             return dict(warn="No server is running.")
         return dict(success=svlist)

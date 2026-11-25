@@ -77,7 +77,7 @@ class UrlAdd(feature.OneshotResultEdgeFeature, validator.Validator):
             url_id = common.random_string(size=8)
             
             # .urlsフォルダを作成
-            urls_dir = Path(self.default_data) / '.urls'
+            urls_dir = Path(args.client_data) / '.urls'
             urls_dir.mkdir(parents=True, exist_ok=True)
             
             # JSONファイルのパスを指定

@@ -65,6 +65,8 @@ dependencies = [
     "rich>=13.9.4,<14.0",
     "six",
     "starsessions[redis]",
+    "sqlalchemy",
+    "sqlglot",
     "sqlite_vec",
     "tabulate",
     "uvicorn",

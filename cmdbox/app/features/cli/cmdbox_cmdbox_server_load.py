@@ -91,7 +91,8 @@ class CmdboxServerLoad(cmdbox_base.CmdboxBase, validator.Validator):
             install_tag = f"_{args.install_tag}" if hasattr(args, 'install_tag') and args.install_tag else ''
             imgname = self.get_imgname(container, args)
             comp, docker_compose_path = self.make_compose_server(logger, args.compose_path, container, imgname, user, args.data,
-                                                                 start_sh_tgt, args.install_use_gpu, install_tag, args.language)
+                                                                 start_sh_tgt, args.install_use_gpu, install_tag, args.language,
+                                                                 tenant_id=args.tenant_id)
             with open(docker_compose_path, 'w', encoding='utf-8') as fp:
                 yaml.dump(comp, fp)
             ret = self.load(logger, args.compose_path, container, install_tag, args.image_file)

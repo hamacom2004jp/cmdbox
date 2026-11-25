@@ -379,6 +379,10 @@ class Options:
             type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None, web="fixed",
             description_ja="コマンドレットの実行を許可するグループを指定します。",
             description_en="Specify the groups that are allowed to run the command-let.")
+        self._options["tenant_id"] = dict(
+            type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None, web="fixed",
+            description_ja="テナントIDを指定します。",
+            description_en="Specify the tenant ID.")
 
     def init_debugoption(self):
         # デバックオプションを追加
@@ -402,6 +406,7 @@ class Options:
         self._options["signin_user"]["opt"] = "signin_user"
         self._options["signin_groups"]["opt"] = "signin_groups"
         self._options["allow_groups"]["opt"] = "allow_groups"
+        self._options["tenant_id"]["opt"] = "tenant_id"
 
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
@@ -448,6 +453,8 @@ class Options:
                     c["choice"].append(self._options["signin_groups"])
                 if "allow_groups" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["allow_groups"])
+                if "tenant_id" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["tenant_id"])
 
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]
@@ -503,9 +510,11 @@ class Options:
         """
         return ftype in self.features_loaded and self.features_loaded[ftype]
 
-    def _load_features_yml(self, ver, logger:logging.Logger=None):
+    def _load_features_yml(self, tenant_id:str, ver, logger:logging.Logger=None):
         # cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む
-        features_yml = Path(f'.{ver.__appid__}/features.yml')
+        features_yml = Path(f'.{ver.__appid__}') / 'features.yml'
+        if tenant_id:
+            features_yml = Path(f'.{ver.__appid__}') / tenant_id / 'features.yml'
         if not features_yml.exists() or not features_yml.is_file():
             # cmdboxを拡張したアプリの組み込みfeatures.ymlを読み込む
             features_yml = Path(ver.__file__).parent / 'extensions' / 'features.yml'
@@ -523,12 +532,13 @@ class Options:
             return yml
         return None
 
-    def load_features_file(self, ftype:str, func, appcls, ver, language, logger:logging.Logger=None):
+    def load_features_file(self, ftype:str, func, tenant_id:str, appcls, ver, language, logger:logging.Logger=None):
         """
         フィーチャーファイル（features.yml）を読み込みます。
 
         Args:
             ftype (str): フィーチャータイプ。cli又はweb
+            tenant_id (str): テナントID
             func (Any): フィーチャーの処理関数
             appcls (Any): アプリケーションクラス
             ver (Any): バージョンモジュール
@@ -538,7 +548,7 @@ class Options:
         # 読込み済みかどうかの判定
         if self.is_features_loaded(ftype):
             return
-        yml = self._load_features_yml(ver, logger)
+        yml = self._load_features_yml(tenant_id, ver, logger)
         if yml is None: return
         if 'features' not in yml:
             raise Exception('features.yml is invalid. (The root element must be "features".)')

@@ -7,7 +7,9 @@ import argcomplete
 import logging
 import os
 import queue
+import re
 import threading
+import shlex
 import sys
 
 
@@ -41,6 +43,28 @@ class CmdBoxApp:
         self.cli_features_packages = cli_features_packages
         self.cli_features_prefix = cli_features_prefix
 
+    @staticmethod
+    def _tenant_path(value, tenant_id:str):
+        if not value:
+            return value
+        path = Path(value)
+        return str(path if tenant_id in path.parts else path / tenant_id)
+
+    @staticmethod
+    def _tenant_file(value, tenant_id:str):
+        if not value:
+            return value
+        path = Path(value)
+        if tenant_id in path.parts:
+            return str(path)
+        return str(path.parent / tenant_id / path.name)
+
+    @staticmethod
+    def _tenant_svname(value, tenant_id:str):
+        if not value or str(value).startswith(f"{tenant_id}_"):
+            return value
+        return f"{tenant_id}_{value}"
+
     def main(self, args_list:list=None, file_dict:dict=dict(), webcall:bool=False, resqueue:queue.Queue=None):
         """
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
@@ -53,8 +77,41 @@ class CmdBoxApp:
             parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
                                             formatter_class=argparse.RawDescriptionHelpFormatter)
         if args_list is not None and isinstance(args_list, list):
-            args_list = [item[1:-1] if isinstance(item, str) and len(item) >= 2 and item[0] in ('"', "'") and item[-1] == item[0] else item \
-                         for item in args_list]
+            # 引数リストの中にシングルクォートやダブルクォートで囲まれた文字列がある場合に処理する
+            al = []
+            for item in args_list:
+                if not isinstance(item, str) or len(item) < 2 or item[0] not in ('"', "'") or item[-1] != item[0]:
+                    al.append(item)
+                    continue
+                try:
+                    p = shlex.split(item)
+                    if len(p) == 1:
+                        al.append(p[0])
+                        continue
+                except ValueError:
+                    pass
+                al.append(item)
+            args_list = al
+        # テナントIDの取得
+        tenant_id = tenant_dir = None
+        if args_list is not None and '--tenant_id' in args_list:
+            tenant_id = args_list[args_list.index('--tenant_id') + 1]
+        elif sys.argv is not None and '--tenant_id' in sys.argv:
+            tenant_id = sys.argv[sys.argv.index('--tenant_id') + 1]
+        if tenant_id:
+            if not re.fullmatch(r'[A-Za-z0-9_]+', tenant_id):
+                msg = dict(warn=f"Invalid tenant_id: {tenant_id}")
+                common.print_format(msg, False, smaintime)
+                if resqueue is not None: resqueue.put(msg)
+                return feature.Feature.RESP_WARN, msg, None
+            tenant_dir = Path.cwd() / f'.{self.ver.__appid__}' / tenant_id
+            if not tenant_dir.is_dir():
+                msg = dict(warn=f"Tenant directory not found: {tenant_id}")
+                common.print_format(msg, False, smaintime)
+                if resqueue is not None: resqueue.put(msg)
+                return feature.Feature.RESP_WARN, msg, None
+
+        # デバッグモードの判定
         if args_list is not None and '--debug' in args_list:
             self.default_logger = common.default_logger(True, ver=self.ver, webcall=webcall)
         elif sys.argv is not None and '--debug' in sys.argv:
@@ -73,8 +130,8 @@ class CmdBoxApp:
 
         # プラグイン読込み
         sfeatureloadtime = common.perf_counter()
-        common.copy_sample(Path.cwd(), ver=self.ver)
-        self.options._load_features_yml(self.ver, logger=self.default_logger)
+        common.copy_sample(Path.cwd(), ver=self.ver, tenant_id=tenant_id)
+        self.options._load_features_yml(tenant_id, self.ver, logger=self.default_logger)
         self.options.load_features_agentrule(self.default_logger)
         #self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[],
         #                        appcls=self.appcls, ver=self.ver, language=self.default_language,
@@ -88,7 +145,8 @@ class CmdBoxApp:
                 self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], excludes=[],
                                         appcls=self.appcls, ver=self.ver, language=self.default_language,
                                         logger=self.default_logger)
-        self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_language, self.default_logger)
+        self.options.load_features_file('cli', self.options.load_svcmd, tenant_id,
+                                        self.appcls, self.ver, self.default_language, logger=self.default_logger)
         self.options.load_features_aliases_cli(self.default_logger)
         self.options.load_features_audit(self.default_logger)
         efeatureloadtime = common.perf_counter()
@@ -159,6 +217,16 @@ class CmdBoxApp:
 
         if not hasattr(args, 'data') or args.data is None:
             args.data = str(Path.home() / f".{self.ver.__appid__}")
+        # テナントIDが指定されている場合、パスとサービス名をテナント配下へ切り替える
+        if tenant_id:
+            if hasattr(args, 'svname') and args.svname:
+                args.svname = self._tenant_svname(args.svname, tenant_id)
+            args.data = self._tenant_path(args.data, tenant_id)
+            if hasattr(args, 'client_data') and args.client_data:
+                args.client_data = self._tenant_path(args.client_data, tenant_id)
+            if hasattr(args, 'signin_file') and args.signin_file:
+                args.signin_file = self._tenant_file(args.signin_file, tenant_id)
+
         common.mklogdir(args.data)
 
         if args.version:

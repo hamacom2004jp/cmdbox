@@ -90,7 +90,7 @@ class WebUserDel(feature.UnsupportEdgeFeature, validator.Validator):
         w = None
         try:
             client_data = Path(args.client_data or args.data)
-            w = web.Web.getInstance(logger, client_data, appcls=self.appcls, ver=self.ver,
+            w = web.Web.getInstance(logger, client_data, tenant_id=args.tenant_id, appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)

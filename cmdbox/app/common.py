@@ -553,13 +553,14 @@ from cmdbox.app.commons import convert, module, loghandler
 
 
 HOME_DIR = Path(os.path.expanduser("~"))
-def copy_sample(data:Path, ver=version):
+def copy_sample(data:Path, ver=version, tenant_id:str=None):
     """
     サンプルデータをコピーします。
 
     Args:
         data (Path): データディレクトリ
         ver (version, optional): バージョン. Defaults to version
+        tenant_id (str, optional): テナントID. Defaults to None
     """
     # サンプルデータをコピー
     dst_sample = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
@@ -573,6 +574,8 @@ def copy_sample(data:Path, ver=version):
         shutil.copytree(src_sample, dst_sample, dirs_exist_ok=True, copy_function=copy)
     # 設定ファイルをコピー
     dst_config = Path(data) / f'.{ver.__appid__}' if data is not None else HOME_DIR / f'.{ver.__appid__}'
+    if tenant_id:
+        dst_config = dst_config / tenant_id
     dst_config.mkdir(parents=True, exist_ok=True)
     if not (dst_config / 'features.yml').exists():
         shutil.copy2(src / 'features.yml', dst_config / 'features.yml')

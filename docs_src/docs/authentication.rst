@@ -20,6 +20,8 @@ Configuration items in `user_list.yml`
       groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
       email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
       home: /.users/admin          # The home directory of the user, used for file operations.
+      roles:                       # A list of roles assigned to the user.
+      - USERADMIN                  # Role types are system-specific and are defined in `cmdbox.app.auth.role` module.
     - uid: 2
       name: develop
       password: XXXXXXXXXXXXXX
@@ -27,6 +29,9 @@ Configuration items in `user_list.yml`
       groups: [develop]
       email: develop@aaa.bbb.jp
       home: /.users/develop
+      roles:
+      - PFDEVELOPER
+      buildin: true                # Whether the user is a built-in user. Built-in users cannot be deleted.
     - uid: 3
       name: master
       password: XXXXXXXXXXXXXX
@@ -34,6 +39,9 @@ Configuration items in `user_list.yml`
       groups: [master]
       email: master@aaa.bbb.jp
       home: /.users/master
+      roles:
+      - PFMASTER
+      buildin: true
     - uid: 101
       name: user01
       password: XXXXXXXXXXXXXX
@@ -41,6 +49,8 @@ Configuration items in `user_list.yml`
       groups: [user]
       email: user01@aaa.bbb.jp
       home: /.users/user01
+      roles:
+      - MEMBER
     - uid: 102
       name: user02
       password: XXXXXXXXXXXXXX
@@ -48,6 +58,8 @@ Configuration items in `user_list.yml`
       groups: [readonly]
       email: user02@aaa.bbb.jp
       home: /.users/user02
+      roles:
+      - MEMBER
     - uid: 103
       name: user03
       password: XXXXXXXXXXXXXX
@@ -55,155 +67,211 @@ Configuration items in `user_list.yml`
       groups: [editor]
       email: user03@aaa.bbb.jp
       home: /.users/user03
+      roles:
+      - MANAGER
     groups:                        # A list of groups, each of which is a map that contains the following fields.
     - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
       name: admin                  # A name that identifies the group. No two groups can have the same name.
       home: /.groups/admin         # The home directory of the group, used for file operations.
+      startpage: /agent            # The group's start page.
+                                   # This is the page to which users belonging to the group are redirected when they access the “/” path.
+      readonly: true               # Whether the group is read-only. If True, the settings for this group cannot be changed.
+      hidden: false                # Whether the group is hidden. If True, it will not be returned in the group list.
     - gid: 2
       name: develop
       home: /.groups/develop
+      startpage: /gui
+      buildin: true                # Whether the group is a built-in group. Built-in groups cannot be deleted.
+      readonly: true
+      hidden: true
     - gid: 3
       name: master
       home: /.groups/master
+      startpage: /gui
+      buildin: true
+      readonly: true
+      hidden: true
     - gid: 4
       name: guest
       home: /.groups/guest
+      startpage: /agent
+      readonly: true
+      hidden: false
     - gid: 101
       name: user
       home: /.groups/user
+      startpage: /agent
+      readonly: true
+      hidden: false
     - gid: 102
       name: readonly
       parent: user                 # The parent group of the group. If the parent group is not specified, the group is a top-level group.
       home: /.groups/readonly
+      readonly: true
+      hidden: false
     - gid: 103
       name: editor
       parent: user
       home: /.groups/editor
+      readonly: true
+      hidden: false
     cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
       policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
       rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
-      - groups: [admin]
-        coercion:
-          fwpath: "['/.users','/.groups']"
-          from_fwpath: "['/.users','/.groups']"
-          to_fwpath: "['/.users','/.groups']"
-        rule: allow
-      - groups: [develop, master]
-        coercion:
-          fwpath: "['/']"
-          from_fwpath: "['/']"
-          to_fwpath: "['/']"
-        rule: allow
-      - groups: [admin, master]
-        mode: test
-        rule: deny
-      - groups: [user]             # Specify the groups to which the rule applies.
-        mode: client               # Specify the "mode" as the condition for applying the rule.
-        cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+      - groups: [develop, master]  # Specify the groups to which the rule applies.
         coercion:                  # Specify a coercion value for each item to be set when a rule is matched.
                                    # e.g. wpath: f"/users/{user_name}"
-          fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-          from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-          to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+          fwpath: "['/']"
+          rjpath: "[]"
+          from_fwpath: "['/']"
+          to_fwpath: "['/']"
+          from_rjpath: '[]'
+          to_rjpath: '[]'
         rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
-      - groups: [user]
-        mode: agent
-        cmds: [chat, agent_list, mcp_client, mcpsv_list, memory_list, runner_list,
-               memory_status, runner_load,
-               session_list, session_del, start, stop]
+      - groups: [admin]
+        coercion:
+          fwpath: "['/.users/','/.groups/']"
+          rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
+          from_fwpath: "['/.users/','/.groups/']"
+          to_fwpath: "['/.users/','/.groups/']"
+          from_rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
+          to_rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
+        rule: deny
+      - groups: [guest, user]
+        coercion:
+          fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
+          rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
+          from_fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
+          to_fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
+          from_rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
+          to_rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
+        rule: deny
+      - groups: [admin]
+        mode: limiter              # Specify the "mode" as the condition for applying the rule.
+        cmds: [counter, evidences, # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+               list, load, targets, plan_list, plan_load]
         rule: allow
-      - groups: [user]
-        mode: cmd
-        cmds: [list, load]
+      - groups: [admin]
+        mode: web
+        cmds: [user_add, user_del, user_edit, user_list, group_add, group_del, group_edit, group_list]
         rule: allow
-      - groups: [user]
-        mode: embed
+      - groups: [master]
+        mode: test
+        rule: deny
+      - groups: [admin, guest, user]
+        mode: tts
+        cmds: [list, say] 
+        rule: allow
+      - groups: [admin, guest, user]
+        mode: datasource
         cmds: [list]
         rule: allow
-      - groups: [user]
+      - groups: [admin, guest, user]
+        mode: llm
+        cmds: [list, chat, embed, translation]
+        rule: allow
+      - groups: [admin, user]
+        mode: client
+        cmds: [file_download, file_is, file_list, server_info, time]
+        rule: allow
+      - groups: [admin, user]
+        mode: agent
+        cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list, runner_load,
+               session_list, session_del, start, stop]
+        rule: allow
+      - groups: [admin, user]
+        mode: cmd
+        cmds: [list, load, check]
+        rule: allow
+      - groups: [admin, user]
         mode: extract
         cmds: [list, pdfplumber, chunklet]
         coercion:
-          fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+          fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
         rule: allow
-      - groups: [user]
-        mode: llm
-        cmds: [list]
-        rule: allow
-      - groups: [user]
+      - groups: [admin, user]
         mode: rag
         cmds: [list]
         rule: allow
-      - groups: [user]
+      - groups: [admin, guest, user]
+        mode: datasource
+        cmds: [list]
+        rule: allow
+      - groups: [admin, user]
         mode: server
         cmds: [list]
         rule: allow
-      - groups: [user, guest]
+      - groups: [admin, user]
+        mode: skill
+        cmds: [list]
+        rule: allow
+      - groups: [admin, user, guest]
         mode: audit
         cmds: [write]
         rule: allow
-      - groups: [user, guest]
+      - groups: [admin, user, guest]
         mode: web
-        cmds: [genpass]
+        cmds: [genpass, totp_del, totp_load, totp_save, totp_valid]
         rule: allow
-      - groups: [user]
+      - groups: [admin, user, guest]
+        mode: url
+        cmds: [add, del, load]
+        rule: allow
+      - groups: [admin, editor]
         mode: client
         cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
-        coercion:
-          fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-          from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-          to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
         rule: allow
-      - groups: [editor]
+      - groups: [admin, editor]
         mode: agent
-        cmds: [agent_del, mcpsv_del, memory_del, runner_del,
-               agent_load, mcpsv_load, memory_load, runner_load,
-               agent_save, mcpsv_save, memory_save, runner_save,]
+        cmds: [agent_del, mcpsv_del, runner_del,
+               agent_load, mcpsv_load, runner_load,
+               agent_save, mcpsv_save, runner_save,]
         rule: allow
-      - groups: [editor]
+      - groups: [admin, editor]
         mode: extract
         cmds: [del, load, save]
         rule: allow
-      - groups: [editor]
+      - groups: [admin, editor]
         mode: llm
         cmds: [del, load, save]
-        rule: allow
-      - groups: [editor]
-        mode: embed
-        cmds: [del, load, save, start, stop]
         rule: allow
     pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
       policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
       rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.
       - groups:                    # Specify the groups to which the rule applies.
-        - admin
         - develop
         - master
         paths: [/]                 # Specify the "path" to which the rule applies. Multiple items can be specified in a list.
         rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
+      - groups: [admin]
+        paths: [/audit, /users, /groups, /roles, /cmdrules, /pathrules, /passsetting]
+        rule: allow
       - groups: [guest]
-        paths: [/signin, /assets, /copyright, /dosignin, /dosignout, /password/change,
-                /gui, /get_server_opt, /usesignout,
+        paths: [/signin, /signin_translation, /ru,
+                /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
+                /gui, /get_server_opt, /usesignout, /oauth2, /saml,
                 /versions, /versions_cmdbox, /versions_used]
         rule: allow
-      - groups: [user]
-        paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
+      - groups: [admin, user]
+        paths: [/signin, /signin_translation, /ru,
+                /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
+                /gui, /get_server_opt, /usesignout, /oauth2, /saml,
                 /gui/user_data/load, /gui/user_data/save, /gui/user_data/delete,
                 /agent, /a2a, /a2a_reload, /mcp,
-                /exec_cmd, /exec_pipe, /filer, /result, /gui, /get_server_opt, /usesignout,
+                /exec_cmd, /exec_sse_cmd, /exec_pipe, /filer, /result,
                 /versions, /versions_cmdbox, /versions_used]
         rule: allow
       - groups: [readonly]
         paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
         rule: deny
-      - groups: [editor]
+      - groups: [admin, editor]
         paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
         rule: allow
     password:                       # Password settings.
       policy:                       # Password policy settings.
         enabled: true               # Specify whether or not to enable password policy.
         not_same_before: true       # Specify whether or not to allow the same password as the previous one.
-        min_length: 16              # Specify the minimum length of the password.
+        min_length: 8               # Specify the minimum length of the password.
         max_length: 64              # Specify the maximum length of the password.
         min_lowercase: 1            # Specify the minimum number of lowercase letters in the password.
         min_uppercase: 1            # Specify the minimum number of uppercase letters in the password.
@@ -242,6 +310,11 @@ Configuration items in `user_list.yml`
         issuer: identity_provider       # Specify the issuer of the JWT. This is usually the name of the identity provider. (If not specified, no verification)
         audience: app_organization      # Specify the audience of the JWT. This is usually the name of the organization that will use the application. (If not specified, no verification)
         algorithm: RS256                # Specify the algorithm used to verify the JWT. The value can be RS256, PS256, or ES256.
+    signin:                             # Sign-in settings.
+      signin_module:                    # Specify the module name that implements the sign-in for the authentication provider.
+        cmdbox.app.auth.signin
+      role_module:                     # Specify the module name that implements role management.
+        cmdbox.app.auth.role
     oauth2:                             # OAuth2 settings.
       providers:                        # This is a per-provider setting for OAuth2.
         google:                         # Google's OAuth2 configuration.

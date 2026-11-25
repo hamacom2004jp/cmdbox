@@ -87,7 +87,7 @@ class Mcp:
         Returns:
             ToolList: ToolListのリスト
         """
-        tool_list = ToolListProvider(logger, self.data, mcp=mcp, appcls=self.appcls, ver=self.ver, language=self.language)
+        tool_list = ToolListProvider(logger, self.data, tenant_id=args.tenant_id, mcp=mcp, appcls=self.appcls, ver=self.ver, language=self.language)
         tool_list.extract_callable = extract_callable
         return tool_list
 
@@ -153,13 +153,15 @@ class Mcp:
 
 
 class ToolListProvider(Provider):
-    def __init__(self, logger:logging.Logger, data:Path, *tools:List, mcp:FastMCP=None, appcls=None, ver=None, language:str=None):
+    def __init__(self, logger:logging.Logger, data:Path, tenant_id:str,
+                 *tools:List, mcp:FastMCP=None, appcls=None, ver=None, language:str=None):
         """
         ツールリストを初期化します
 
         Args:
             logger (logging.Logger): ロガー
             data (Path): データパス
+            tenant_id (str): テナントID
             *tools (List): 追加するツールのリスト
             mcp (FastMCP, optional): FastMCP インスタンス. Defaults to None.
             appcls ([type], optional): アプリケーションクラス. Defaults to None.
@@ -170,6 +172,7 @@ class ToolListProvider(Provider):
         self.tools = []
         self.logger = logger
         self.data = data
+        self.tenant_id = tenant_id
         self.extract_callable = False
         self.appcls = appcls
         self.ver = ver
@@ -311,7 +314,7 @@ class ToolListProvider(Provider):
         from fastmcp.tools import FunctionTool
         options = Options.getInstance()
         ret_tools = self.tools.copy()
-        web = Web.getInstance(self.logger, self.data)
+        web = Web.getInstance(self.logger, self.data, self.tenant_id)
         is_japan = common.is_japan(language=web.language)
         data = web.signin.signin_file_data
         if data is None:

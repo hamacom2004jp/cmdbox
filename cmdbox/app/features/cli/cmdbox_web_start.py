@@ -208,7 +208,7 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             web.Web: Webオブジェクト
         """
-        w = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver, language=args.language,
+        w = web.Web.getInstance(logger, Path(args.data), tenant_id=args.tenant_id, appcls=self.appcls, ver=self.ver, language=args.language,
                     redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                     client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,

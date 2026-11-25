@@ -281,7 +281,8 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase, validator.Validator):
             dockerfile.unlink(missing_ok=True)
 
             comp, docker_compose_path = self.make_compose_server(logger, compose_path, container, imgname, user, data,
-                                                                 start_sh_tgt, install_use_gpu, install_tag, language)
+                                                                 start_sh_tgt, install_use_gpu, install_tag, language,
+                                                                 tenant_id=args.tenant_id)
             with open(docker_compose_path, 'w', encoding='utf-8') as fp:
                 yaml.dump(comp, fp)
             if returncode != 0:

@@ -67,7 +67,7 @@ class UrlLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         """
         try:
             # JSONファイルのパスを指定
-            urls_dir = Path(self.default_data) / '.urls'
+            urls_dir = Path(args.client_data) / '.urls'
             
             # パストラバーサル対策: url_idが.urls内に留まることを確認
             is_safe, error_msg = validator.Validator.validate_safe_path(urls_dir, f"{args.url_id}.json")

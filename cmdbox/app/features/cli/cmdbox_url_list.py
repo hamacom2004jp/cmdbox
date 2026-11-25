@@ -68,7 +68,7 @@ class UrlList(feature.OneshotResultEdgeFeature, validator.Validator):
             results: List[Dict[str, Any]] = []
             
             # .urlsフォルダを確認
-            urls_dir = Path(self.default_data) / '.urls'
+            urls_dir = Path(args.client_data) / '.urls'
             if not urls_dir.exists():
                 msg = dict(success=dict(data=results, msg="No URLs found."))
                 common.print_format(msg, args.format, tm, pf=pf)

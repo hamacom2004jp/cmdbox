@@ -92,7 +92,8 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         # サーバーを起動
-        args.svname = f"{self.ver.__appid__}_setup"
+        svname = f"{self.ver.__appid__}_setup"
+        args.svname = f"{args.tenant_id}_{svname}" if args.tenant_id else svname
         args.data = Path(args.data).resolve() if args.data is not None else None
 
         # server_countで指定した数だけサーバープロセスを起動

@@ -116,7 +116,8 @@ class Web:
             cls._instance = cls(*args, **kwargs)
         return cls._instance
 
-    def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None, language:str=None,
+    def __init__(self, logger:logging.Logger, data:Path, tenant_id:str=None,
+                 appcls=None, ver=None, language:str=None,
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  retry_count:int=3, retry_interval:int=5, timeout:int=60,
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None,
@@ -131,6 +132,7 @@ class Web:
         Args:
             logger (logging): ロガー
             data (Path): コマンドやパイプラインの設定ファイルを保存するディレクトリ
+            tenant_id (str, optional): テナントID. Defaults to None.
             appcls ([type], optional): アプリケーションクラス. Defaults to None.
             ver ([type], optional): バージョン. Defaults to None.
             language (str, optional): 言語. Defaults to None.
@@ -164,6 +166,7 @@ class Web:
         self.logger = logger
         self.debug = self.logger.level == logging.DEBUG
         self.data = data
+        self.tenant_id = tenant_id
         self.appcls = appcls
         self.ver = ver
         self.language = language
@@ -301,7 +304,7 @@ class Web:
                 wf_route(pn, self.web_features_prefix[i], [], self, app, self.appcls, self.ver, self.language, self.logger)
         self.options.load_features_file('web',
                                         lambda pk, pn, excludes, appcls, ver, language, logger, _: wf_route(pk, pn, excludes, self, app, appcls, ver, language, logger),
-                                        self.appcls, self.ver, self.language, self.logger)
+                                        self.tenant_id, self.appcls, self.ver, self.language, self.logger)
         wf_route("cmdbox.app.features.web", "cmdbox_web_", [], self, app, self.appcls, self.ver, self.language, self.logger)
         # エイリアスの登録
         self.options.load_features_aliases_web(app.routes, self.logger)
@@ -1508,7 +1511,8 @@ class Web:
         try:
             def _w(f):
                 f.write(str(os.getpid()))
-            common.save_file("web.pid", _w, nolock=False)
+            pid_path = self.data / "web.pid"
+            common.save_file(pid_path, _w, nolock=False)
             while self.is_running:
                 gevent.sleep(1)
             if th is not None:
@@ -1536,8 +1540,9 @@ class Web:
                     self.logger.info(f"Stop web.")
                 else:
                     self.logger.warning(f"pid is empty.")
-            common.load_file("web.pid", _r, nolock=True)
-            Path("web.pid").unlink(missing_ok=True)
+            pid_path = self.data / "web.pid"
+            common.load_file(pid_path, _r, nolock=True)
+            pid_path.unlink(missing_ok=True)
         except:
             traceback.print_exc()
         finally:

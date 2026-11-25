@@ -72,8 +72,9 @@ class A2asvStop(feature.UnsupportEdgeFeature, validator.Validator):
                 else:
                     logger.warning(f"pid is empty.")
 
-            common.load_file("a2a.pid", _r, nolock=True)
-            Path("a2a.pid").unlink(missing_ok=True)
+            pid_path = Path(args.data) / "a2a.pid"
+            common.load_file(pid_path, _r, nolock=True)
+            pid_path.unlink(missing_ok=True)
             msg = dict(success="a2a complate.")
             common.print_format(msg, args.format, tm, pf=pf)
             return self.RESP_SUCCESS, msg, None

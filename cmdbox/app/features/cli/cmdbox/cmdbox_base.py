@@ -577,7 +577,7 @@ class CmdboxBase(feature.OneshotEdgeFeature):
 
     def make_compose_server(self, logger:logging.Logger, compose_path:str, container:str,
                             imgname:str, user:str, data:str, start_sh_tgt:str, install_use_gpu:bool,
-                            install_tag:str, language:str) -> tuple[Dict[str, Any], Path]:
+                            install_tag:str, language:str, tenant_id:str=None) -> tuple[Dict[str, Any], Path]:
         """
         server用のdocker-compose.ymlを作成します。
         
@@ -592,6 +592,7 @@ class CmdboxBase(feature.OneshotEdgeFeature):
             install_use_gpu (bool): GPUを使用してインストールするかどうか
             install_tag (str): インストールタグ
             language (str): 言語
+            tenant_id (str, optional): テナントID
 
         Returns:
             dict: composeファイルの内容
@@ -606,6 +607,9 @@ class CmdboxBase(feature.OneshotEdgeFeature):
         with open(docker_compose_path, 'r', encoding='utf-8') as fp:
             comp = yaml.safe_load(fp)
 
+            svname = self.ver.__appid__ + install_tag
+            if tenant_id:
+                svname = f"{tenant_id}_{svname}"
             services = comp['services']
             services[container] = dict(
                 image=imgname,
@@ -617,7 +621,7 @@ class CmdboxBase(feature.OneshotEdgeFeature):
                     REDIS_HOST='${REDIS_HOST:-redis}',
                     REDIS_PORT='${REDIS_PORT:-6379}',
                     REDIS_PASSWORD='${REDIS_PASSWORD:-password}',
-                    SVNAME='${SVNAME:-'+self.ver.__appid__+install_tag+'}',
+                    SVNAME='${SVNAME:-'+svname+'}',
                     LISTEN_PORT='${LISTEN_PORT:-8081}',
                     MCPSV_LISTEN_PORT='${MCPSV_LISTEN_PORT:-8091}',
                     A2ASV_LISTEN_PORT='${A2ASV_LISTEN_PORT:-8071}',

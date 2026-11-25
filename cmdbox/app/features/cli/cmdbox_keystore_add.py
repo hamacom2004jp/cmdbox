@@ -179,7 +179,7 @@ class KeystoreAdd(feature.OneshotResultEdgeFeature, validator.Validator):
         if hasattr(args, 'key_provider') and args.key_provider is None:
             args.key_provider = self.ver.__appid__
         if key_type == 'apikey' and hasattr(args, 'key_value') and args.key_value is None:
-            w = web.Web.getInstance(logger, args.data, appcls=self.appcls, ver=self.ver,
+            w = web.Web.getInstance(logger, args.data, tenant_id=args.tenant_id, appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)

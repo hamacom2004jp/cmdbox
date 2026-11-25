@@ -70,6 +70,16 @@ Configuration items in `features.yml`
       write:
         mode: audit                         # Specify the mode of the feature to be writed.
         cmd: write                          # Specify the command to be writed.
+        exclude_clmsg_tag:                  # Specify the list of tags to be excluded from the audit log.
+        - client_file_is
+        - client_file_list
+        - client_file_tail
+        - client_time
+        - cmd_check
+        - limiter_targets
+        - llm_translation
+        - server_list
+        - web_session_list
       search:
         mode: audit                         # Specify the mode of the feature to be searched.
         cmd: search                         # Specify the command to be searched.

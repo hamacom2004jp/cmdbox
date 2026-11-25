@@ -123,7 +123,8 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
                 return self.RESP_WARN, msg, None
             signin_data = signin.Signin.load_signin_file(signin_file, None, self=self, logger=logger) if signin_file is not None else None
             # ツール側で参照できるようにするためにインスタンス化
-            _web = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver, language=args.language,
+            _web = web.Web.getInstance(logger, Path(args.data), tenant_id=args.tenant_id,
+                                       appcls=self.appcls, ver=self.ver, language=args.language,
                                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                                        signin_file=args.signin_file)
@@ -195,7 +196,8 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
             try:
                 def _w(f):
                     f.write(str(os.getpid()))
-                common.save_file("a2a.pid", _w, nolock=False)
+                pid_path = Path(args.data) / "a2a.pid"
+                common.save_file(pid_path, _w, nolock=False)
                 # ブロッキングで稼働
                 import gevent
                 while True:

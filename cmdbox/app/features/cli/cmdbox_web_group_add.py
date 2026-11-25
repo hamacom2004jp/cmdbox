@@ -103,7 +103,7 @@ class WebGroupAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Lim
         w = None
         try:
             client_data = Path(args.client_data or args.data)
-            w = web.Web.getInstance(logger, client_data, appcls=self.appcls, ver=self.ver,
+            w = web.Web.getInstance(logger, client_data, tenant_id=args.tenant_id, appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)
@@ -132,8 +132,8 @@ class WebGroupAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Lim
         return Result
 
     def apprun_registrations(self, data_dir, logger, args, msg):
-        w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
-                    redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
+        w = web.Web(logger, data_dir, tenant_id=args.tenant_id, appcls=self.appcls, ver=self.ver,
+                    redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=args.svname,
                     signin_file=args.signin_file)
         groups = w.group_list(None, ret_hidden=False)
         return len(groups)

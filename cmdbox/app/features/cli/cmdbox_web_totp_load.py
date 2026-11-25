@@ -91,7 +91,7 @@ class WebTotpLoad(feature.UnsupportEdgeFeature, validator.Validator):
         _web = None
         try:
             client_data = Path(args.client_data or args.data)
-            _web = web.Web.getInstance(logger, client_data, appcls=self.appcls, ver=self.ver,
+            _web = web.Web.getInstance(logger, client_data, tenant_id=args.tenant_id, appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)

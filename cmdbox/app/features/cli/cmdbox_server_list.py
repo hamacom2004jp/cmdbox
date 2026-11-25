@@ -48,6 +48,9 @@ class ServerList(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                      description_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
+                dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
+                     description_ja="サーバーのサービス名を指定します。",
+                     description_en="Specify the service name of the server."),
                 dict(opt="timeout", type=Options.T_INT, default="15", required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
@@ -68,7 +71,8 @@ class ServerList(feature.OneshotResultEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname='server') # list取得なのでデフォルトのsvnameを指定
+        #sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname='server') # list取得なのでデフォルトのsvnameを指定
+        sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = sv.list_server()
         common.print_format(ret, args.format, tm, pf=pf)
         if 'success' not in ret:
