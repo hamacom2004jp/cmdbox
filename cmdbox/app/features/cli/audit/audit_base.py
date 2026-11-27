@@ -1,10 +1,12 @@
 from cmdbox.app import feature
 from cmdbox.app.options import Options
 from pathlib import Path
+from psycopg.rows import tuple_row
 from psycopg_pool import ConnectionPool
 from typing import Any
 import logging
 import sqlite3
+from contextlib import contextmanager
 
 
 class AuditBase(feature.ResultEdgeFeature):
@@ -76,7 +78,17 @@ class AuditBase(feature.ResultEdgeFeature):
             
             if AuditBase._pg_pool is None:
                 AuditBase._pg_pool = ConnectionPool(constr, min_size=1, max_size=2)
-            return AuditBase._pg_pool.connection()
+
+            @contextmanager
+            def pg_context():
+                with AuditBase._pg_pool.connection() as conn:
+                    conn.row_factory = tuple_row
+                    try:
+                        yield conn
+                    finally:
+                        conn.row_factory = tuple_row
+
+            return pg_context()
         else:
             db_path = data_dir / '.audit' / 'audit.db'
             #if logger.level == logging.DEBUG:
@@ -112,7 +124,8 @@ class AuditBase(feature.ResultEdgeFeature):
                     #if logger.level == logging.DEBUG:
                     #    logger.debug(f"SQL query: SELECT count(*) FROM information_schema.tables WHERE table_name='audit'")
                     #    logger.debug(f"SQL row  : {row}")
-                    if row[0] == 0:
+                    count = row.get('count', 0) if hasattr(row, 'get') else row[0]
+                    if count == 0:
                         # テーブルが存在しない場合は作成
                         cursor.execute('''
                             CREATE TABLE IF NOT EXISTS audit (

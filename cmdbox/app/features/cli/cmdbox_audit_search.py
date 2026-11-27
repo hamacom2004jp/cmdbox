@@ -3,7 +3,7 @@ from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.features.cli.audit import audit_base
 from cmdbox.app.options import Options
 from pathlib import Path
-from psycopg.rows import dict_row
+from psycopg.rows import dict_row, tuple_row
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import csv
@@ -518,6 +518,8 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                         return rescode
                 finally:
                     cursor.close()
+                    if pg_enabled:
+                        conn.row_factory = tuple_row
         except Exception as e:
             logger.warning(f"Failed to write: {e}", exc_info=True)
             redis_cli.rpush(reskey, dict(warn=f"Failed to write: {e}"))
