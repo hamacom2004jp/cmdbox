@@ -1328,10 +1328,9 @@ class Web:
 
         # 所属グループ以外は編集できない
         signin_data = self.signin.signin_file_data
-        user = [u for u in signin_data['users'] if u['name'] == user_name]
-        if user:
-            user = copy.deepcopy(user[0])
-        if not user:
+        users = [u for u in signin_data['users'] if u['name'] == user_name]
+        user = copy.deepcopy(users[0]) if users else dict()
+        if req is not None and not users and not myrole:
             raise ValueError(f"User not found.")
         if not pfrole and not admrole and not myrole and not self.in_group(req, signin_data, user.get('groups', [])):
             raise ValueError(f"You cannot edit users who are not members of the group.")
